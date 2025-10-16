@@ -9,7 +9,5 @@ final class Assignment extends AbstractCanvasPopulatedModel{
         [GroupCategory::class, "group"]
     ];
 
-    public static function getPluralNames(): array{
-        return ["Assignments"];
-    }
+    public static array $plurals = ["Assignments"];
 }

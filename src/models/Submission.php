@@ -18,8 +18,6 @@ final class Submission extends AbstractCanvasPopulatedModel{
         ["string", "url"], 
         [\DateTime::class, "submittedAt"]
     ];
-
-    public static function getPluralNames(): array{
-        return ["Submissions"];
-    }
+    
+    public static array $plurals = ["Submissions"];
 }

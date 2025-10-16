@@ -9,7 +9,5 @@ use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
 final class Group extends AbstractCanvasPopulatedModel{
     protected static array $properties = [["string", "name"]];
 
-    public static function getPluralNames(): array{
-        return ["Groups"];
-    }
+    public static array $plurals = ["Groups"];
 }

@@ -10,8 +10,6 @@ final class Student extends AbstractCanvasPopulatedModel{
     protected static array $properties = [
         ["string", "name"]
     ];
-
-    public static function getPluralNames(): array{
-        return ["Students"];
-    }
+    
+    public static array $plurals = ["Students"];
 }

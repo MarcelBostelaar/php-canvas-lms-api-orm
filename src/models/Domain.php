@@ -11,7 +11,5 @@ final class Domain implements ModelInterface{
         return $this->domain;
     }
 
-    public function getPluralNames(): array{
-        return ["Domains"];
-    }
+    public static array $plurals = ["Domains"];
 }

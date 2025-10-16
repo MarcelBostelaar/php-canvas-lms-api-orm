@@ -9,7 +9,6 @@ final class Section extends AbstractCanvasPopulatedModel{
         [Course::class, "course"]
     ];
 
-    public static function getPluralNames(): array{
-        return ["Sections"];
-    }
+    
+    public static array $plurals = ["Sections"];
 }

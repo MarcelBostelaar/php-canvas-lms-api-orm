@@ -15,7 +15,5 @@ final class SubmissionFeedback extends AbstractCanvasPopulatedModel{
         [\DateTime::class, "date"]
     ];
 
-    public static function getPluralNames(): array{
-        return ["SubmissionFeedbacks"];
-    }
+    public static array $plurals = ["SubmissionFeedbacks"];
 }
