@@ -1,6 +1,15 @@
 {
     "require": {
-        "nette/php-generator": "^4.2",
         "nikic/php-parser": "^5.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Buildscript\\": "./"
+        },
+        "files":[
+            "models/BuildModels.php",
+            "models/CodeGenModels.php",
+            "providers/BuildProviders.php"
+        ]
     }
 }

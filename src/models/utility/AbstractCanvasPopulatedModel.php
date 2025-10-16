@@ -11,12 +11,16 @@ abstract class AbstractCanvasPopulatedModel implements ModelInterface{
      * @param Domain $domain The domain of the canvas object
      * @param int $id The canvas ID of the object.
      */
-    public function __construct(public readonly Domain $domain, public readonly int $id){
+    public function __construct(private readonly Domain $domain, public readonly int $id){
         $this->processProperties(static::$properties, false);
         $this->processProperties(static::$nullableProperties, false);
     }
     public function getUniqueId(): mixed {
         return $this->domain->domain . "-" . $this::class . "-" . $this->id;
+    }
+    
+    protected function getDomain(): Domain{
+        return $this->domain;
     }
     /**
      * A list of property names to be dynamically generated/handled. 
@@ -37,6 +41,7 @@ abstract class AbstractCanvasPopulatedModel implements ModelInterface{
      * @var array
      */
     protected static array $nullableProperties = [];
+
     private array $virtualProperties = [];
 
     public function __get($name) {
@@ -96,7 +101,7 @@ abstract class AbstractCanvasPopulatedModel implements ModelInterface{
      * @param string $type
      * @return bool
      */
-    private static function isA($value, string $type): bool {
+    protected static function isA($value, string $type): bool {
         return match ($type) {
             'int' => is_int($value),
             'string' => is_string($value),

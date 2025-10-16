@@ -1,7 +1,12 @@
 <?php
 
-require_once __DIR__ . '/BuildModels.php';
-require_once __DIR__ . '/BuildProviders.php';
+namespace Buildscript;
+require_once __DIR__ . '/vendor/autoload.php';
+use function Buildscript\Models\buildModels;
+use function Buildscript\Providers\buildProviders;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
+
 $buildFolder = __DIR__ . '/../build';
 $srcFolder = __DIR__ . '/../src';
 
