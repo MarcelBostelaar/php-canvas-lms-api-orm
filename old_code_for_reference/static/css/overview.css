@@ -1,0 +1,128 @@
+.submissions-container {
+    margin: 20px 0;
+}
+.filters {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+}
+.filter-group {
+    display: inline-block;
+    margin-right: 20px;
+    margin-bottom: 10px;
+}
+.filter-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.filter-group input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 200px;
+}
+.submissions-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+.submissions-table th,
+.submissions-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+    vertical-align: top;
+}
+.submissions-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+}
+.submissions-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+.submissions-table tr:hover {
+    background-color: #f5f5f5;
+}
+.status-valid { color: green; font-weight: bold; }
+.status-missing { color: red; font-weight: bold; }
+.status-notfound { color: orange; font-weight: bold; }
+.status-empty { color: orange; font-weight: bold; }
+.clone-btn {
+    padding: 5px 10px;
+    margin: 2px;
+    background-color: #007cba;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.clone-btn:hover {
+    background-color: #005a87;
+}
+.feedback-section, .commits-section {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #fafafa;
+    border-left: 3px solid #007cba;
+}
+.section-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+textarea{
+    width: 100%;
+}
+
+.commit_message, .feedback_entry{
+    border: 1px solid gray; 
+    padding: 5px; 
+    margin: 5px;
+}
+
+.commit_message.clickable{
+    background-color: lightgray;
+}
+.commit_message:hover{
+    background-color: grey;
+    cursor: pointer;
+}
+a .commit_message,
+a:has(.commit_message) {
+    color: black;
+    text-decoration: none;
+}
+
+.author{
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.active-repo {
+    /* background-color: #7b9d8e !important; */
+    border-color: green !important;
+    border-style: solid !important;
+    border-width: 8px 0px 8px 0px !important;
+    position: relative;
+}
+
+.active-repo::after {
+    content: "(Last Cloned)";
+    color: white;
+    font-weight: bold;
+    position: absolute;
+    top: 0;              /* start at the top of the parent */
+    left: 0;
+    font-size: 0.8em;   /* slightly smaller text */
+    background-color: green;
+    border-radius: 0px 0px 10px 0px;
+    padding: 0 3px 3px 3px;
+}
+
+.active-repo td{
+    padding-top: 20px;
+}
