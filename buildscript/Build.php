@@ -6,7 +6,7 @@ $buildFolder = __DIR__ . '/../build';
 $srcFolder = __DIR__ . '/../src';
 
 function build(){
-    global $buildFolder, $srcFolder;
+    global $buildFolder;
     copyEverything();
     buildModels($buildFolder . "/models");
     buildProviders($buildFolder . "/providers");

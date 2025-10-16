@@ -1,5 +1,6 @@
 {
     "require": {
-        "nette/php-generator": "^4.2"
+        "nette/php-generator": "^4.2",
+        "nikic/php-parser": "^5.6"
     }
 }
