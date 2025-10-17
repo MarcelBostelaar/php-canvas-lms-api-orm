@@ -1,7 +1,184 @@
-Parse the original files
+<?php
+
+namespace Buildscript\Models;
+/*Parse the original files
 
 Extract their fields
 Extract their plurals
 
 Put both in comprehensive array and return as a set with the parsed ast.
+*/
 
+use Exception;
+use PhpParser\Node as n;
+use PhpParser\Node\PropertyItem;
+use PhpParser\Node\Scalar;
+use PhpParser\Node\VarLikeIdentifier;
+use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\ClassConstFetch;
+use PhpParser\Node\Name\FullyQualified;
+use PhpParser\NodeVisitorAbstract;
+use PhpParser\ParserFactory;
+use PhpParser\PrettyPrinter\Standard;
+use PhpParser\NodeTraverser;
+use PhpParser\Node;
+use PhpParser\NodeVisitor\NameResolver;
+use PhpParser\NodeDumper;
+
+/**
+ * Takes a php file by path (a valid model) and processed it. Gives back ast and required data for further processing/generation.
+ * @param mixed $filePath
+ * @return array{ast: \PhpParser\Node[], fields: array{type: string, name: string}, fieldsNullable: array{type: string, name: string}, filename: string, plurals: string[]} \
+ *   An array with the parsed AST, fields, nullable fields, filename and plurals.\
+ *   ast: The parsed Abstract Syntax Tree of the PHP file.\
+ *   fields: An array of fields with their fully qualified types, and names.\
+ *   fieldsNullable: An array of nullable fields with their fully qualified types, and names.\
+ *   filename: The name of the file being processed without the path.\
+ *   plurals: An array of plural forms of the name of the model, for automatic method generation in providers. 
+ */
+function processModelFile($filePath){
+    $ast = parseFile($filePath);
+    $fields = (new FieldListFinderVisitor("properties"))->process($ast)->getList();
+    $fieldsNullable = (new FieldListFinderVisitor("nullableProperties"))->process($ast)->getList();
+    $plurals = (new PluralsFinderVisitor())->process($ast)->getPlurals();
+    return ["ast" => $ast,
+            "filename" => basename($filePath),
+            "fields" => $fields,
+            "fieldsNullable" => $fieldsNullable,
+            "plurals" => $plurals
+    ];
+}
+function parseFile($filePath){
+    
+    // Create parser
+    $parser = (new ParserFactory)->createForNewestSupportedVersion();
+    
+    echo "Processing: $filePath\n";
+    
+    // Read the file
+    $code = file_get_contents($filePath);
+    
+    // Parse the code
+    $ast = $parser->parse($code);
+    
+    // Optional: Add name resolution (resolves class names, etc.)
+    $traverser = new NodeTraverser();
+    $traverser->addVisitor(new NameResolver());
+    $ast = $traverser->traverse($ast);
+    return $ast;
+}
+
+class FieldListFinderVisitor extends NodeVisitorAbstract{
+    public function __construct(private readonly string $varname){}
+    public PropertyItem $found;
+    public function enterNode(Node $node) {
+        if($node instanceof PropertyItem){
+            if($node->name instanceof VarLikeIdentifier){
+                if($node->name->name == $this->varname){
+                    $this->found = $node;
+                }
+            }
+        }
+    }
+
+    public function process($ast){
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor($this);
+        $traverser->traverse($ast);
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getList(){
+        $unexpectedNodeForm = new Exception("Found node not as expected");
+        if(!isset($this->found)){
+            echo "No $this->varname found.\n";
+            return []; //Node not found, possible since it might only have normal or nullable properties.
+        }
+        $vals = $this->found->default;
+        if(!($vals instanceof Array_)){
+            throw $unexpectedNodeForm; //must be list of arrays
+        }
+        $vals = $vals->items;
+        $foundItems = [];
+        foreach($vals as $item){
+            if(!is_object($item)){
+                throw $unexpectedNodeForm;
+            }
+            $value = $item->value;
+            if(!$value instanceof Array_){
+                throw $unexpectedNodeForm;
+            }
+            $key = $value->items[0]->value;
+            $propnameContainer = $value->items[1]->value;
+            if($key instanceof ClassConstFetch){
+                if(!$key->class instanceof FullyQualified){
+                    throw $unexpectedNodeForm; //must be YourClass::class
+                }
+                $classname = $key->class->name;
+            }
+            elseif($key instanceof Scalar\String_){
+                $classname = $key->value;
+            }
+            else{
+                throw $unexpectedNodeForm; //Name of class must be YourClass::class or a string
+            }
+
+            if(!$propnameContainer instanceof Scalar\String_){
+                throw $unexpectedNodeForm; //Name of prop must be of type string.
+            }
+            $propertyName = $propnameContainer->value;
+            $foundItems[] = [
+                "type" => $classname,
+                "name" => $propertyName
+            ];
+        }
+        return $foundItems;
+    }
+}
+
+class PluralsFinderVisitor extends NodeVisitorAbstract{
+    private PropertyItem $found;
+
+    public function enterNode(Node $node) {
+        if($node instanceof PropertyItem){
+            if($node->name instanceof VarLikeIdentifier){
+                if($node->name->name == "plurals"){
+                    $this->found = $node;
+                }
+            }
+        }
+    }
+
+    public function process($ast){
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor($this);
+        $traverser->traverse($ast);
+        return $this;
+    }
+
+    public function getPlurals(){
+        $unexpectedNodeForm = new Exception("Found node not as expected");
+        if(!isset($this->found)){
+            throw $unexpectedNodeForm; //No plurals found
+        }
+        if(!$this->found->default instanceof Array_){
+            throw $unexpectedNodeForm;
+        }
+        $items = $this->found->default->items;
+        $foundPlurals = [];
+        foreach($items as $item){
+            if(!is_object($item)){
+                throw $unexpectedNodeForm;
+            }
+            $itemval = $item->value;
+            if(!$itemval instanceof Scalar\String_){
+                throw $unexpectedNodeForm;
+            }
+            $foundPlurals[] = $itemval->value;
+        }
+        return $foundPlurals;
+    }
+}
