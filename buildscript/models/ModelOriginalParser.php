@@ -13,6 +13,7 @@ use Exception;
 use PhpParser\Node as n;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Scalar;
+use PhpParser\Node\Stmt;
 use PhpParser\Node\VarLikeIdentifier;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\ClassConstFetch;
@@ -36,16 +37,19 @@ use PhpParser\NodeDumper;
  *   filename: The name of the file being processed without the path.\
  *   plurals: An array of plural forms of the name of the model, for automatic method generation in providers. 
  */
-function processModelFile($filePath){
+function processModelFile($filePath, $modelname, $traitname){
     $ast = parseFile($filePath);
     $fields = (new FieldListFinderVisitor("properties"))->process($ast)->getList();
     $fieldsNullable = (new FieldListFinderVisitor("nullableProperties"))->process($ast)->getList();
     $plurals = (new PluralsFinderVisitor())->process($ast)->getPlurals();
+    $traitFound = (new FindTraitUserVisitor($traitname))->process($ast)->wasFound;
     return ["ast" => $ast,
-            "filename" => basename($filePath),
+            "modelname" => $modelname,
+            "traitname" => $traitname,
             "fields" => $fields,
             "fieldsNullable" => $fieldsNullable,
-            "plurals" => $plurals
+            "plurals" => $plurals,
+            "hasTrait" => $traitFound
     ];
 }
 function parseFile($filePath){
@@ -92,47 +96,50 @@ class FieldListFinderVisitor extends NodeVisitorAbstract{
      * @return array
      */
     public function getList(){
-        $unexpectedNodeForm = new Exception("Found node not as expected");
+        $unexpectedNodeForm = fn() => new Exception("Found node not as expected");
         if(!isset($this->found)){
             echo "No $this->varname found.\n";
             return []; //Node not found, possible since it might only have normal or nullable properties.
         }
         $vals = $this->found->default;
         if(!($vals instanceof Array_)){
-            throw $unexpectedNodeForm; //must be list of arrays
+            throw $unexpectedNodeForm(); //must be list of arrays
         }
         $vals = $vals->items;
         $foundItems = [];
         foreach($vals as $item){
             if(!is_object($item)){
-                throw $unexpectedNodeForm;
+                throw $unexpectedNodeForm();
             }
             $value = $item->value;
             if(!$value instanceof Array_){
-                throw $unexpectedNodeForm;
+                throw $unexpectedNodeForm();
             }
             $key = $value->items[0]->value;
             $propnameContainer = $value->items[1]->value;
             if($key instanceof ClassConstFetch){
                 if(!$key->class instanceof FullyQualified){
-                    throw $unexpectedNodeForm; //must be YourClass::class
+                    throw $unexpectedNodeForm(); //must be YourClass::class
                 }
                 $classname = $key->class->name;
+                $classType = true;
             }
             elseif($key instanceof Scalar\String_){
                 $classname = $key->value;
+                $classType = false;
             }
             else{
-                throw $unexpectedNodeForm; //Name of class must be YourClass::class or a string
+                throw $unexpectedNodeForm(); //Name of class must be YourClass::class or a string
             }
 
             if(!$propnameContainer instanceof Scalar\String_){
-                throw $unexpectedNodeForm; //Name of prop must be of type string.
+                throw $unexpectedNodeForm(); //Name of prop must be of type string.
             }
             $propertyName = $propnameContainer->value;
             $foundItems[] = [
                 "type" => $classname,
-                "name" => $propertyName
+                "name" => $propertyName,
+                "classType" => $classType
             ];
         }
         return $foundItems;
@@ -160,25 +167,49 @@ class PluralsFinderVisitor extends NodeVisitorAbstract{
     }
 
     public function getPlurals(){
-        $unexpectedNodeForm = new Exception("Found node not as expected");
+        $unexpectedNodeForm = fn() => new Exception("Found node not as expected");
         if(!isset($this->found)){
-            throw $unexpectedNodeForm; //No plurals found
+            throw $unexpectedNodeForm(); //No plurals found
         }
         if(!$this->found->default instanceof Array_){
-            throw $unexpectedNodeForm;
+            throw $unexpectedNodeForm();
         }
         $items = $this->found->default->items;
         $foundPlurals = [];
         foreach($items as $item){
             if(!is_object($item)){
-                throw $unexpectedNodeForm;
+                throw $unexpectedNodeForm();
             }
             $itemval = $item->value;
             if(!$itemval instanceof Scalar\String_){
-                throw $unexpectedNodeForm;
+                throw $unexpectedNodeForm();
             }
             $foundPlurals[] = $itemval->value;
         }
         return $foundPlurals;
+    }
+}
+
+class FindTraitUserVisitor extends NodeVisitorAbstract{
+    public $wasFound = false;
+    public function __construct(public readonly string $traitname){}
+    public function EnterNode(Node $node){
+        if($node instanceof Stmt\TraitUse){
+            $traits = $node->traits;
+            foreach($traits as $trait){
+                if($trait instanceof FullyQualified){
+                    if($trait->name == $this->traitname || str_ends_with($trait->name, "\\" . $this->traitname)){
+                        $this->wasFound = true;
+                    }
+                }
+            }
+        }
+    }
+
+    public function process($ast){
+        $traverser = new NodeTraverser();
+        $traverser->addVisitor($this);
+        $traverser->traverse($ast);
+        return $this;
     }
 }

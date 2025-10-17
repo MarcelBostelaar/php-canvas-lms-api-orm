@@ -1,5 +1,5 @@
 <?php
-
+/* Automatically generated based on model properties.*/
 namespace Src\Models\Generated;
 
 use CanvasApiLibrary\Exceptions\MixingDomainsException;
@@ -9,56 +9,29 @@ use CanvasApiLibrary\Models\Course;
 trait SectionProperties{
     abstract protected function getDomain(): Domain;
 
-    public ?string $nullableprop{
+    public string $name{
         get {
-            return $this->nullableprop;
-        }
-        set(?string $value) {
-            $this->nullableprop = $value;
-        }
-    }
-
-    public string $notnullableprop{
-        get {
-            return $this->notnullableprop;
+            return $this->name;
         }
         set(string $value) {
-            $this->notnullableprop = $value;
+            $this->name = $value;
         }
     }
 
-    protected int $courseId;
-    public Course $notnullablemodelprop{
+    protected int $course_id;
+    public Course $course{
         get { 
-            return new Course($this->getDomain(), $this->courseId);
+            return new Course($this->getDomain(), $this->course_id);
         }
         set (Course $value) {
             if($value->getDomain() != $this->getDomain()){
                 $classname = self::class;
                 $selfDomain = $this->getDomain()->domain;
                 $otherDomain = $value->getDomain()->domain;
-                throw new MixingDomainsException("Tried to save a '$classname' from domain '$otherDomain' to <ModelName>.<Prop name> from domain '$selfDomain'.");
+                throw new MixingDomainsException("Tried to save a '$classname' from domain '$otherDomain' to Course.course from domain '$selfDomain'.");
             }
-            $this->courseId = $value->id;
+            $this->course_id = $value->id;
         }
     }
-    protected ?int $courseId2;
-    public ?Course $nullablemodelprop{
-        get {
-            return $this->courseId2 ? new Course($this->getDomain(), $this->courseId) : null;
-        }
-        set (?Course $value) {
-            if($value === null){
-                $this->courseId2 = null;
-                return;
-            }
-            if($value->getDomain() != $this->getDomain()){
-                $classname = self::class;
-                $selfDomain = $this->getDomain()->domain;
-                $otherDomain = $value->getDomain()->domain;
-                throw new MixingDomainsException("Tried to save a '$classname' from domain '$otherDomain' to <ModelName>.<Prop name> from domain '$selfDomain'.");
-            }
-            $this->courseId = $value->id;
-        }
-    }
+
 }

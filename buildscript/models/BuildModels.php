@@ -3,37 +3,63 @@ namespace Buildscript\Models;
 
 use PhpParser\NodeDumper;
 include_once __DIR__ . '/ModelOriginalParser.php';
-function buildModels($folder){
-    // $testResuls = GenerateFullModelTrait(
-    //     "TestTrait",
-    //     [["name"=> "myNormalString", "type" => "string"], ["name"=> "myNormalInt", "type" => "int"]],
-    //     [["name"=> "myNullableString", "type" => "string"], ["name"=> "myullableInt", "type" => "int"]],
-    //     [["name"=> "mySection", "type" => "Section"], ["name"=> "myStudent", "type" => "Student"]],
-    //     [["name"=> "myNullableCourse", "type" => "Course"], ["name"=> "myNullableSubmission", "type" => "Submission"]]
-    // );
-
-    //write to testfile.php
-    // file_put_contents("testfile.php", $testResuls);
-    
-    // Get all PHP files in the folder (not recursively)
+function buildModels($folder, $targetFolderForTraits){
     $phpFiles = [];
     foreach (glob($folder . '/*.php') as $filePath) {
         $phpFiles[] = [$filePath];
     }
     $mapped = [];
     foreach ($phpFiles as $file) {
-        if($file[0] === "Domain.php"){
+        if(str_ends_with($file[0], "Domain.php")){
             continue;//Domain.php is special, it does not have a trait
         }
         $filePath = $file[0];
-        $parsedFile = processModelFile($filePath);
+        $modelname = substr(basename($filePath), 0, -4);
+        $traitname = $modelname . "Properties";
+        $parsedFile = processModelFile($filePath, $modelname, $traitname);
+        [$normalProps, $normalModels] = processAndGetModelClassProps($parsedFile['fields']);
+        [$nullableProps, $nullableModels] = processAndGetModelClassProps($parsedFile['fieldsNullable']);
+        $normalProps = fixGlobalClassTypes($normalProps);
+        $nullableProps = fixGlobalClassTypes($nullableProps);
+        $parsedFile['generatedTrait'] = GenerateFullModelTrait($traitname, $normalProps, $nullableProps, $normalModels, $nullableModels);
         $mapped[] = $parsedFile;
+        file_put_contents("$targetFolderForTraits/$traitname.php", $parsedFile["generatedTrait"]);
         //write to test folder
         $ast = $parsedFile["ast"];
-        $name = $parsedFile["filename"];
+        $name = $parsedFile["modelname"];
         unset($parsedFile["ast"]);
+        unset($parsedFile["generatedTrait"]);
         file_put_contents(__DIR__ . "/../test/" . $name, json_encode($parsedFile, JSON_PRETTY_PRINT) . (new NodeDumper)->dump($ast));
     }
     return  $mapped;
 }
 
+function fixGlobalClassTypes($properties){
+    $props = [];
+    foreach($properties as $property){
+        if($property["classType"]){
+            $property['type'] = "\\" . $property['type'];
+        }
+        unset($property["classType"]);
+        $props[] = $property;
+    }
+    return $props;
+}
+
+function processAndGetModelClassProps($properties){
+    $normalProps = [];
+    $modelProps = [];
+    foreach($properties as $prop){
+        // match \models\Something, models\Something, \models\Something.php, models\Something.php, or arrays like \models\Something[]
+        if (preg_match('/\\\\?Models\\\\([A-Za-z_][A-Za-z0-9_]*)$/', $prop["type"], $matches)) {
+            // var_dump($matches);
+            $model = $matches[1];
+            $prop["type"] = $model;
+            $modelProps[] = $prop;
+        }
+        else{
+            $normalProps[] = $prop;
+        }
+    }
+    return [$normalProps, $modelProps];
+}

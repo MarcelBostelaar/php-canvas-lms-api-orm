@@ -8,11 +8,9 @@ use DateTime;
  * @return void
  */
 function fileTop($classname, array $usedModels){
-    $dateTimeNow = (new DateTime())->format("Y-m-d H:i:s");
-
     echo "<?php\n";
     ?>
-/* Automatically generated based on model properties on <?=$dateTimeNow?>*/
+/* Automatically generated based on model properties.*/
 namespace Src\Models\Generated;
 
 use CanvasApiLibrary\Exceptions\MixingDomainsException;
@@ -123,9 +121,10 @@ function fileEnd(){
  * @return string
  */
 function GenerateFullModelTrait($chosenTraitName, array $regularProperties, array $nullableProperties, array $ModelProperties, array $nullableModelProperties){
+    var_dump($regularProperties);
     ob_start();
-    $usedModels = array_merge($ModelProperties, $nullableModelProperties);
-    fileTop($chosenTraitName, array_map(fn($x) => $x["type"], $usedModels));
+    $usedModels = array_unique(array_map(fn($x) => $x["type"], array_merge($ModelProperties, $nullableModelProperties)));
+    fileTop($chosenTraitName, $usedModels);
 
     foreach($regularProperties as $p){
         property($p["type"], $p["name"]);
