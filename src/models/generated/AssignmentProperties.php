@@ -1,6 +1,6 @@
 <?php
 /* Automatically generated based on model properties.*/
-namespace Src\Models\Generated;
+namespace CanvasApiLibrary\Models\Generated;
 
 use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Models\Domain;
@@ -15,11 +15,10 @@ trait AssignmentProperties{
             return new GroupCategory($this->getDomain(), $this->group_id);
         }
         set (GroupCategory $value) {
-            if($value->getDomain() != $this->getDomain()){
-                $classname = self::class;
+            if($value->getDomain()->domain != $this->getDomain()->domain){
                 $selfDomain = $this->getDomain()->domain;
                 $otherDomain = $value->getDomain()->domain;
-                throw new MixingDomainsException("Tried to save a '$classname' from domain '$otherDomain' to GroupCategory.group from domain '$selfDomain'.");
+                throw new MixingDomainsException("Tried to save a GroupCategory from domain '$otherDomain' to Assignment.group from domain '$selfDomain'.");
             }
             $this->group_id = $value->id;
         }

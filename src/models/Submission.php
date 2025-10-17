@@ -2,6 +2,7 @@
 
 namespace CanvasApiLibrary\Models;
 use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
+use CanvasApiLibrary\Models\Generated\SubmissionProperties;
 
 /**
  * @property Student $student
@@ -10,6 +11,7 @@ use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
  * @property ?\DateTime $submittedAt
  */
 final class Submission extends AbstractCanvasPopulatedModel{
+    use SubmissionProperties;
     protected static array $properties = [
         [Student::class, "student"],
         [Assignment::class, "assignment"]

@@ -1,6 +1,6 @@
 <?php
 /* Automatically generated based on model properties on 2025-10-16 21:39:55*/
-namespace Src\Models\Generated;
+namespace CanvasApiLibrary\Models\Generated;
 
 use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Models\Domain;

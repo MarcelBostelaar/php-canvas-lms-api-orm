@@ -2,13 +2,10 @@
 
 namespace CanvasApiLibrary\Models;
 use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
+use CanvasApiLibrary\Models\Generated\SubmissionFeedbackProperties;
 
-/**
- * @property string $feedbackGiver
- * @property string $comment
- * @property \DateTime $date
- */
 final class SubmissionFeedback extends AbstractCanvasPopulatedModel{
+    use SubmissionFeedbackProperties;
     protected static array $properties = [
         ["string", "feedbackGiver"],
         ["string", "comment"],
@@ -17,3 +14,6 @@ final class SubmissionFeedback extends AbstractCanvasPopulatedModel{
 
     public static array $plurals = ["SubmissionFeedbacks"];
 }
+
+$x = new SubmissionFeedback(new Domain("test.nl"), 1);
+$x->date;

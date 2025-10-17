@@ -1,6 +1,6 @@
 <?php
 /* Automatically generated based on model properties.*/
-namespace Src\Models\Generated;
+namespace CanvasApiLibrary\Models\Generated;
 
 use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Models\Domain;
@@ -24,11 +24,10 @@ trait SectionProperties{
             return new Course($this->getDomain(), $this->course_id);
         }
         set (Course $value) {
-            if($value->getDomain() != $this->getDomain()){
-                $classname = self::class;
+            if($value->getDomain()->domain != $this->getDomain()->domain){
                 $selfDomain = $this->getDomain()->domain;
                 $otherDomain = $value->getDomain()->domain;
-                throw new MixingDomainsException("Tried to save a '$classname' from domain '$otherDomain' to Course.course from domain '$selfDomain'.");
+                throw new MixingDomainsException("Tried to save a Course from domain '$otherDomain' to Section.course from domain '$selfDomain'.");
             }
             $this->course_id = $value->id;
         }

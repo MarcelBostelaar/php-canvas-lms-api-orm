@@ -2,7 +2,7 @@
 
 namespace CanvasApiLibrary\Models;
 use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
-use Src\Models\Generated\SectionProperties;
+use CanvasApiLibrary\Models\Generated\SectionProperties;
 
 final class Section extends AbstractCanvasPopulatedModel{
     use SectionProperties;

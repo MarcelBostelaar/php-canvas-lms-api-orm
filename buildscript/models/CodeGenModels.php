@@ -1,7 +1,6 @@
 <?php
 namespace Buildscript\Models;
 
-use DateTime;
 /**
  * @param string $classname
  * @param string[] $usedModels
@@ -11,7 +10,7 @@ function fileTop($classname, array $usedModels){
     echo "<?php\n";
     ?>
 /* Automatically generated based on model properties.*/
-namespace Src\Models\Generated;
+namespace CanvasApiLibrary\Models\Generated;
 
 use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Models\Domain;
@@ -77,7 +76,7 @@ function ModelGetter($modelname, $propertyIdName){
  * @param string $propertyName
  * @param bool $nullable
  */
-function modelProp($modelname, $propertyname, $nullable){ 
+function modelProp($modelname, $propertyname, $nullable, $originalModelName){ 
     $intType = $nullable ? "?int" : "int";
     $modelType = ($nullable ? "?" : "") . $modelname;
     $intPropertyName = $propertyname . "_id";
@@ -94,11 +93,10 @@ function modelProp($modelname, $propertyname, $nullable){
                 return;
             }
 <?php endif?>
-            if($value->getDomain() != $this->getDomain()){
-                $classname = self::class;
+            if($value->getDomain()->domain != $this->getDomain()->domain){
                 $selfDomain = $this->getDomain()->domain;
                 $otherDomain = $value->getDomain()->domain;
-                throw new MixingDomainsException("Tried to save a '$classname' from domain '$otherDomain' to <?=$modelname?>.<?=$propertyname?> from domain '$selfDomain'.");
+                throw new MixingDomainsException("Tried to save a <?=$modelname?> from domain '$otherDomain' to <?=$originalModelName?>.<?=$propertyname?> from domain '$selfDomain'.");
             }
             $this-><?=$intPropertyName?> = $value->id;
         }
@@ -120,8 +118,8 @@ function fileEnd(){
  * @param array{type: string, name: string} $nullableModelProperties
  * @return string
  */
-function GenerateFullModelTrait($chosenTraitName, array $regularProperties, array $nullableProperties, array $ModelProperties, array $nullableModelProperties){
-    var_dump($regularProperties);
+function GenerateFullModelTrait($originalModelName, $chosenTraitName, array $regularProperties, array $nullableProperties, array $ModelProperties, array $nullableModelProperties){
+    // var_dump($regularProperties);
     ob_start();
     $usedModels = array_unique(array_map(fn($x) => $x["type"], array_merge($ModelProperties, $nullableModelProperties)));
     fileTop($chosenTraitName, $usedModels);
@@ -137,12 +135,12 @@ function GenerateFullModelTrait($chosenTraitName, array $regularProperties, arra
     }
 
     foreach($ModelProperties as $p){
-        modelProp($p["type"], $p["name"], false);
+        modelProp($p["type"], $p["name"], false, $originalModelName);
         echo "\n";
     }
 
     foreach($nullableModelProperties as $p){
-        modelProp($p["type"],  $p["name"], true);
+        modelProp($p["type"],  $p["name"], true, $originalModelName);
         echo "\n";
     }
 

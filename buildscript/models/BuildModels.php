@@ -21,15 +21,15 @@ function buildModels($folder, $targetFolderForTraits){
         [$nullableProps, $nullableModels] = processAndGetModelClassProps($parsedFile['fieldsNullable']);
         $normalProps = fixGlobalClassTypes($normalProps);
         $nullableProps = fixGlobalClassTypes($nullableProps);
-        $parsedFile['generatedTrait'] = GenerateFullModelTrait($traitname, $normalProps, $nullableProps, $normalModels, $nullableModels);
+        $parsedFile['generatedTrait'] = GenerateFullModelTrait($modelname, $traitname, $normalProps, $nullableProps, $normalModels, $nullableModels);
         $mapped[] = $parsedFile;
         file_put_contents("$targetFolderForTraits/$traitname.php", $parsedFile["generatedTrait"]);
         //write to test folder
-        $ast = $parsedFile["ast"];
-        $name = $parsedFile["modelname"];
-        unset($parsedFile["ast"]);
-        unset($parsedFile["generatedTrait"]);
-        file_put_contents(__DIR__ . "/../test/" . $name, json_encode($parsedFile, JSON_PRETTY_PRINT) . (new NodeDumper)->dump($ast));
+        // $ast = $parsedFile["ast"];
+        // $name = $parsedFile["modelname"];
+        // unset($parsedFile["ast"]);
+        // unset($parsedFile["generatedTrait"]);
+        // file_put_contents(__DIR__ . "/../test/" . $name, json_encode($parsedFile, JSON_PRETTY_PRINT) . (new NodeDumper)->dump($ast));
     }
     return  $mapped;
 }
