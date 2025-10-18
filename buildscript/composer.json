@@ -13,7 +13,8 @@
             "shared/Shared.php",
             "models/BuildModels.php",
             "models/CodeGenModels.php",
-            "providers/BuildProviders.php"
+            "providers/BuildProviders.php",
+            "providers/CodeGenProviders.php"
         ]
     }
 }

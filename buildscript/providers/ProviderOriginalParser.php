@@ -7,30 +7,14 @@ use function Buildscript\parseFile;
 
 function processProviderFile($filePath, $providername, $traitname, $modelname){
     $ast = parseFile($filePath);
-
-    // dump to test/providername-ast.json
-    $dumper = new \PhpParser\NodeDumper(['dumpComments' => true]);
-    $dump = $dumper->dump($ast);
-
-    $outFile = "./test/$providername-ast.txt";
-
-
     $traitFound = (new FindTraitUserVisitor($traitname))->process($ast)->wasFound;
     $methods = (new ExtractProviderMethodsVisitor())->process($ast)->methods;
-
-    $extraData = json_encode([
-            "providername" => $providername,
-            "traitname" => $traitname,
-            "hasTrait" => $traitFound,
-            "methods" => $methods], JSON_PRETTY_PRINT);
-    
-    file_put_contents($outFile, $extraData . "\n" . $dump);
 
     return ["ast" => $ast,
             "providername" => $providername,
             "traitname" => $traitname,
-            "hasTrait" => $traitFound,
-            "modelName" => $modelname,
+            "hastrait" => $traitFound,
+            "modelname" => $modelname,
             "methods" => $methods
     ];
 }
@@ -56,7 +40,7 @@ class ExtractProviderMethodsVisitor extends AbstractExtractorVisitor {
         }
         //get return type
         $returnType = $node->getReturnType() instanceof \PhpParser\Node\NullableType ? "?" . $node->getReturnType()->type->toString() : ($node->getReturnType() instanceof \PhpParser\Node\Name ? $node->getReturnType()->toString() : (is_string($node->getReturnType()) ? $node->getReturnType() : "mixed"));
-        $this->methods[] = ["name" => $name, "params" => $params, "returnType" => $returnType];
+        $this->methods[] = ["name" => $name, 'parameters' => $params, "returnType" => $returnType];
         return null;
     }
 }

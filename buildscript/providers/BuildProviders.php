@@ -1,7 +1,9 @@
 <?php
 namespace Buildscript\Providers;
 include_once __DIR__ . '/ProviderOriginalParser.php';
+use Exception;
 use function Buildscript\Providers\processProviderFile;
+use function Buildscript\varDumpNoAst;
 
 function buildProviders($folder, $models){
     echo "Building providers in folder: $folder\n";
@@ -21,6 +23,22 @@ function buildProviders($folder, $models){
         $item['methods'] = array_filter($item['methods'], fn($x) => !str_starts_with($x['name'], '__'));
         return $item;
         }, $mapped);
+
+    $pluralLookup = [];
+    foreach($models as $model){
+        $pluralLookup[$model['modelname']] = $model['plurals'];
+    }
+
+    foreach($mapped as $provider){
+        $traitContent = generateFullProviderTrait(
+            $provider['traitname'],
+            $provider['modelname'],
+            $pluralLookup[$provider['modelname']],
+            $provider['methods'],
+            $pluralLookup
+        );
+        file_put_contents("$folder/generated/" . $provider['traitname'] . '.php', "<?php\n" . $traitContent);
+    }
 
     return $mapped;
 }

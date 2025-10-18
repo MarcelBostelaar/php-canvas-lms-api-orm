@@ -24,3 +24,21 @@ function parseFile($filePath){
     $ast = $traverser->traverse($ast);
     return $ast;
 }
+
+function tryExtractModelClassName($typeString){
+    if(preg_match('/CanvasApiLibrary\\\\Models\\\\([A-Z][a-zA-Z0-9_]*)$/', $typeString, $matches)){
+        return $matches[1];
+    }
+    return null;
+}
+
+function varDumpNoAst($data){
+    if(is_array($data)){
+        if(isset($data['ast'])){
+            unset($data['ast']);
+        }
+        var_dump($data);
+    } else {
+        var_dump($data);
+    }
+}
