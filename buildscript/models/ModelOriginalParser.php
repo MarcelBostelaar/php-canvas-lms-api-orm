@@ -1,15 +1,10 @@
 <?php
 
 namespace Buildscript\Models;
-/*Parse the original files
-
-Extract their fields
-Extract their plurals
-
-Put both in comprehensive array and return as a set with the parsed ast.
-*/
-
 use Exception;
+use function Buildscript\parseFile;
+use Buildscript\AbstractExtractorVisitor;
+use Buildscript\FindTraitUserVisitor;
 use PhpParser\Node as n;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Scalar;
@@ -52,27 +47,9 @@ function processModelFile($filePath, $modelname, $traitname){
             "hasTrait" => $traitFound
     ];
 }
-function parseFile($filePath){
-    
-    // Create parser
-    $parser = (new ParserFactory)->createForNewestSupportedVersion();
-    
-    echo "Processing: $filePath\n";
-    
-    // Read the file
-    $code = file_get_contents($filePath);
-    
-    // Parse the code
-    $ast = $parser->parse($code);
-    
-    // Optional: Add name resolution (resolves class names, etc.)
-    $traverser = new NodeTraverser();
-    $traverser->addVisitor(new NameResolver());
-    $ast = $traverser->traverse($ast);
-    return $ast;
-}
 
-class FieldListFinderVisitor extends NodeVisitorAbstract{
+
+class FieldListFinderVisitor extends AbstractExtractorVisitor{
     public function __construct(private readonly string $varname){}
     public PropertyItem $found;
     public function enterNode(Node $node) {
@@ -83,13 +60,6 @@ class FieldListFinderVisitor extends NodeVisitorAbstract{
                 }
             }
         }
-    }
-
-    public function process($ast){
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor($this);
-        $traverser->traverse($ast);
-        return $this;
     }
 
     /**
@@ -146,7 +116,7 @@ class FieldListFinderVisitor extends NodeVisitorAbstract{
     }
 }
 
-class PluralsFinderVisitor extends NodeVisitorAbstract{
+class PluralsFinderVisitor extends AbstractExtractorVisitor{
     private PropertyItem $found;
 
     public function enterNode(Node $node) {
@@ -157,13 +127,6 @@ class PluralsFinderVisitor extends NodeVisitorAbstract{
                 }
             }
         }
-    }
-
-    public function process($ast){
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor($this);
-        $traverser->traverse($ast);
-        return $this;
     }
 
     public function getPlurals(){
@@ -187,29 +150,5 @@ class PluralsFinderVisitor extends NodeVisitorAbstract{
             $foundPlurals[] = $itemval->value;
         }
         return $foundPlurals;
-    }
-}
-
-class FindTraitUserVisitor extends NodeVisitorAbstract{
-    public $wasFound = false;
-    public function __construct(public readonly string $traitname){}
-    public function EnterNode(Node $node){
-        if($node instanceof Stmt\TraitUse){
-            $traits = $node->traits;
-            foreach($traits as $trait){
-                if($trait instanceof FullyQualified){
-                    if($trait->name == $this->traitname || str_ends_with($trait->name, "\\" . $this->traitname)){
-                        $this->wasFound = true;
-                    }
-                }
-            }
-        }
-    }
-
-    public function process($ast){
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor($this);
-        $traverser->traverse($ast);
-        return $this;
     }
 }

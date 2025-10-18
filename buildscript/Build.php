@@ -14,8 +14,8 @@ function build(){
     $modelTraitFolder = $srcFolder . "/models/generated";
     clearFolder(__DIR__ . "/test");
     clearFolder($modelTraitFolder);
-    buildModels($srcFolder . "/models", $modelTraitFolder);
-    buildProviders($srcFolder . "/providers");
+    $models = buildModels($srcFolder . "/models", $modelTraitFolder);
+    $providers = buildProviders($srcFolder . "/providers", ["Category"]); //provide category for testing
 }
 
 function clearFolder($folder){
@@ -28,6 +28,8 @@ function clearFolder($folder){
         }
     }
 }
+
+
 
 build();
 echo "Build complete\n";

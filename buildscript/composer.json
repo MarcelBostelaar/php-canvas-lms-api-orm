@@ -4,9 +4,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Buildscript\\": "./"
+            "Buildscript\\": [
+                "./",
+                "./shared/"
+            ]
         },
         "files":[
+            "shared/Shared.php",
             "models/BuildModels.php",
             "models/CodeGenModels.php",
             "providers/BuildProviders.php"
