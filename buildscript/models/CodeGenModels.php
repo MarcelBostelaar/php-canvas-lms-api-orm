@@ -54,7 +54,12 @@ function property($type, $name){ ?>
  */
 function NullableModelGetter($modelname, $propertyname, $propertyIdName){?>
         get {
-            return $this-><?=$propertyname?> ? new <?=$modelname?>($this->getDomain(), $this-><?=$propertyIdName?>) : null;
+            if($this-><?=$propertyname?> === null){
+                return null;
+            }
+            $item = new <?=$modelname?>($this->getDomain());
+            $item->id = $this-><?=$propertyIdName?>;
+            return $item;
         }
 <?php
 }
@@ -66,7 +71,9 @@ function NullableModelGetter($modelname, $propertyname, $propertyIdName){?>
 function ModelGetter($modelname, $propertyIdName){
 ?>
         get { 
-            return new <?=$modelname?>($this->getDomain(), $this-><?=$propertyIdName?>);
+            $item = new <?=$modelname?>($this->getDomain());
+            $item->id = $this-><?=$propertyIdName?>;
+            return $item;
         }
 <?php
 }

@@ -23,18 +23,6 @@ abstract class AbstractProvider{
         //Do nothing by default.
     }
 
-    /**
-     * Summary of MapData
-     * @param mixed $data
-     * @param \CanvasApiLibrary\Models\Domain $domain
-     * @param array $suplementaryDataMapping Additional key value mappings to apply when mapping data.
-     * Allowed formats: 
-     *  string (one to one mapping)
-     *  [string, callable] transforms key to value using callable
-     *  [string, string, callable] transforms key to value using callable with second argument as the target name
-     * @return \CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel[]
-     */
-    abstract protected function MapData(mixed $data, Domain $domain, array $suplementaryDataMapping): array;
     abstract protected function populateModel(Domain $domain, $model, mixed $data): AbstractCanvasPopulatedModel;
 
     protected function Get(Domain $domain, string $route, array $suplementaryDataMapping = [], ?callable $preprocess = null): array{

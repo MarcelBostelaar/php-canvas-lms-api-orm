@@ -31,7 +31,9 @@ trait SubmissionProperties{
     protected int $student_id;
     public Student $student{
         get { 
-            return new Student($this->getDomain(), $this->student_id);
+            $item = new Student($this->getDomain());
+            $item->id = $this->student_id;
+            return $item;
         }
         set (Student $value) {
             if($value->getDomain()->domain != $this->getDomain()->domain){
@@ -46,7 +48,9 @@ trait SubmissionProperties{
     protected int $assignment_id;
     public Assignment $assignment{
         get { 
-            return new Assignment($this->getDomain(), $this->assignment_id);
+            $item = new Assignment($this->getDomain());
+            $item->id = $this->assignment_id;
+            return $item;
         }
         set (Assignment $value) {
             if($value->getDomain()->domain != $this->getDomain()->domain){

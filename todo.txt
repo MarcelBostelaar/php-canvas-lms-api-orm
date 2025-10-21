@@ -1,6 +1,8 @@
 Rework models to not automatically require an id, as you need to be able to build a model and then save it. 
 Instead, ensure that the id can only be set once, and throw error on every subsequent time.
 
+  DONE
+
 Create a "isSaved" that tracks if the item has been locally modified, or has been populated from remote/saved to remote and not further modified.
 Create a "isPopulated" method that returns a bool indicating whether any mandatory properties are missing before saving.
 

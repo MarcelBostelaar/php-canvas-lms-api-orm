@@ -7,7 +7,7 @@ use CanvasApiLibrary\Models\Student;
 use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Providers\Utility\Lookup;
-use function CanvasApiLibrary\Providers\Utility\array_map_to_models;
+
 
 /**
  * Provider for Canvas API Student operations
@@ -15,6 +15,7 @@ use function CanvasApiLibrary\Providers\Utility\array_map_to_models;
  * @method Lookup<Models\Group, Models\Student> getStudentsInGroups() Virtual method to get all student in groups
  */
 class StudentProvider extends AbstractProvider{
+    use StudentProviderProperties;
     public function __construct(
         public readonly Services\StatusHandlerInterface $statusHandler
     ){}
@@ -35,7 +36,11 @@ class StudentProvider extends AbstractProvider{
         [], fn($x) => $x["user"]);
     }
 
-    public function MapData(mixed $data, Domain $domain, array $suplementaryDataMapping = []): array{
-        return array_map_to_models($data, $domain, Student::class, ["name", ...$suplementaryDataMapping]);
+    protected function populateModel(Models\Domain $domain, $model, mixed $data): Models\Utility\AbstractCanvasPopulatedModel{
+        //todo
+    }
+
+    public function populateStudent(Student $student){
+        //todo
     }
 }

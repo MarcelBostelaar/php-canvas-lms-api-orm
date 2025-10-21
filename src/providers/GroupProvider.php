@@ -6,7 +6,7 @@ use CanvasApiLibrary\Services as Services;
 use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Providers\Utility\Lookup;
-use function CanvasApiLibrary\Providers\Utility\array_map_to_models;
+
 
 /**
  * Provider for Canvas API group operations
@@ -14,6 +14,7 @@ use function CanvasApiLibrary\Providers\Utility\array_map_to_models;
  * @method Lookup<Models\GroupCategory, Models\Group> GetAllGroupsInGroupCategories() Virtual method to get all groups in group categories
  */
 class GroupProvider extends AbstractProvider{
+    use GroupProviderProperties;
     public function __construct(public readonly Services\StatusHandlerInterface $statusHandler){}
 
     /**
@@ -25,8 +26,12 @@ class GroupProvider extends AbstractProvider{
     public function getAllGroupsInGroupCategory(Models\GroupCategory $category, Domain $domain) : array{
         return $this->Get($domain, "/group_categories/{$category->id}/groups");
     }
+    
+    protected function populateModel(Models\Domain $domain, $model, mixed $data): Models\Utility\AbstractCanvasPopulatedModel{
+        //todo
+    }
 
-    public function MapData(mixed $data, Domain $domain, array $suplementaryDataMapping = []): array{
-        return array_map_to_models($data, $domain, Group::class, ["name", ...$suplementaryDataMapping]);
+    public function populateGroup(Group $group){
+        //todo
     }
 }

@@ -12,7 +12,9 @@ trait AssignmentProperties{
     protected int $group_id;
     public GroupCategory $group{
         get { 
-            return new GroupCategory($this->getDomain(), $this->group_id);
+            $item = new GroupCategory($this->getDomain());
+            $item->id = $this->group_id;
+            return $item;
         }
         set (GroupCategory $value) {
             if($value->getDomain()->domain != $this->getDomain()->domain){

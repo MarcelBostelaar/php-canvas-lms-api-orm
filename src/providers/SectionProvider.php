@@ -7,7 +7,7 @@ use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\Course;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Providers\Utility\Lookup;
-use function CanvasApiLibrary\Providers\Utility\array_map_to_models;
+
 
 /**
  * Provider for Canvas API section operations
@@ -26,5 +26,13 @@ class SectionProvider extends AbstractProvider{
      */
     public function getAllSectionsInCourse(Domain $domain, Course $course) : array{
         return $this->Get($domain, "/courses/$course->id/sections");
+    }
+
+    public function populateSection(Section $section){
+        //todo
+    }
+
+    protected function populateModel(Models\Domain $domain, $model, mixed $data): Section{
+        //todo
     }
 }

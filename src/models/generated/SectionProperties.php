@@ -21,7 +21,9 @@ trait SectionProperties{
     protected int $course_id;
     public Course $course{
         get { 
-            return new Course($this->getDomain(), $this->course_id);
+            $item = new Course($this->getDomain());
+            $item->id = $this->course_id;
+            return $item;
         }
         set (Course $value) {
             if($value->getDomain()->domain != $this->getDomain()->domain){
