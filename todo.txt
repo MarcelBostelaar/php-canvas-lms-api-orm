@@ -6,6 +6,8 @@ Instead, ensure that the id can only be set once, and throw error on every subse
 Create a "isSaved" that tracks if the item has been locally modified, or has been populated from remote/saved to remote and not further modified.
 Create a "isPopulated" method that returns a bool indicating whether any mandatory properties are missing before saving.
 
+  Removed altogether. No need for this atm.
+
 Rework the populating builder to have the "accepts null" property on the consumer via a method/setter. 
 Just throw if you try to set it to nullable on something that can never accept null.
 Maybe get rid of the two-method (before moving accepts null still 4) altogether and 

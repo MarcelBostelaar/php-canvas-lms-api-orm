@@ -53,21 +53,4 @@ abstract class AbstractCanvasPopulatedModel implements ModelInterface{
      * @var array
      */
     protected static array $nullableProperties = [];
-
-    /**
-     * Indicated whether or not the class is populated from the corresponding canvas system.
-     * 
-     * @var bool
-     */
-    public bool $isPopulated{
-        get {
-            throw new Exception("Not implemented");
-            // foreach($this->virtualProperties as $_ => $info){
-            //     if($info['value'] === null){
-            //         return false;
-            //     }
-            // }
-            // return true;
-        }
-    }
 }
