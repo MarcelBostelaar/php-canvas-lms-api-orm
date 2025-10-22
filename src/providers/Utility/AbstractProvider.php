@@ -6,7 +6,7 @@ use CanvasApiLibrary\Services\CanvasCommunicator;
 use CanvasApiLibrary\Services\StatusHandlerInterface;
 use CanvasApiLibrary\Models\Domain;
 
-abstract class AbstractProvider{
+abstract class AbstractProvider implements HandleEmittedInterface{
     public function __construct(
         public readonly StatusHandlerInterface $statusHandler,
         public readonly CanvasCommunicator $canvasCommunicator

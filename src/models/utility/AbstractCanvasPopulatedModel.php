@@ -18,7 +18,7 @@ abstract class AbstractCanvasPopulatedModel implements ModelInterface{
         return $this->domain->domain . "-" . $this::class . "-" . $this->id;
     }
     
-    protected function getDomain(): Domain{
+    public function getDomain(): Domain{
         return $this->domain;
     }
 
