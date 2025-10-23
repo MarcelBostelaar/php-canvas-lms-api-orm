@@ -135,7 +135,8 @@ function GenerateFullModelTrait($originalModelName, $chosenTraitName, array $reg
         property($p["type"], $p["name"]);
         echo "\n";
     }
-
+    //TODO handle minimum properties.
+    //TODO also write generated "getSkeleton" and static "fromSkeleton" methods based on them.
     foreach($nullableProperties as $p){
         nullableProperty($p["type"], $p["name"]);
         echo "\n";

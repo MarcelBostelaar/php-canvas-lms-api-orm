@@ -14,12 +14,12 @@ final class Submission extends AbstractCanvasPopulatedModel{
     use SubmissionProperties;
     protected static array $properties = [
         [User::class, "student"],
-        [Assignment::class, "assignment"]
+        [Assignment::class, "assignment"],
+        [Course::class, "course"]
     ];
     protected static array $nullableProperties = [
         ["string", "url"], 
         [\DateTime::class, "submitted_at"],
-        [Course::class, "course"],
         [Section::class, "section"]
     ];
     

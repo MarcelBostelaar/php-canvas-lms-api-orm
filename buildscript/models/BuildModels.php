@@ -19,6 +19,7 @@ function buildModels($folder, $targetFolderForTraits){
         $traitname = $modelname . "Properties";
         $parsedFile = processModelFile($filePath, $modelname, $traitname);
         [$normalProps, $normalModels] = processAndGetModelClassProps($parsedFile['fields']);
+        //TODO handle minimum fields
         [$nullableProps, $nullableModels] = processAndGetModelClassProps($parsedFile['fieldsNullable']);
         $normalProps = fixGlobalClassTypes($normalProps);
         $nullableProps = fixGlobalClassTypes($nullableProps);

@@ -20,16 +20,6 @@ abstract class AbstractCanvasPopulatedModel implements ModelInterface{
         return $this->domain;
     }
 
-    /**
-     * Returns a boolean indicating whether or not the needed fields 
-     * have been set to allow the item to be re-populated via
-     *  their corresponding API calls.
-     * @return bool
-     */
-    public function validateSkeleton(): bool{
-        return isset($this->id); //Domain is implicit in all canvas populated models.
-    }
-
     public int $id{
         get{
             return $this->id;
@@ -43,22 +33,22 @@ abstract class AbstractCanvasPopulatedModel implements ModelInterface{
     }
 
     /**
-     * A list of property names to be dynamically generated/handled. 
-     * Optionally, instead of a property name, a [type, name] can be given, which will be used for type checking on setting.
-     * If an unpopulated property is accessed, a NotPopulatedException is thrown.
-     * List is used to calculate whether or not a model is fully populated.
-     * Use docstring to provide info about properties to tooling.
-     * @var array<string|array>
+     * A list of non-nullable property names to be generated, which are required to re-populate the item from the canvas api.
+     * These properties are saved inside foreign models, if the model is included as a field in the other model. 
+     * A [type, name] must be given.
+     * @var array{0: class-string, 1: string}
+     */
+    protected static array $minimumProperties = [];
+    /**
+     * A list of non-nullable property names to be generated. 
+     * A [type, name] must be given.
+     * @var array{0: class-string, 1: string}
      */
     protected static array $properties = [];
     /**
-     * A list of property names to be dynamically generated/handled. 
-     * Optionally, instead of a property name, a [type, name] can be given, which will be used for type checking on setting.
-     * If an unpopulated property is accessed, null is returned.
-     * List is used to calculate whether or not a model is fully populated.
-     * Use docstring to provide info about properties to tooling.
-     * @var array<string|array>
-     * @var array
+     * A list of nullable property names to be generated. 
+     * A [type, name] must be given.
+     * @var array{0: class-string, 1: string}
      */
     protected static array $nullableProperties = [];
 }
