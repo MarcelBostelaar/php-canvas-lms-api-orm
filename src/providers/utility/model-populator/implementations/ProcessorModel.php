@@ -1,7 +1,6 @@
 <?php
 
 namespace CanvasApiLibrary\Providers\Utility\ModelPopulator;
-use Closure;
 use CanvasApiLibrary\Models\Domain;
 
 class ProcessorModel implements ProcessorInterface{
@@ -24,6 +23,13 @@ class ProcessorModel implements ProcessorInterface{
         }
         $newModel = new $this->modelclass($domain);
         $newModel->id = $data;
+        if(!$newModel->validateSkeleton()){
+            return [
+                "data" => null,
+                "errors" => ["Not all needed fields for the model $newModel have been set."],
+                "continue" => false
+            ];
+        }
         return [
             "data" => $newModel,
             "errors" => [],

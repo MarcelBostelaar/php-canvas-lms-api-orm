@@ -4,11 +4,13 @@ namespace CanvasApiLibrary\Models\Generated;
 
 use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Models\Domain;
-use CanvasApiLibrary\Models\Student;
+use CanvasApiLibrary\Models\User;
 use CanvasApiLibrary\Models\Assignment;
+use CanvasApiLibrary\Models\Course;
+use CanvasApiLibrary\Models\Section;
 
 trait SubmissionProperties{
-    abstract protected function getDomain(): Domain;
+    abstract public function getDomain(): Domain;
 
     public ?string $url{
         get {
@@ -19,27 +21,27 @@ trait SubmissionProperties{
         }
     }
 
-    public ?\DateTime $submittedAt{
+    public ?\DateTime $submitted_at{
         get {
-            return $this->submittedAt;
+            return $this->submitted_at;
         }
         set(?\DateTime $value) {
-            $this->submittedAt = $value;
+            $this->submitted_at = $value;
         }
     }
 
     protected int $student_id;
-    public Student $student{
+    public User $student{
         get { 
-            $item = new Student($this->getDomain());
+            $item = new User($this->getDomain());
             $item->id = $this->student_id;
             return $item;
         }
-        set (Student $value) {
+        set (User $value) {
             if($value->getDomain()->domain != $this->getDomain()->domain){
                 $selfDomain = $this->getDomain()->domain;
                 $otherDomain = $value->getDomain()->domain;
-                throw new MixingDomainsException("Tried to save a Student from domain '$otherDomain' to Submission.student from domain '$selfDomain'.");
+                throw new MixingDomainsException("Tried to save a User from domain '$otherDomain' to Submission.student from domain '$selfDomain'.");
             }
             $this->student_id = $value->id;
         }
@@ -59,6 +61,54 @@ trait SubmissionProperties{
                 throw new MixingDomainsException("Tried to save a Assignment from domain '$otherDomain' to Submission.assignment from domain '$selfDomain'.");
             }
             $this->assignment_id = $value->id;
+        }
+    }
+
+    protected ?int $course_id;
+    public ?Course $course{
+        get {
+            if($this->course === null){
+                return null;
+            }
+            $item = new Course($this->getDomain());
+            $item->id = $this->course_id;
+            return $item;
+        }
+        set (?Course $value) {
+            if($value === null){
+                $this->course_id = null;
+                return;
+            }
+            if($value->getDomain()->domain != $this->getDomain()->domain){
+                $selfDomain = $this->getDomain()->domain;
+                $otherDomain = $value->getDomain()->domain;
+                throw new MixingDomainsException("Tried to save a Course from domain '$otherDomain' to Submission.course from domain '$selfDomain'.");
+            }
+            $this->course_id = $value->id;
+        }
+    }
+
+    protected ?int $section_id;
+    public ?Section $section{
+        get {
+            if($this->section === null){
+                return null;
+            }
+            $item = new Section($this->getDomain());
+            $item->id = $this->section_id;
+            return $item;
+        }
+        set (?Section $value) {
+            if($value === null){
+                $this->section_id = null;
+                return;
+            }
+            if($value->getDomain()->domain != $this->getDomain()->domain){
+                $selfDomain = $this->getDomain()->domain;
+                $otherDomain = $value->getDomain()->domain;
+                throw new MixingDomainsException("Tried to save a Section from domain '$otherDomain' to Submission.section from domain '$selfDomain'.");
+            }
+            $this->section_id = $value->id;
         }
     }
 

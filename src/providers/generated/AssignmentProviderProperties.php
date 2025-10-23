@@ -7,7 +7,6 @@ namespace CanvasApiLibrary\Providers;
 
 use CanvasApiLibrary\Providers\Utility\Lookup;
 use CanvasApiLibrary\Models\Assignment;
-use CanvasApiLibrary\Models\Domain;
 
 trait AssignmentProviderProperties{
     abstract public function populateAssignment(Assignment $assignment);

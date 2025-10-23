@@ -13,4 +13,9 @@ final class Section extends AbstractCanvasPopulatedModel{
 
     
     public static array $plurals = ["Sections"];
+
+    
+    public function validateSkeleton(): bool{
+        return isset($this->course_id) && isset($this->id);
+    }
 }

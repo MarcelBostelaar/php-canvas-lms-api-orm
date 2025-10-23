@@ -1,10 +1,8 @@
 <?php
 
 namespace CanvasApiLibrary\Models\Utility;
-use CanvasApiLibrary\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Models\Domain;
 use ChangingIdException;
-use Exception;
 
 abstract class AbstractCanvasPopulatedModel implements ModelInterface{
 
@@ -20,6 +18,16 @@ abstract class AbstractCanvasPopulatedModel implements ModelInterface{
     
     public function getDomain(): Domain{
         return $this->domain;
+    }
+
+    /**
+     * Returns a boolean indicating whether or not the needed fields 
+     * have been set to allow the item to be re-populated via
+     *  their corresponding API calls.
+     * @return bool
+     */
+    public function validateSkeleton(): bool{
+        return isset($this->id); //Domain is implicit in all canvas populated models.
     }
 
     public int $id{

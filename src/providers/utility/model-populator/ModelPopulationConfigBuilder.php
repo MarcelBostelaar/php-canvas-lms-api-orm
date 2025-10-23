@@ -3,6 +3,7 @@
 namespace CanvasApiLibrary\Providers\Utility\ModelPopulator;
 
 use CanvasApiLibrary\Models\Domain;
+use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
 use CanvasApiLibrary\Providers\Utility\HandleEmittedInterface;
 use DateTime;
 use LogicException;
@@ -10,6 +11,8 @@ use LogicException;
 class ModelPopulationConfigBuilder{
     private $instructions;
     private string $model;
+
+    private AbstractCanvasPopulatedModel $instance;
 
     public function __construct(string $model, array $instructions = [[null, [], null]]){
         $this->instructions = $instructions;
@@ -120,6 +123,17 @@ class ModelPopulationConfigBuilder{
         return $this->addProcessor(new ProcessorClosure($closure));
     }
 
+    /**
+     * Sets a specific instance to run the builder with. Method does not mutate original builder (entire builder is immutable/behaviourally pure).
+     * @param \CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel $instance
+     * @return ModelPopulationConfigBuilder
+     */
+    public function withInstance(AbstractCanvasPopulatedModel $instance): ModelPopulationConfigBuilder{
+        $new = clone $this;
+        $new->instance = $instance;
+        return $new;
+    }
+
     //Usability combinations
 
     /**
@@ -151,7 +165,10 @@ class ModelPopulationConfigBuilder{
     //Building
 
     public function build(Domain $domain, $data) : mixed{
+        //TODO check if an instance has been set. 
+        // If data is singular, populate instance if it exists, else make a new instance.
         //TODO: Orchestrate collected instructions
+        //TODO check that all skeleton mandated elements have been set.
         return null;
     }
 }

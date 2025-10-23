@@ -7,7 +7,7 @@ use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\Course;
 
 trait SectionProperties{
-    abstract protected function getDomain(): Domain;
+    abstract public function getDomain(): Domain;
 
     public string $name{
         get {

@@ -7,26 +7,21 @@ use CanvasApiLibrary\Models\Course;
 use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\GroupCategory;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
+use CanvasApiLibrary\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 
 
 class AssignmentProvider extends AbstractProvider{
     use AssignmentProviderProperties;
 
-    public function populateAssignment(Assignment $assignment) : Assignment{
-        // $this->populateModel($assignment);
-    }
+    protected static ModelPopulationConfigBuilder $modelPopulator = 
+        new ModelPopulationConfigBuilder(Assignment::class)
+        ->from("group_category_id")->to("group_category")->asModel(GroupCategory::class)
+        ->from("course_id")->to("course")->asModel(Course::class);
 
-    /**
-     * Summary of populateModel
-     * @param Domain $domain
-     * @param Assignment $model
-     * @param mixed $data
-     * @return Assignment
-     */
-    protected function populateModel(Domain $domain, $model, mixed $data) : Assignment{
-        //Replace array_map_to_models with a builder pattern. Save builder pattern statically in the provider.
-        //Use the builder pattern to populate the model easily.
-        //Builder pattern will not save the domain, but is passed it on build.
-        //Builder pattern returns new model class.
+    public function populateAssignment(Assignment $assignment) : Assignment{
+        $this->Get($assignment->getDomain(), 
+        "/api/v1/courses/{$assignment->course->id}/assignments/$assignment->id",
+        self::$modelPopulator->withInstance($assignment));
+        return $assignment;
     }
 }

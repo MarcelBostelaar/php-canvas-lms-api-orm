@@ -3,7 +3,7 @@ namespace CanvasApiLibrary\Providers;
 
 use CanvasApiLibrary\Services as Services;
 use CanvasApiLibrary\Models as Models;
-use CanvasApiLibrary\Models\Student;
+use CanvasApiLibrary\Models\User;
 use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Providers\Utility\Lookup;
@@ -12,7 +12,7 @@ use CanvasApiLibrary\Providers\Utility\Lookup;
 /**
  * Provider for Canvas API Student operations
  * 
- * @method Lookup<Models\Group, Models\Student> getStudentsInGroups() Virtual method to get all student in groups
+ * @method Lookup<Models\Group, Models\User> getStudentsInGroups() Virtual method to get all student in groups
  */
 class StudentProvider extends AbstractProvider{
     use StudentProviderProperties;
@@ -24,7 +24,7 @@ class StudentProvider extends AbstractProvider{
      * Summary of getStudentsInGroup
      * @param \CanvasApiLibrary\Models\Domain $domain
      * @param \CanvasApiLibrary\Models\Group $group
-     * @return Student[]
+     * @return User[]
      */
     public function getStudentsInGroup(Domain $domain, Models\Group $group): array{
         return $this->Get($domain, "/groups/{$group->id}/users");
@@ -40,7 +40,7 @@ class StudentProvider extends AbstractProvider{
         //todo
     }
 
-    public function populateStudent(Student $student){
+    public function populateStudent(User $student){
         //todo
     }
 }

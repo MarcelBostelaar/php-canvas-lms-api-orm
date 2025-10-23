@@ -5,8 +5,8 @@ namespace CanvasApiLibrary\Models\Generated;
 use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Models\Domain;
 
-trait StudentProperties{
-    abstract protected function getDomain(): Domain;
+trait UserProperties{
+    abstract public function getDomain(): Domain;
 
     public string $name{
         get {

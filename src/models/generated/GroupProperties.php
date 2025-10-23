@@ -6,7 +6,7 @@ use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Models\Domain;
 
 trait GroupProperties{
-    abstract protected function getDomain(): Domain;
+    abstract public function getDomain(): Domain;
 
     public string $name{
         get {

@@ -19,7 +19,7 @@ use CanvasApiLibrary\Models\<?=$modelName?>;
 <?php endforeach ?>
 
 trait <?=$classname?>{
-    abstract protected function getDomain(): Domain;
+    abstract public function getDomain(): Domain;
 
 <?php 
 }

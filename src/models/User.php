@@ -1,14 +1,14 @@
 <?php
 
 namespace CanvasApiLibrary\Models;
+use CanvasApiLibrary\Models\Generated\UserProperties;
 use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
-use CanvasApiLibrary\Models\Generated\StudentProperties;
 
-final class Student extends AbstractCanvasPopulatedModel{
-    use StudentProperties;
+class User extends AbstractCanvasPopulatedModel{
+    use UserProperties;
     protected static array $properties = [
         ["string", "name"]
     ];
     
-    public static array $plurals = ["Students"];
+    public static array $plurals = ["Users"];
 }
