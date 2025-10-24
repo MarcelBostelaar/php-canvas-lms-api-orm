@@ -10,29 +10,29 @@ use CanvasApiLibrary\Providers\Utility\Lookup;
 
 
 /**
- * Provider for Canvas API Student operations
+ * Provider for Canvas API User operations
  * 
- * @method Lookup<Models\Group, Models\User> getStudentsInGroups() Virtual method to get all student in groups
+ * @method Lookup<Models\Group, Models\User> getUsersInGroups() Virtual method to get all user in groups
  */
-class StudentProvider extends AbstractProvider{
-    use StudentProviderProperties;
+class UserProvider extends AbstractProvider{
+    use UserProviderProperties;
     public function __construct(
         public readonly Services\StatusHandlerInterface $statusHandler
     ){}
 
     /**
-     * Summary of getStudentsInGroup
+     * Summary of getUsersInGroup
      * @param \CanvasApiLibrary\Models\Domain $domain
      * @param \CanvasApiLibrary\Models\Group $group
      * @return User[]
      */
-    public function getStudentsInGroup(Domain $domain, Models\Group $group): array{
+    public function getUsersInGroup(Domain $domain, Models\Group $group): array{
         return $this->Get($domain, "/groups/{$group->id}/users");
     }
 
-    public function getStudentsInSection(Domain $domain, Models\Section $section): array{
+    public function getUsersInSection(Domain $domain, Models\Section $section): array{
         return $this->Get($domain, 
-        "/sections/{$section->id}/enrollments?type[]=StudentEnrollment&per_page=100", 
+        "/sections/{$section->id}/enrollments?type[]=UserEnrollment&per_page=100", 
         [], fn($x) => $x["user"]);
     }
 
@@ -40,7 +40,7 @@ class StudentProvider extends AbstractProvider{
         //todo
     }
 
-    public function populateStudent(User $student){
+    public function populateUser(User $user){
         //todo
     }
 }

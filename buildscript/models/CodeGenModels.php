@@ -111,6 +111,49 @@ function modelProp($modelname, $propertyname, $nullable, $originalModelName){
 <?php
 }
 
+function getSkeletonMethod($minimumProperties, $minimumModels, $modelName){
+    array_push($minimumProperties, ["type" => "int", "name" => "id"]);
+    
+    $mergedNames = array_map(fn($x) => $x['name'],array_merge($minimumModels, $minimumProperties));
+
+    $propsProcessed = array_map(fn($x) => "['" . $x['name'] . "'] => \$this->" . $x['name'], $minimumProperties);
+    $modelsProcessed = array_map(fn($x) => "['" . $x['name'] . "'] => \$this->" . $x['name'] . "->getMinimumDataRepresentation()", $minimumModels);
+    $assocArrayStringInside = implode(",\n", array_merge($propsProcessed, $modelsProcessed));
+    ?>
+    public function getMinimumDataRepresentation(){
+        if(!(<?php foreach($mergedNames as $name){?>
+            isset($this-><?=$name?>) &&
+            <?php }?>
+            true
+        )){
+            throw new NotPopulatedException("Not all minimum required fields for this model, so it can be re-populated, have been set.");
+        }
+        return [
+            <?=$assocArrayStringInside?>
+        ];
+    }
+
+    public static function newFromMinimumDataRepresentation(Domain $domain, array $data): <?=$modelName?>{
+        if(!(<?php foreach($mergedNames as $name){?>
+            isset($data['<?=$name?>']) &&
+            <?php }?>
+            true
+        )){
+            throw new NotPopulatedException("Not all minimum required fields for this model are in the data provided.");
+        }
+        $newInstance = new <?=$modelName?>($domain);
+        <?php foreach ($minimumProperties as $prop){?>
+        $this-><?=$prop['name']?> = $data['<?=$prop['name']?>'];
+        <?php }?>
+
+        <?php foreach ($minimumModels as $prop){?>
+        $this-><?=$prop['name']?> = <?=$prop['type']?>::newFromMinimumDataRepresentation($data['<?=$prop['name']?>']);
+        <?php }?>
+        return $newInstance;
+    }
+    <?php
+}
+
 function fileEnd(){
     echo "}";
 }
@@ -121,22 +164,27 @@ function fileEnd(){
  * @param mixed $chosenTraitName
  * @param array{type: string, name: string} $regularProperties
  * @param array{type: string, name: string} $nullableProperties
+ * @param array{type: string, name: string} $minimumProperties
+ * @param array{type: string, name: string} $minimumModelProperties
  * @param array{type: string, name: string} $ModelProperties
  * @param array{type: string, name: string} $nullableModelProperties
  * @return string
  */
-function GenerateFullModelTrait($originalModelName, $chosenTraitName, array $regularProperties, array $nullableProperties, array $ModelProperties, array $nullableModelProperties){
+function GenerateFullModelTrait($originalModelName, $chosenTraitName, array $regularProperties, array $nullableProperties, array $minimumProperties, array $minimumModelProperties, array $ModelProperties, array $nullableModelProperties){
     // var_dump($regularProperties);
     ob_start();
-    $usedModels = array_unique(array_map(fn($x) => $x["type"], array_merge($ModelProperties, $nullableModelProperties)));
+    $usedModels = array_unique(array_map(fn($x) => $x["type"], array_merge($ModelProperties, $nullableModelProperties, $minimumModelProperties)));
     fileTop($chosenTraitName, $usedModels);
 
     foreach($regularProperties as $p){
         property($p["type"], $p["name"]);
         echo "\n";
     }
-    //TODO handle minimum properties.
-    //TODO also write generated "getSkeleton" and static "fromSkeleton" methods based on them.
+    foreach($minimumProperties as $p){
+        property($p["type"], $p["name"]);
+        echo "\n";
+    }
+    
     foreach($nullableProperties as $p){
         nullableProperty($p["type"], $p["name"]);
         echo "\n";
@@ -147,10 +195,17 @@ function GenerateFullModelTrait($originalModelName, $chosenTraitName, array $reg
         echo "\n";
     }
 
+    foreach($minimumModelProperties as $p){
+        modelProp($p["type"], $p["name"], false, $originalModelName);
+        echo "\n";
+    }
+
     foreach($nullableModelProperties as $p){
         modelProp($p["type"],  $p["name"], true, $originalModelName);
         echo "\n";
     }
+
+    getSkeletonMethod($minimumProperties, $minimumModelProperties, $originalModelName);
 
     fileEnd();
 

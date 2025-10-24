@@ -89,4 +89,25 @@ trait SubmissionCommentProperties{
         }
     }
 
-}
+    public function getMinimumDataRepresentation(){
+        if(!(            isset($this->id) &&
+                        true
+        )){
+            throw new NotPopulatedException("Not all minimum required fields for this model, so it can be re-populated, have been set.");
+        }
+        return [
+            ['id'] => $this->id        ];
+    }
+
+    public static function newFromMinimumDataRepresentation(Domain $domain, array $data): SubmissionComment{
+        if(!(            isset($data['id']) &&
+                        true
+        )){
+            throw new NotPopulatedException("Not all minimum required fields for this model are in the data provided.");
+        }
+        $newInstance = new SubmissionComment($domain);
+                $this->id = $data['id'];
+        
+                return $newInstance;
+    }
+    }

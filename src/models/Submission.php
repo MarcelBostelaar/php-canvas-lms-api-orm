@@ -5,7 +5,7 @@ use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
 use CanvasApiLibrary\Models\Generated\SubmissionProperties;
 
 /**
- * @property User $student
+ * @property User $user
  * @property Assignment $assignment
  * @property ?string $url
  * @property ?\DateTime $submittedAt
@@ -13,7 +13,7 @@ use CanvasApiLibrary\Models\Generated\SubmissionProperties;
 final class Submission extends AbstractCanvasPopulatedModel{
     use SubmissionProperties;
     protected static array $properties = [
-        [User::class, "student"],
+        [User::class, "user"],
         [Assignment::class, "assignment"],
         [Course::class, "course"]
     ];

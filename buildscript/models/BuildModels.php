@@ -19,11 +19,20 @@ function buildModels($folder, $targetFolderForTraits){
         $traitname = $modelname . "Properties";
         $parsedFile = processModelFile($filePath, $modelname, $traitname);
         [$normalProps, $normalModels] = processAndGetModelClassProps($parsedFile['fields']);
-        //TODO handle minimum fields
+        [$minimumProps, $minimumModels] = processAndGetModelClassProps($parsedFile['minimumProperties']);
         [$nullableProps, $nullableModels] = processAndGetModelClassProps($parsedFile['fieldsNullable']);
         $normalProps = fixGlobalClassTypes($normalProps);
         $nullableProps = fixGlobalClassTypes($nullableProps);
-        $parsedFile['generatedTrait'] = GenerateFullModelTrait($modelname, $traitname, $normalProps, $nullableProps, $normalModels, $nullableModels);
+        $minimumProps = fixGlobalClassTypes($minimumProps);
+        $parsedFile['generatedTrait'] = GenerateFullModelTrait(
+            $modelname, 
+            $traitname, 
+            $normalProps, 
+            $nullableProps, 
+            $minimumProps,
+            $minimumModels,
+            $normalModels, 
+            $nullableModels);
         $mapped[] = $parsedFile;
         file_put_contents("$targetFolderForTraits/$traitname.php", $parsedFile["generatedTrait"]);
         //write to test folder

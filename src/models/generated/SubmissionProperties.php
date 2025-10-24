@@ -30,20 +30,20 @@ trait SubmissionProperties{
         }
     }
 
-    protected int $student_id;
-    public User $student{
+    protected int $user_id;
+    public User $user{
         get { 
             $item = new User($this->getDomain());
-            $item->id = $this->student_id;
+            $item->id = $this->user_id;
             return $item;
         }
         set (User $value) {
             if($value->getDomain()->domain != $this->getDomain()->domain){
                 $selfDomain = $this->getDomain()->domain;
                 $otherDomain = $value->getDomain()->domain;
-                throw new MixingDomainsException("Tried to save a User from domain '$otherDomain' to Submission.student from domain '$selfDomain'.");
+                throw new MixingDomainsException("Tried to save a User from domain '$otherDomain' to Submission.user from domain '$selfDomain'.");
             }
-            $this->student_id = $value->id;
+            $this->user_id = $value->id;
         }
     }
 
@@ -64,21 +64,14 @@ trait SubmissionProperties{
         }
     }
 
-    protected ?int $course_id;
-    public ?Course $course{
-        get {
-            if($this->course === null){
-                return null;
-            }
+    protected int $course_id;
+    public Course $course{
+        get { 
             $item = new Course($this->getDomain());
             $item->id = $this->course_id;
             return $item;
         }
-        set (?Course $value) {
-            if($value === null){
-                $this->course_id = null;
-                return;
-            }
+        set (Course $value) {
             if($value->getDomain()->domain != $this->getDomain()->domain){
                 $selfDomain = $this->getDomain()->domain;
                 $otherDomain = $value->getDomain()->domain;
@@ -112,4 +105,25 @@ trait SubmissionProperties{
         }
     }
 
-}
+    public function getMinimumDataRepresentation(){
+        if(!(            isset($this->id) &&
+                        true
+        )){
+            throw new NotPopulatedException("Not all minimum required fields for this model, so it can be re-populated, have been set.");
+        }
+        return [
+            ['id'] => $this->id        ];
+    }
+
+    public static function newFromMinimumDataRepresentation(Domain $domain, array $data): Submission{
+        if(!(            isset($data['id']) &&
+                        true
+        )){
+            throw new NotPopulatedException("Not all minimum required fields for this model are in the data provided.");
+        }
+        $newInstance = new Submission($domain);
+                $this->id = $data['id'];
+        
+                return $newInstance;
+    }
+    }
