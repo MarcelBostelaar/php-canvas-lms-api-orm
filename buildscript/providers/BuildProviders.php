@@ -4,6 +4,7 @@ include_once __DIR__ . '/ProviderOriginalParser.php';
 use Exception;
 use function Buildscript\Providers\processProviderFile;
 use function Buildscript\varDumpNoAst;
+use function Buildscript\prettified;
 
 function buildProviders($folder, $models){
     echo "Building providers in folder: $folder\n";
@@ -37,7 +38,7 @@ function buildProviders($folder, $models){
             $provider['methods'],
             $pluralLookup
         );
-        file_put_contents("$folder/generated/" . $provider['traitname'] . '.php', "<?php\n" . $traitContent);
+        file_put_contents("$folder/generated/" . $provider['traitname'] . '.php', prettified("<?php\n" . $traitContent));
     }
 
     return $mapped;

@@ -42,3 +42,11 @@ function varDumpNoAst($data){
         var_dump($data);
     }
 }
+
+function prettified(string $code): string {
+    $phpParser = (new ParserFactory())->createForNewestSupportedVersion();
+    $ast = $phpParser->parse($code);
+
+    $prettyPrinter = new \PhpParser\PrettyPrinter\Standard();
+    return $prettyPrinter->prettyPrintFile($ast);
+}

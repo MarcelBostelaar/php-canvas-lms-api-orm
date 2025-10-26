@@ -1,17 +1,18 @@
 <?php
+
 /* Automatically generated based on model properties.*/
 namespace CanvasApiLibrary\Models\Generated;
 
-use CanvasApiLibrary\Exceptions\MixingDomainsException;
+use CanvasApiLibrary\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\Course;
 use CanvasApiLibrary\Models\Assignment;
 use CanvasApiLibrary\Models\User;
-
-trait SubmissionCommentProperties{
+use CanvasApiLibrary\Models\SubmissionComment;
+trait SubmissionCommentProperties
+{
     abstract public function getDomain(): Domain;
-
-    public string $feedback_giver{
+    public string $feedback_giver {
         get {
             return $this->feedback_giver;
         }
@@ -19,8 +20,7 @@ trait SubmissionCommentProperties{
             $this->feedback_giver = $value;
         }
     }
-
-    public string $comment{
+    public string $comment {
         get {
             return $this->comment;
         }
@@ -28,8 +28,7 @@ trait SubmissionCommentProperties{
             $this->comment = $value;
         }
     }
-
-    public \DateTime $date{
+    public \DateTime $date {
         get {
             return $this->date;
         }
@@ -37,77 +36,68 @@ trait SubmissionCommentProperties{
             $this->date = $value;
         }
     }
-
     protected int $course_id;
-    public Course $course{
-        get { 
+    public Course $course {
+        get {
             $item = new Course($this->getDomain());
             $item->id = $this->course_id;
             return $item;
         }
-        set (Course $value) {
-            if($value->getDomain()->domain != $this->getDomain()->domain){
+        set(Course $value) {
+            if ($value->getDomain()->domain != $this->getDomain()->domain) {
                 $selfDomain = $this->getDomain()->domain;
                 $otherDomain = $value->getDomain()->domain;
-                throw new MixingDomainsException("Tried to save a Course from domain '$otherDomain' to SubmissionComment.course from domain '$selfDomain'.");
+                throw new MixingDomainsException("Tried to save a Course from domain '{$otherDomain}' to SubmissionComment.course from domain '{$selfDomain}'.");
             }
             $this->course_id = $value->id;
         }
     }
-
     protected int $assignment_id;
-    public Assignment $assignment{
-        get { 
+    public Assignment $assignment {
+        get {
             $item = new Assignment($this->getDomain());
             $item->id = $this->assignment_id;
             return $item;
         }
-        set (Assignment $value) {
-            if($value->getDomain()->domain != $this->getDomain()->domain){
+        set(Assignment $value) {
+            if ($value->getDomain()->domain != $this->getDomain()->domain) {
                 $selfDomain = $this->getDomain()->domain;
                 $otherDomain = $value->getDomain()->domain;
-                throw new MixingDomainsException("Tried to save a Assignment from domain '$otherDomain' to SubmissionComment.assignment from domain '$selfDomain'.");
+                throw new MixingDomainsException("Tried to save a Assignment from domain '{$otherDomain}' to SubmissionComment.assignment from domain '{$selfDomain}'.");
             }
             $this->assignment_id = $value->id;
         }
     }
-
     protected int $user_id;
-    public User $user{
-        get { 
+    public User $user {
+        get {
             $item = new User($this->getDomain());
             $item->id = $this->user_id;
             return $item;
         }
-        set (User $value) {
-            if($value->getDomain()->domain != $this->getDomain()->domain){
+        set(User $value) {
+            if ($value->getDomain()->domain != $this->getDomain()->domain) {
                 $selfDomain = $this->getDomain()->domain;
                 $otherDomain = $value->getDomain()->domain;
-                throw new MixingDomainsException("Tried to save a User from domain '$otherDomain' to SubmissionComment.user from domain '$selfDomain'.");
+                throw new MixingDomainsException("Tried to save a User from domain '{$otherDomain}' to SubmissionComment.user from domain '{$selfDomain}'.");
             }
             $this->user_id = $value->id;
         }
     }
-
-    public function getMinimumDataRepresentation(){
-        if(!(            isset($this->id) &&
-                        true
-        )){
+    public function getMinimumDataRepresentation()
+    {
+        if (!(isset($this->id) && true)) {
             throw new NotPopulatedException("Not all minimum required fields for this model, so it can be re-populated, have been set.");
         }
-        return [
-            ['id'] => $this->id        ];
+        return [['id'] => $this->id];
     }
-
-    public static function newFromMinimumDataRepresentation(Domain $domain, array $data): SubmissionComment{
-        if(!(            isset($data['id']) &&
-                        true
-        )){
+    public static function newFromMinimumDataRepresentation(Domain $domain, array $data): SubmissionComment
+    {
+        if (!(isset($data['id']) && true)) {
             throw new NotPopulatedException("Not all minimum required fields for this model are in the data provided.");
         }
         $newInstance = new SubmissionComment($domain);
-                $this->id = $data['id'];
-        
-                return $newInstance;
+        $newInstance->id = $data['id'];
+        return $newInstance;
     }
-    }
+}

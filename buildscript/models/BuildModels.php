@@ -2,6 +2,7 @@
 namespace Buildscript\Models;
 
 use function Buildscript\tryExtractModelClassName;
+use function Buildscript\prettified;
 
 include_once __DIR__ . '/ModelOriginalParser.php';
 function buildModels($folder, $targetFolderForTraits){
@@ -34,7 +35,7 @@ function buildModels($folder, $targetFolderForTraits){
             $normalModels, 
             $nullableModels);
         $mapped[] = $parsedFile;
-        file_put_contents("$targetFolderForTraits/$traitname.php", $parsedFile["generatedTrait"]);
+        file_put_contents("$targetFolderForTraits/$traitname.php", prettified($parsedFile["generatedTrait"]));
         //write to test folder
         // $ast = $parsedFile["ast"];
         // $name = $parsedFile["modelname"];

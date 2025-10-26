@@ -21,6 +21,12 @@ function build(){
 }
 
 function clearFolder($folder){
+    //if folder does not exist, create it
+    if(!is_dir($folder)){
+        mkdir($folder);
+        return;
+    }
+
     $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folder, RecursiveDirectoryIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
     foreach ($it as $file) {
         if ($file->isDir()){

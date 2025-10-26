@@ -12,7 +12,7 @@ function fileTop($classname, array $usedModels){
 /* Automatically generated based on model properties.*/
 namespace CanvasApiLibrary\Models\Generated;
 
-use CanvasApiLibrary\Exceptions\MixingDomainsException;
+use CanvasApiLibrary\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Models\Domain;
 <?php foreach($usedModels as $modelName): ?>
 use CanvasApiLibrary\Models\<?=$modelName?>;
@@ -143,11 +143,11 @@ function getSkeletonMethod($minimumProperties, $minimumModels, $modelName){
         }
         $newInstance = new <?=$modelName?>($domain);
         <?php foreach ($minimumProperties as $prop){?>
-        $this-><?=$prop['name']?> = $data['<?=$prop['name']?>'];
+        $newInstance-><?=$prop['name']?> = $data['<?=$prop['name']?>'];
         <?php }?>
 
         <?php foreach ($minimumModels as $prop){?>
-        $this-><?=$prop['name']?> = <?=$prop['type']?>::newFromMinimumDataRepresentation($data['<?=$prop['name']?>']);
+        $newInstance-><?=$prop['name']?> = <?=$prop['type']?>::newFromMinimumDataRepresentation($data['<?=$prop['name']?>']);
         <?php }?>
         return $newInstance;
     }
@@ -174,6 +174,8 @@ function GenerateFullModelTrait($originalModelName, $chosenTraitName, array $reg
     // var_dump($regularProperties);
     ob_start();
     $usedModels = array_unique(array_map(fn($x) => $x["type"], array_merge($ModelProperties, $nullableModelProperties, $minimumModelProperties)));
+    array_push($usedModels, $originalModelName);
+
     fileTop($chosenTraitName, $usedModels);
 
     foreach($regularProperties as $p){
