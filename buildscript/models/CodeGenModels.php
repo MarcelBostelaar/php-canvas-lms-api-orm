@@ -13,6 +13,7 @@ function fileTop($classname, array $usedModels){
 namespace CanvasApiLibrary\Models\Generated;
 
 use CanvasApiLibrary\Exceptions\NotPopulatedException;
+use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Models\Domain;
 <?php foreach($usedModels as $modelName): ?>
 use CanvasApiLibrary\Models\<?=$modelName?>;

@@ -4,6 +4,7 @@
 namespace CanvasApiLibrary\Models\Generated;
 
 use CanvasApiLibrary\Exceptions\NotPopulatedException;
+use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\User;
 use CanvasApiLibrary\Models\Assignment;
