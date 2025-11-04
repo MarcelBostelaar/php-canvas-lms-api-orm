@@ -2,7 +2,7 @@
 
 namespace CanvasApiLibrary\Models\Utility;
 use CanvasApiLibrary\Models\Domain;
-use ChangingIdException;
+use CanvasApiLibrary\Exceptions\ChangingIdException;
 
 abstract class AbstractCanvasPopulatedModel implements ModelInterface{
 
@@ -10,14 +10,22 @@ abstract class AbstractCanvasPopulatedModel implements ModelInterface{
      * Constructs a new basemodel. Do not override the constructor with non-optional parameters.
      * @param Domain $domain The domain of the canvas object
      */
-    public function __construct(private readonly Domain $domain){
+    public function __construct(){
     }
     public function getUniqueId(): mixed {
         return $this->domain->domain . "-" . $this::class . "-" . $this->id;
     }
     
-    public function getDomain(): Domain{
-        return $this->domain;
+    public Domain $domain{
+        get{
+            return $this->domain;
+        }
+        protected set(Domain $value){
+            if(isset($this->domain)){
+                throw new ChangingIdException("Tried to change the domain of a model.");
+            }
+            $this->domain = $value;
+        }
     }
 
     public int $id{

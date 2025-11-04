@@ -1,7 +1,7 @@
 <?php
 
 namespace CanvasApiLibrary\Providers\Utility\ModelPopulator;
-use CanvasApiLibrary\Models\Domain;
+use CanvasApiLibrary\Models\Utility\ModelInterface;
 
 
 /**
@@ -13,10 +13,11 @@ interface ProcessorInterface
      * Consumes input data and returns transformed data along with errors and a continue flag.
      *
      * @param mixed $data Input data to process
+     * @param ModelInterface[] $context Context data from which can be pulled for suplementary data.
      * @return array{data:mixed, errors:string[], continue:bool} An associative array with:
      *  - data: Transformed/new data
      *  - errors: List of error messages (empty when none)
      *  - continue: Whether the pipeline should continue processing/consumption
      */
-    public function process(mixed $data, Domain $domain): array;
+    public function process(mixed $data, array $context): array;
 }
