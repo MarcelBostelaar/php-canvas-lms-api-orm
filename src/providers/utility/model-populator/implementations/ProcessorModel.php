@@ -6,7 +6,7 @@ use CanvasApiLibrary\Models\Domain;
 class ProcessorModel implements ProcessorInterface{
     public function __construct(readonly private string $modelclass){}
 
-    public function process(mixed $data, Domain $domain): array{
+    public function process(mixed $data, array $context): array{
         if($data === null){
             return [
                 "data" => null,
@@ -21,8 +21,9 @@ class ProcessorModel implements ProcessorInterface{
                 "continue" => false
             ];
         }
-        $newModel = new $this->modelclass($domain);
+        $newModel = new $this->modelclass();
         $newModel->id = $data;
+        $newModel->populateWithContext($context);
         if(!$newModel->validateSkeleton()){
             return [
                 "data" => null,

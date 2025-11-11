@@ -20,7 +20,7 @@ class ConsumerEmitter implements ConsumerInterface{
         if($data === null){
             return ["Cannot pass null data to emittion handler"];
         }
-        $this->emitHandler->HandleEmitted($data, $model->getDomain());
+        $this->emitHandler->HandleEmitted($data, $model->getContext());
         return [];
     }
 

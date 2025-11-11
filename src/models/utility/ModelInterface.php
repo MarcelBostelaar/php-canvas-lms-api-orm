@@ -14,4 +14,15 @@ interface ModelInterface{
      * @throws NotPopulatedException When not all required fields are set
      */
     public function populateWithContext(array $context);
+    /**
+     * Returns the context of this model + the model itself to be used for populating context needed for other items.
+     * @return ModelInterface[]
+     */
+    public function getContext() : array;
+
+    /**
+     * Checks if all required data is set for updating the item from the api
+     * @return bool
+     */
+    public function validateIdentityIntegrity() : bool;
 }

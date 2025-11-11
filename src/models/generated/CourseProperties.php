@@ -1,5 +1,4 @@
 <?php
-
 /* Automatically generated based on model properties.*/
 namespace CanvasApiLibrary\Models\Generated;
 
@@ -7,23 +6,13 @@ use CanvasApiLibrary\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\Course;
-trait CourseProperties
-{
-    abstract public function getDomain(): Domain;
-    public function getMinimumDataRepresentation()
-    {
-        if (!(isset($this->id) && true)) {
-            throw new NotPopulatedException("Not all minimum required fields for this model, so it can be re-populated, have been set.");
-        }
-        return [['id'] => $this->id];
+
+trait CourseProperties{
+    public abstract Domain $domain{
+        get;
+        protected set(Domain $value);
     }
-    public static function newFromMinimumDataRepresentation(Domain $domain, array $data): Course
-    {
-        if (!(isset($data['id']) && true)) {
-            throw new NotPopulatedException("Not all minimum required fields for this model are in the data provided.");
-        }
-        $newInstance = new Course($domain);
-        $newInstance->id = $data['id'];
-        return $newInstance;
+    
+    abstract public function getMinimumDataRepresentation();
+    abstract public static function newFromMinimumDataRepresentation(mixed $data): Course;
     }
-}

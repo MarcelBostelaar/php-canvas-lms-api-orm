@@ -44,6 +44,8 @@ function varDumpNoAst($data){
 }
 
 function prettified(string $code): string {
+    //temp disable
+    return $code;
     $phpParser = (new ParserFactory())->createForNewestSupportedVersion();
     $ast = $phpParser->parse($code);
 

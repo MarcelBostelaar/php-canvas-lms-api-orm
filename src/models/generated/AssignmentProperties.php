@@ -1,5 +1,4 @@
 <?php
-
 /* Automatically generated based on model properties.*/
 namespace CanvasApiLibrary\Models\Generated;
 
@@ -9,55 +8,47 @@ use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\GroupCategory;
 use CanvasApiLibrary\Models\Course;
 use CanvasApiLibrary\Models\Assignment;
-trait AssignmentProperties
-{
-    abstract public function getDomain(): Domain;
-    protected int $group_category_id;
-    public GroupCategory $group_category {
-        get {
-            $item = new GroupCategory($this->getDomain());
-            $item->id = $this->group_category_id;
+
+trait AssignmentProperties{
+    public abstract Domain $domain{
+        get;
+        protected set(Domain $value);
+    }
+    
+    protected mixed $group_category_identity;
+    public GroupCategory $group_category{
+        get { 
+            $item = new GroupCategory();
+            $item->newFromMinimumDataRepresentation($this->group_category_identity);
             return $item;
         }
-        set(GroupCategory $value) {
-            if ($value->getDomain()->domain != $this->getDomain()->domain) {
-                $selfDomain = $this->getDomain()->domain;
-                $otherDomain = $value->getDomain()->domain;
-                throw new MixingDomainsException("Tried to save a GroupCategory from domain '{$otherDomain}' to Assignment.group_category from domain '{$selfDomain}'.");
+        set (GroupCategory $value) {
+            if($value->domain != $this->domain){
+                $selfDomain = $this->domain->domain;
+                $otherDomain = $value->domain->domain;
+                throw new MixingDomainsException("Tried to save a GroupCategory from domain '$otherDomain' to Assignment.group_category from domain '$selfDomain'.");
             }
-            $this->group_category_id = $value->id;
+            $this->group_category_identity = $value->getMinimumDataRepresentation();
         }
     }
-    protected int $course_id;
-    public Course $course {
-        get {
-            $item = new Course($this->getDomain());
-            $item->id = $this->course_id;
+
+    protected mixed $course_identity;
+    public Course $course{
+        get { 
+            $item = new Course();
+            $item->newFromMinimumDataRepresentation($this->course_identity);
             return $item;
         }
-        set(Course $value) {
-            if ($value->getDomain()->domain != $this->getDomain()->domain) {
-                $selfDomain = $this->getDomain()->domain;
-                $otherDomain = $value->getDomain()->domain;
-                throw new MixingDomainsException("Tried to save a Course from domain '{$otherDomain}' to Assignment.course from domain '{$selfDomain}'.");
+        set (Course $value) {
+            if($value->domain != $this->domain){
+                $selfDomain = $this->domain->domain;
+                $otherDomain = $value->domain->domain;
+                throw new MixingDomainsException("Tried to save a Course from domain '$otherDomain' to Assignment.course from domain '$selfDomain'.");
             }
-            $this->course_id = $value->id;
+            $this->course_identity = $value->getMinimumDataRepresentation();
         }
     }
-    public function getMinimumDataRepresentation()
-    {
-        if (!(isset($this->id) && true)) {
-            throw new NotPopulatedException("Not all minimum required fields for this model, so it can be re-populated, have been set.");
-        }
-        return [['id'] => $this->id];
+
+    abstract public function getMinimumDataRepresentation();
+    abstract public static function newFromMinimumDataRepresentation(mixed $data): Assignment;
     }
-    public static function newFromMinimumDataRepresentation(Domain $domain, array $data): Assignment
-    {
-        if (!(isset($data['id']) && true)) {
-            throw new NotPopulatedException("Not all minimum required fields for this model are in the data provided.");
-        }
-        $newInstance = new Assignment($domain);
-        $newInstance->id = $data['id'];
-        return $newInstance;
-    }
-}

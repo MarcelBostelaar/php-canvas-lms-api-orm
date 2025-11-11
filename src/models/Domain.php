@@ -15,5 +15,9 @@ final class Domain implements ModelInterface{
         //No underlying context
     }
 
+    public function getContext(): array{
+        return [$this];
+    }
+
     public static array $plurals = ["Domains"];
 }

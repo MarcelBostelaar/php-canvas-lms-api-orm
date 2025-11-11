@@ -1,6 +1,7 @@
 <?php
 
 namespace CanvasApiLibrary\Models;
+use CanvasApiLibrary\Models\ContextPopulationTraits\AssignmentIdentityTrait;
 use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
 use CanvasApiLibrary\Models\Generated\SubmissionProperties;
 
@@ -12,6 +13,7 @@ use CanvasApiLibrary\Models\Generated\SubmissionProperties;
  */
 final class Submission extends AbstractCanvasPopulatedModel{
     use SubmissionProperties;
+    use AssignmentIdentityTrait;
     protected static array $properties = [
         [User::class, "user"],
         [Assignment::class, "assignment"],
@@ -24,9 +26,4 @@ final class Submission extends AbstractCanvasPopulatedModel{
     ];
     
     public static array $plurals = ["Submissions"];
-
-    public function validateSkeleton(): bool{
-        return (isset($this->course_id) || isset($this->section_id)) 
-            && isset($this->assignment_id) && isset($this->id);
-    }
 }

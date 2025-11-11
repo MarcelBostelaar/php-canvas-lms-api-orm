@@ -19,7 +19,7 @@ class AssignmentProvider extends AbstractProvider{
         ->from("course_id")->to("course")->asModel(Course::class);
 
     public function populateAssignment(Assignment $assignment) : Assignment{
-        $this->Get($assignment->getDomain(), 
+        $this->Get($assignment->domain, 
         "/api/v1/courses/{$assignment->course->id}/assignments/$assignment->id",
         self::$modelPopulator->withInstance($assignment));
         return $assignment;

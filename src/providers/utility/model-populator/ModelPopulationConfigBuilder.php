@@ -2,7 +2,7 @@
 
 namespace CanvasApiLibrary\Providers\Utility\ModelPopulator;
 
-use CanvasApiLibrary\Models\Domain;
+use CanvasApiLibrary\Models\Utility\ModelInterface;
 use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
 use CanvasApiLibrary\Providers\Utility\HandleEmittedInterface;
 use DateTime;
@@ -164,7 +164,13 @@ class ModelPopulationConfigBuilder{
 
     //Building
 
-    public function build(Domain $domain, $data) : mixed{
+    /**
+     * Builds the item
+     * @param mixed $data Dictionary data
+     * @param ModelInterface[] $context 
+     * @return AbstractCanvasPopulatedModel
+     */
+    public function build($data, ...$context) : AbstractCanvasPopulatedModel{
         //TODO check if an instance has been set. 
         // If data is singular, populate instance if it exists, else make a new instance.
         //TODO: Orchestrate collected instructions

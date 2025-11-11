@@ -1,5 +1,4 @@
 <?php
-
 /* Automatically generated based on model properties.*/
 namespace CanvasApiLibrary\Models\Generated;
 
@@ -8,10 +7,14 @@ use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\Course;
 use CanvasApiLibrary\Models\Section;
-trait SectionProperties
-{
-    abstract public function getDomain(): Domain;
-    public string $name {
+
+trait SectionProperties{
+    public abstract Domain $domain{
+        get;
+        protected set(Domain $value);
+    }
+    
+    public string $name{
         get {
             return $this->name;
         }
@@ -19,36 +22,24 @@ trait SectionProperties
             $this->name = $value;
         }
     }
-    protected int $course_id;
-    public Course $course {
-        get {
-            $item = new Course($this->getDomain());
-            $item->id = $this->course_id;
+
+    protected mixed $course_identity;
+    public Course $course{
+        get { 
+            $item = new Course();
+            $item->newFromMinimumDataRepresentation($this->course_identity);
             return $item;
         }
-        set(Course $value) {
-            if ($value->getDomain()->domain != $this->getDomain()->domain) {
-                $selfDomain = $this->getDomain()->domain;
-                $otherDomain = $value->getDomain()->domain;
-                throw new MixingDomainsException("Tried to save a Course from domain '{$otherDomain}' to Section.course from domain '{$selfDomain}'.");
+        set (Course $value) {
+            if($value->domain != $this->domain){
+                $selfDomain = $this->domain->domain;
+                $otherDomain = $value->domain->domain;
+                throw new MixingDomainsException("Tried to save a Course from domain '$otherDomain' to Section.course from domain '$selfDomain'.");
             }
-            $this->course_id = $value->id;
+            $this->course_identity = $value->getMinimumDataRepresentation();
         }
     }
-    public function getMinimumDataRepresentation()
-    {
-        if (!(isset($this->id) && true)) {
-            throw new NotPopulatedException("Not all minimum required fields for this model, so it can be re-populated, have been set.");
-        }
-        return [['id'] => $this->id];
+
+    abstract public function getMinimumDataRepresentation();
+    abstract public static function newFromMinimumDataRepresentation(mixed $data): Section;
     }
-    public static function newFromMinimumDataRepresentation(Domain $domain, array $data): Section
-    {
-        if (!(isset($data['id']) && true)) {
-            throw new NotPopulatedException("Not all minimum required fields for this model are in the data provided.");
-        }
-        $newInstance = new Section($domain);
-        $newInstance->id = $data['id'];
-        return $newInstance;
-    }
-}

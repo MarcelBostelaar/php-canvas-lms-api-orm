@@ -20,8 +20,11 @@ use CanvasApiLibrary\Models\<?=$modelName?>;
 <?php endforeach ?>
 
 trait <?=$classname?>{
-    abstract public function getDomain(): Domain;
-
+    public abstract Domain $domain{
+        get;
+        protected set(Domain $value);
+    }
+    
 <?php 
 }
 
@@ -53,13 +56,13 @@ function property($type, $name){ ?>
  * @param string $modelName
  * @param string $propertyName
  */
-function NullableModelGetter($modelname, $propertyname, $propertyIdName){?>
+function NullableModelGetter($modelname, $propertyIdName){?>
         get {
-            if($this-><?=$propertyname?> === null){
+            if($this-><?=$propertyIdName?> === null){
                 return null;
             }
-            $item = new <?=$modelname?>($this->getDomain());
-            $item->id = $this-><?=$propertyIdName?>;
+            $item = new <?=$modelname?>();
+            $item->newFromMinimumDataRepresentation($this-><?=$propertyIdName?>);
             return $item;
         }
 <?php
@@ -72,8 +75,8 @@ function NullableModelGetter($modelname, $propertyname, $propertyIdName){?>
 function ModelGetter($modelname, $propertyIdName){
 ?>
         get { 
-            $item = new <?=$modelname?>($this->getDomain());
-            $item->id = $this-><?=$propertyIdName?>;
+            $item = new <?=$modelname?>();
+            $item->newFromMinimumDataRepresentation($this-><?=$propertyIdName?>);
             return $item;
         }
 <?php
@@ -85,73 +88,37 @@ function ModelGetter($modelname, $propertyIdName){
  * @param bool $nullable
  */
 function modelProp($modelname, $propertyname, $nullable, $originalModelName){ 
-    $intType = $nullable ? "?int" : "int";
+    $intType = $nullable ? "?mixed" : "mixed";
     $modelType = ($nullable ? "?" : "") . $modelname;
-    $intPropertyName = $propertyname . "_id";
+    $propertyIdName = $propertyname . "_identity";
     ?>
-    protected <?=$intType?> $<?=$intPropertyName?>;
+    protected <?=$intType?> $<?=$propertyIdName?>;
     public <?=$modelType?> $<?=$propertyname?>{
 <?= $nullable ? 
-        NullableModelGetter($modelname, $propertyname, $intPropertyName) 
-        : modelGetter($modelname, $intPropertyName)?>
+        NullableModelGetter($modelname,  $propertyIdName) 
+        : modelGetter($modelname, $propertyIdName)?>
         set (<?=$modelType?> $value) {
 <?php if($nullable): ?>
             if($value === null){
-                $this-><?=$intPropertyName?> = null;
+                $this-><?=$propertyIdName?> = null;
                 return;
             }
 <?php endif?>
-            if($value->getDomain()->domain != $this->getDomain()->domain){
-                $selfDomain = $this->getDomain()->domain;
-                $otherDomain = $value->getDomain()->domain;
+            if($value->domain != $this->domain){
+                $selfDomain = $this->domain->domain;
+                $otherDomain = $value->domain->domain;
                 throw new MixingDomainsException("Tried to save a <?=$modelname?> from domain '$otherDomain' to <?=$originalModelName?>.<?=$propertyname?> from domain '$selfDomain'.");
             }
-            $this-><?=$intPropertyName?> = $value->id;
+            $this-><?=$propertyIdName?> = $value->getMinimumDataRepresentation();
         }
     }
 <?php
 }
 
 function getSkeletonMethod($minimumProperties, $minimumModels, $modelName){
-    array_push($minimumProperties, ["type" => "int", "name" => "id"]);
-    
-    $mergedNames = array_map(fn($x) => $x['name'],array_merge($minimumModels, $minimumProperties));
-
-    $propsProcessed = array_map(fn($x) => "['" . $x['name'] . "'] => \$this->" . $x['name'], $minimumProperties);
-    $modelsProcessed = array_map(fn($x) => "['" . $x['name'] . "'] => \$this->" . $x['name'] . "->getMinimumDataRepresentation()", $minimumModels);
-    $assocArrayStringInside = implode(",\n", array_merge($propsProcessed, $modelsProcessed));
     ?>
-    public function getMinimumDataRepresentation(){
-        if(!(<?php foreach($mergedNames as $name){?>
-            isset($this-><?=$name?>) &&
-            <?php }?>
-            true
-        )){
-            throw new NotPopulatedException("Not all minimum required fields for this model, so it can be re-populated, have been set.");
-        }
-        return [
-            <?=$assocArrayStringInside?>
-        ];
-    }
-
-    public static function newFromMinimumDataRepresentation(Domain $domain, array $data): <?=$modelName?>{
-        if(!(<?php foreach($mergedNames as $name){?>
-            isset($data['<?=$name?>']) &&
-            <?php }?>
-            true
-        )){
-            throw new NotPopulatedException("Not all minimum required fields for this model are in the data provided.");
-        }
-        $newInstance = new <?=$modelName?>($domain);
-        <?php foreach ($minimumProperties as $prop){?>
-        $newInstance-><?=$prop['name']?> = $data['<?=$prop['name']?>'];
-        <?php }?>
-
-        <?php foreach ($minimumModels as $prop){?>
-        $newInstance-><?=$prop['name']?> = <?=$prop['type']?>::newFromMinimumDataRepresentation($data['<?=$prop['name']?>']);
-        <?php }?>
-        return $newInstance;
-    }
+    abstract public function getMinimumDataRepresentation();
+    abstract public static function newFromMinimumDataRepresentation(mixed $data): <?=$modelName?>;
     <?php
 }
 

@@ -6,10 +6,15 @@ use CanvasApiLibrary\Exceptions\ChangingIdException;
 use CanvasApiLibrary\Models\Utility\ModelInterface;
 use CanvasApiLibrary\Models\Domain;
 
-trait DomainTrait{
+trait DomainIdentityTrait{
     public Domain $domain{
         abstract protected set(Domain $value);
         abstract get;
+    }
+
+    abstract public int $id{
+        get;
+        set;
     }
     
     /**
@@ -23,12 +28,36 @@ trait DomainTrait{
         foreach($context as $item){
             if($item instanceof Domain){
                 if(isset($this->domain)){
-                    //TODO check if domain is the same.
-                    throw new ChangingIdException("Tried to set the domain of a model that already exists.");
+                    if($this->domain != $item){
+                        throw new ChangingIdException("Tried to set the domain of a model that already exists.");
+                    }
+                    //same domain
                 }
                 $this->domain = $item;
                 continue;
             }
         }
+    }
+
+    public function getContext(): array{
+        return [$this, $this->domain];
+    }
+
+    public function getMinimumDataRepresentation(): mixed{
+        return [
+            self::class => $this->id,
+            Domain::class => $this->domain->domain
+        ];
+    }
+
+    public static function newFromMinimumDataRepresentation($data){
+        $item = new (self::class)();
+        $item->id = $data[self::class];
+        $item->domain = new Domain($data[Domain::class]);
+        return $item;
+    } 
+
+    public function validateIdentityIntegrity() : bool{
+        return isset($this->id) && isset($this->domain);
     }
 }

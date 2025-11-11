@@ -1,11 +1,13 @@
 <?php
 
 namespace CanvasApiLibrary\Models;
+use CanvasApiLibrary\Models\ContextPopulationTraits\CourseIdentityTrait;
 use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
 use CanvasApiLibrary\Models\Generated\SectionProperties;
 
 final class Section extends AbstractCanvasPopulatedModel{
     use SectionProperties;
+    use CourseIdentityTrait;
     protected static array $properties = [
         ["string", "name"],
         [Course::class, "course"]
@@ -13,9 +15,4 @@ final class Section extends AbstractCanvasPopulatedModel{
 
     
     public static array $plurals = ["Sections"];
-
-    
-    public function validateSkeleton(): bool{
-        return isset($this->course_id) && isset($this->id);
-    }
 }

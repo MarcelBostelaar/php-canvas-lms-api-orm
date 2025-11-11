@@ -16,8 +16,4 @@ class SubmissionComment extends AbstractCanvasPopulatedModel{
     ];
 
     public static array $plurals = ["SubmissionComments"];
-
-    public function validateSkeleton(): bool{
-        return isset($this->course_id) && isset($this->assignment_id) && isset($this->user_id) && isset($this->id);
-    }
 }
