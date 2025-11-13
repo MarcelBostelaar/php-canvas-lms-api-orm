@@ -26,4 +26,8 @@ class ProviderKey implements ProviderInterface{
             "errors" => []
         ];
     }
+
+    public function getDescription(): string{
+        return "Key: $this->key";
+    }
 }

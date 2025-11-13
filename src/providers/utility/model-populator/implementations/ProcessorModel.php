@@ -24,7 +24,7 @@ class ProcessorModel implements ProcessorInterface{
         $newModel = new $this->modelclass();
         $newModel->id = $data;
         $newModel->populateWithContext($context);
-        if(!$newModel->validateSkeleton()){
+        if(!$newModel->validateIdentityIntegrity()){
             return [
                 "data" => null,
                 "errors" => ["Not all needed fields for the model $newModel have been set."],

@@ -37,9 +37,6 @@ trait DomainIdentityTrait{
                 continue;
             }
         }
-        if(!$this->validateIdentityIntegrity()){
-            throw new NotPopulatedException("Missing essential data needed to be able to work with the item.");
-        }
     }
 
     public function getContext(): array{

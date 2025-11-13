@@ -195,24 +195,8 @@ class ModelPopulationConfigBuilder{
         $instructions = $this->getInstructionsFinished(); //checks if all instructions are finished, and returns finalized instructions.
 
         foreach($instructions as $instruction){
-            $provider = $instruction[0];
-            $processors = $instruction[1];
-            $consumer = $instruction[2];
-
-            $item = $provider->getData($data);
-
-            foreach($processors as $processor){
-                $item = $processor->process($item, $context);
-            }
-
-            if(!$consumer->getAcceptsNull()){
-                if($item === null){
-                    $description = $provider->getDescription();
-                    $errors[] = "Unacceptable null value encountered for $description while processing data to build a " . $toPopulate::class;
-                    continue;//save all errors for cleaner error handling in a batch.
-                }
-            }
-            $consumer->consumeData($item, $toPopulate, $context);
+            [$provider, $processors, $consumer] = $instruction;
+            array_push($errors, $this->buildOneInstruction($toPopulate, $data, $context, $provider, $processors, $consumer));
         }
 
         if(count($errors) > 0){
@@ -220,5 +204,48 @@ class ModelPopulationConfigBuilder{
         }
 
         return $toPopulate;
+    }
+
+    /**
+     * Summary of buildOneInstruction
+     * @param AbstractCanvasPopulatedModel $toBuild
+     * @param mixed $data
+     * @param ModelInterface[] $context
+     * @param ProviderInterface $provider
+     * @param ProcessorInterface[] $processors
+     * @param ConsumerInterface $consumer
+     * @return string[] Errors that have come up
+     */
+    private static function buildOneInstruction($toBuild, $data, $context, $provider, $processors, $consumer): array{
+        $errors = [];
+        [$item, $error] = $provider->getData($data);
+        if($error !== null){
+            $errors[] = $error;
+        }
+
+        foreach($processors as $processor){
+            [$item, $error, $continue] = $processor->process($item, $context);
+            if($error !== null){
+                $errors[] = $error;
+            }
+            if(!$continue){
+                //Processor indicated not to continue processing this value.
+                return $errors;
+            }
+        }
+
+        if(!$consumer->getAcceptsNull()){
+            if($item === null){
+                $description = $provider->getDescription();
+                $errors[] = "Unacceptable null value encountered for $description while processing data to build a " . $toBuild::class;
+                return $errors; //Do not continue processing this value.
+            }
+        }
+        $error = $consumer->consumeData($item, $toBuild, $context);
+        
+        if($error !== null){
+            array_push($errors, ...$error);
+        }
+        return $errors;
     }
 }
