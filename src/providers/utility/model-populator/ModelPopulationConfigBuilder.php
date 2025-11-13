@@ -6,13 +6,14 @@ use CanvasApiLibrary\Models\Utility\ModelInterface;
 use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
 use CanvasApiLibrary\Providers\Utility\HandleEmittedInterface;
 use DateTime;
+use Exception;
 use LogicException;
 
 class ModelPopulationConfigBuilder{
     private $instructions;
     private string $model;
 
-    private AbstractCanvasPopulatedModel $instance;
+    private ?AbstractCanvasPopulatedModel $instance = null;
 
     public function __construct(string $model, array $instructions = [[null, [], null]]){
         $this->instructions = $instructions;
@@ -27,6 +28,18 @@ class ModelPopulationConfigBuilder{
             throw new LogicException("Unfinished model populator command. Consumer or provider is not set.");
         }
         return new ModelPopulationConfigBuilder($this->model, array_merge($this->instructions, [[null, [], null]]));
+    }
+
+    protected function getInstructionsFinished(){
+        $stepped = $this->newInstruction();
+        $lastInstruction = end($stepped->instructions);
+        if($lastInstruction[0] === null & $lastInstruction[1] === null & $lastInstruction[2] === null){
+            //last instruction is empty, so final command was complete
+            $popped = clone $stepped->instructions;
+            array_pop($popped);
+            return $popped;
+        }
+        throw new LogicException("Tried to get finalized instructions, but last build instruction is incomplete");
     }
 
     protected function setProvider(ProviderInterface $provider): ModelPopulationConfigBuilder{
@@ -171,10 +184,41 @@ class ModelPopulationConfigBuilder{
      * @return AbstractCanvasPopulatedModel
      */
     public function build($data, ...$context) : AbstractCanvasPopulatedModel{
-        //TODO check if an instance has been set. 
-        // If data is singular, populate instance if it exists, else make a new instance.
-        //TODO: Orchestrate collected instructions
-        //TODO check that all skeleton mandated elements have been set.
-        return null;
+        $errors = [];
+
+        $toPopulate = $this->instance === null ? new ($this->model)() : $this->instance;
+        
+        $toPopulate->id = $data["id"];
+        $toPopulate->populateWithContext($context);
+        array_push($context, $toPopulate); //add self to context in case any dependent items need this model as an identity element.
+
+        $instructions = $this->getInstructionsFinished(); //checks if all instructions are finished, and returns finalized instructions.
+
+        foreach($instructions as $instruction){
+            $provider = $instruction[0];
+            $processors = $instruction[1];
+            $consumer = $instruction[2];
+
+            $item = $provider->getData($data);
+
+            foreach($processors as $processor){
+                $item = $processor->process($item, $context);
+            }
+
+            if(!$consumer->getAcceptsNull()){
+                if($item === null){
+                    $description = $provider->getDescription();
+                    $errors[] = "Unacceptable null value encountered for $description while processing data to build a " . $toPopulate::class;
+                    continue;//save all errors for cleaner error handling in a batch.
+                }
+            }
+            $consumer->consumeData($item, $toPopulate, $context);
+        }
+
+        if(count($errors) > 0){
+            throw new Exception(implode("\n", $errors));
+        }
+
+        return $toPopulate;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace CanvasApiLibrary\Providers\Utility\ModelPopulator;
 
+use CanvasApiLibrary\Models\Utility\ModelInterface;
 use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
 
 /**
@@ -15,9 +16,10 @@ interface ConsumerInterface
      *
      * @param mixed $data Arbitrary data to be consumed
      * @param AbstractCanvasPopulatedModel $model A model instance to mutate/populate
+     * @param ModelInterface[] $context A list of context items.
      * @return string[] List of error messages encountered during consumption (empty when none)
      */
-    public function consumeData(mixed $data, AbstractCanvasPopulatedModel $model): array;
+    public function consumeData(mixed $data, AbstractCanvasPopulatedModel $model, array ...$context): array;
 
     /**
      * Whether this consumer accepts null data inputs without error.

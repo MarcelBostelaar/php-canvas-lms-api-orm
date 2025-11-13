@@ -16,4 +16,6 @@ interface ProviderInterface
      *  - errors: A list of error messages (empty when none)
      */
     public function getData(array $source): array;
+
+    public function getDescription(): string;
 }
