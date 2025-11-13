@@ -7,8 +7,9 @@ use CanvasApiLibrary\Models\Utility\ModelInterface;
 use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\Course;
 use CanvasApiLibrary\Models\Assignment;
+use CanvasApiLibrary\Models\User;
 
-trait AssignmentIdentityTrait{
+trait AssignmentAndUserIdentityTrait{
     abstract public Domain $domain{
         protected set(Domain $value);
         get;
@@ -25,6 +26,11 @@ trait AssignmentIdentityTrait{
     }
 
     abstract public Assignment $assignment{
+        get;
+        set;
+    }
+
+    abstract public User $user{
         get;
         set;
     }
@@ -68,6 +74,16 @@ trait AssignmentIdentityTrait{
                 $this->assignment = $item;
                 continue;
             }
+            if($item instanceof User){
+                if(isset($this->user)){
+                    if($this->user != $item){
+                        throw new ChangingIdException("Tried to set the user of a model that already exists.");
+                    }
+                    //same assignment
+                }
+                $this->user = $item;
+                continue;
+            }
         }
         if(!$this->validateIdentityIntegrity()){
             throw new NotPopulatedException("Missing essential data needed to be able to work with the item.");
@@ -83,7 +99,8 @@ trait AssignmentIdentityTrait{
             self::class => $this->id,
             Domain::class => $this->domain->domain,
             Course::class => $this->course->id,
-            Assignment::class => $this->assignment->id
+            Assignment::class => $this->assignment->id,
+            User::class => $this->user->id
         ];
     }
 
@@ -93,14 +110,15 @@ trait AssignmentIdentityTrait{
         $item->domain = new Domain($data[Domain::class]);
         $item->course = Course::newFromMinimumDataRepresentation($data);
         $item->assignment = Assignment::newFromMinimumDataRepresentation($data);
+        $item->assignment = User::newFromMinimumDataRepresentation($data);
         return $item;
     }
     
     public function validateIdentityIntegrity() : bool{
-        return isset($this->id) && isset($this->domain) && isset($this->course) && isset($this->assignment);
+        return isset($this->id) && isset($this->domain) && isset($this->course) && isset($this->assignment) && isset($this->user);
     }
 
     public function getUniqueId(): string{
-        return static::class . "-" . $this->domain->domain . "-Course:" . $this->course->id . "-"  . "-Assignment:" . $this->assignment->id . "-" . $this->id;
+        return static::class . "-" . $this->domain->domain . "-Course:" . $this->course->id . "-"  . "-Assignment:" . $this->assignment->id . "-"  . "-User:" . $this->user->id . "-" . $this->id;
     }
 }

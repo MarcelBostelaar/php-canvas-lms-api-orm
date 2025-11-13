@@ -5,7 +5,7 @@ use CanvasApiLibrary\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Exceptions\ChangingIdException;
 
 interface ModelInterface{
-    public function getUniqueId() : mixed;
+    public function getUniqueId() : string;
     /**
      * Populates the model using the provided other models, filling in missing data.
      * @param ModelInterface[] $context A list of context items from which to pull the needed data to populate.

@@ -2,7 +2,6 @@
 
 namespace CanvasApiLibrary\Models;
 use CanvasApiLibrary\Models\ContextPopulationTraits\DomainIdentityTrait;
-use CanvasApiLibrary\Models\ContextPopulationTraits\DomainTrait;
 use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
 use CanvasApiLibrary\Models\Generated\CourseProperties;
 

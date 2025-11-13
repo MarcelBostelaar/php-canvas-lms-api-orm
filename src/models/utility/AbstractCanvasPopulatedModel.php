@@ -12,9 +12,6 @@ abstract class AbstractCanvasPopulatedModel implements ModelInterface{
      */
     public function __construct(){
     }
-    public function getUniqueId(): mixed {
-        return $this->domain->domain . "-" . $this::class . "-" . $this->id;
-    }
     
     public Domain $domain{
         get{

@@ -7,12 +7,16 @@ use CanvasApiLibrary\Models\Utility\ModelInterface;
 final class Domain implements ModelInterface{
     public function __construct(public readonly string $domain){}
 
-    public function getUniqueId(): mixed {
+    public function getUniqueId(): string {
         return $this->domain;
     }
 
     public function populateWithContext(array $context){
         //No underlying context
+    }
+
+    public function validateIdentityIntegrity(): bool{
+        return true; //No underlying identity
     }
 
     public function getContext(): array{

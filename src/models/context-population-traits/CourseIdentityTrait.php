@@ -53,6 +53,9 @@ trait CourseIdentityTrait{
                 continue;
             }
         }
+        if(!$this->validateIdentityIntegrity()){
+            throw new NotPopulatedException("Missing essential data needed to be able to work with the item.");
+        }
     }
 
     public function getContext(): array{
@@ -77,5 +80,9 @@ trait CourseIdentityTrait{
 
     public function validateIdentityIntegrity() : bool{
         return isset($this->id) && isset($this->domain) && isset($this->course);
+    }
+
+    public function getUniqueId(): string{
+        return static::class . "-" . $this->domain->domain . "-Course:" . $this->course->id . "-" . $this->id;
     }
 }
