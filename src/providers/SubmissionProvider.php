@@ -34,7 +34,7 @@ class SubmissionProvider extends AbstractProvider{
      * @param ?UserProvider $userProvider If provided, will also fetch the users associated with these submissions and pass them to the emitted in the user provider.
      * @return Submission[]
      */
-    protected function getSubmissionsForAssignment(Assignment $assignment, ?UserProvider $userProvider = null) : array{
+    function getSubmissionsForAssignment(Assignment $assignment, ?UserProvider $userProvider = null) : array{
         $postfix = "";
         $builder = self::$modelPopulator;
         if($userProvider !== null){

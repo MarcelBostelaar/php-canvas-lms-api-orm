@@ -18,9 +18,6 @@ use InvalidArgumentException;
  */
 class UserProvider extends AbstractProvider{
     use UserProviderProperties;
-    public function __construct(
-        public readonly Services\StatusHandlerInterface $statusHandler
-    ){}
 
     protected static $modelPopulator = 
     new ModelPopulationConfigBuilder(User::class)

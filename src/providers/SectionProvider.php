@@ -17,7 +17,6 @@ use CanvasApiLibrary\Providers\Utility\Lookup;
  */
 class SectionProvider extends AbstractProvider{
     use SectionProviderProperties;
-    public function __construct(public readonly Services\StatusHandlerInterface $statusHandler){}
 
     protected static $modelPopulator = 
     new ModelPopulationConfigBuilder(Section::class)

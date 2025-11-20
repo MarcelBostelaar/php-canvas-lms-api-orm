@@ -16,7 +16,6 @@ use CanvasApiLibrary\Providers\Utility\Lookup;
  */
 class GroupProvider extends AbstractProvider{
     use GroupProviderProperties;
-    public function __construct(public readonly Services\StatusHandlerInterface $statusHandler){}
 
     /**
      * @param Models\GroupCategory $category

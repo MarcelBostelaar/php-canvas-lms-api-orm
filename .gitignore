@@ -1,2 +1,3 @@
 *vendor*
 buildscript/test/*
+/src/.env
