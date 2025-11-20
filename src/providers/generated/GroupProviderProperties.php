@@ -8,7 +8,6 @@ namespace CanvasApiLibrary\Providers;
 use CanvasApiLibrary\Providers\Utility\Lookup;
 use CanvasApiLibrary\Models\Group;
 use CanvasApiLibrary\Models\GroupCategory;
-use CanvasApiLibrary\Models\Domain;
 
 trait GroupProviderProperties{
     abstract public function populateGroup(Group $group);
@@ -22,17 +21,17 @@ trait GroupProviderProperties{
         return array_map(fn($x) => $this->populateGroup($x), $groups);
     }
 
-    abstract public function getAllGroupsInGroupCategory(GroupCategory $category, Domain $domain) : array;
+    abstract public function getAllGroupsInGroupCategory(GroupCategory $category) : array;
     
     /**
      * Summary of getAllGroupsInGroupCategories
      * @param GroupCategory[] $groupCategories
      * @return Lookup<GroupCategory, Group>
      */
-    public function getAllGroupsInGroupCategories(array $groupCategories, Domain $domain): Lookup{
+    public function getAllGroupsInGroupCategories(array $groupCategories): Lookup{
         $lookup = new Lookup();
         foreach($groupCategories as $groupCategory){
-            $lookup->add($groupCategory, $this->getAllGroupsInGroupCategory($groupCategory, $domain));
+            $lookup->add($groupCategory, $this->getAllGroupsInGroupCategory($groupCategory));
         }
         return $lookup;
     }

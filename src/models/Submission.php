@@ -1,6 +1,7 @@
 <?php
 
 namespace CanvasApiLibrary\Models;
+use CanvasApiLibrary\Models\ContextPopulationTraits\AssignmentAndUserIdentityTrait;
 use CanvasApiLibrary\Models\ContextPopulationTraits\AssignmentIdentityTrait;
 use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
 use CanvasApiLibrary\Models\Generated\SubmissionProperties;
@@ -13,7 +14,7 @@ use CanvasApiLibrary\Models\Generated\SubmissionProperties;
  */
 final class Submission extends AbstractCanvasPopulatedModel{
     use SubmissionProperties;
-    use AssignmentIdentityTrait;
+    use AssignmentAndUserIdentityTrait;
     protected static array $properties = [
         [User::class, "user"],
         [Assignment::class, "assignment"],

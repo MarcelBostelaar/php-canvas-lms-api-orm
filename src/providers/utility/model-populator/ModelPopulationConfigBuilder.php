@@ -206,6 +206,17 @@ class ModelPopulationConfigBuilder{
         return $toPopulate;
     }
 
+    public function buildMany($dataArray, ...$context) : array{
+        if($this->instance !== null){
+            throw new LogicException("Cannot build many with a pre-set instance.");
+        }
+        $results = [];
+        foreach($dataArray as $data){
+            $results[] = $this->build($data, ...$context);
+        }
+        return $results;
+    }
+
     /**
      * Summary of buildOneInstruction
      * @param AbstractCanvasPopulatedModel $toBuild

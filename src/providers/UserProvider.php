@@ -1,12 +1,14 @@
 <?php
 namespace CanvasApiLibrary\Providers;
 
+use CanvasApiLibrary\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Services as Services;
 use CanvasApiLibrary\Models as Models;
 use CanvasApiLibrary\Models\User;
-use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Providers\Utility\Lookup;
+use Exception;
+use InvalidArgumentException;
 
 
 /**
@@ -20,27 +22,42 @@ class UserProvider extends AbstractProvider{
         public readonly Services\StatusHandlerInterface $statusHandler
     ){}
 
+    protected static $modelPopulator = 
+    new ModelPopulationConfigBuilder(User::class)
+    ->keyCopy("name");
+
+    public function getUsersInGroup(Models\Group $group): array{
+        return $this->GetMany( "/groups/{$group->id}/users", $group->getContext());
+    }
+
     /**
-     * Summary of getUsersInGroup
-     * @param \CanvasApiLibrary\Models\Domain $domain
-     * @param \CanvasApiLibrary\Models\Group $group
+     * Gets all users in a section.
+     * @param Models\Section $section
+     * @param mixed $enrollmentRoleFilter Filter to only retrieve a specific type of user. Allowed values: Student, Teacher, Ta, Observer, Designer
      * @return User[]
      */
-    public function getUsersInGroup(Domain $domain, Models\Group $group): array{
-        return $this->Get($domain, "/groups/{$group->id}/users");
+    public function getUsersInSection(Models\Section $section, ?string $enrollmentRoleFilter): array{
+        $postfix = "";
+        switch($enrollmentRoleFilter){
+            case null:
+                break;
+            case "Student":
+            case "Teacher":
+            case "Ta":
+            case "Observer":
+            case "Designer":
+                $postfix = "&role=$enrollmentRoleFilter" . "Enrollment";
+                break;
+            default:
+                throw new InvalidArgumentException("Cannot pass $enrollmentRoleFilter as the role, must be null for no filtering, or one of following: Student, Teacher, Ta, Observer, Designer");
+        }
+        return $this->GetMany( "/sections/{$section->id}/enrollments&per_page=100$postfix", 
+        $section->getContext(), self::$modelPopulator, fn($item) => $item["user"]);
     }
 
-    public function getUsersInSection(Domain $domain, Models\Section $section): array{
-        return $this->Get($domain, 
-        "/sections/{$section->id}/enrollments?type[]=UserEnrollment&per_page=100", 
-        [], fn($x) => $x["user"]);
-    }
-
-    protected function populateModel(Models\Domain $domain, $model, mixed $data): Models\Utility\AbstractCanvasPopulatedModel{
-        //todo
-    }
-
-    public function populateUser(User $user){
-        //todo
+    public function populateUser(User $user): User{
+        $this->Get("users/:id{$user->id}",
+        $user->getContext(), self::$modelPopulator->withInstance($user));
+        return $user;
     }
 }

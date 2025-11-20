@@ -7,7 +7,6 @@ namespace CanvasApiLibrary\Providers;
 
 use CanvasApiLibrary\Providers\Utility\Lookup;
 use CanvasApiLibrary\Models\User;
-use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\Group;
 use CanvasApiLibrary\Models\Section;
 
@@ -23,32 +22,32 @@ trait UserProviderProperties{
         return array_map(fn($x) => $this->populateUser($x), $users);
     }
 
-    abstract public function getUsersInGroup(Domain $domain, Group $group) : array;
+    abstract public function getUsersInGroup(Group $group) : array;
     
     /**
      * Summary of getUsersInGroups
      * @param Group[] $groups
      * @return Lookup<Group, User>
      */
-    public function getUsersInGroups(Domain $domain, array $groups): Lookup{
+    public function getUsersInGroups(array $groups): Lookup{
         $lookup = new Lookup();
         foreach($groups as $group){
-            $lookup->add($group, $this->getUsersInGroup($domain, $group));
+            $lookup->add($group, $this->getUsersInGroup($group));
         }
         return $lookup;
     }
 
-    abstract public function getUsersInSection(Domain $domain, Section $section) : array;
+    abstract public function getUsersInSection(Section $section, ?string $enrollmentRoleFilter) : array;
     
     /**
      * Summary of getUsersInSections
      * @param Section[] $sections
      * @return Lookup<Section, User>
      */
-    public function getUsersInSections(Domain $domain, array $sections): Lookup{
+    public function getUsersInSections(array $sections, ?string $enrollmentRoleFilter): Lookup{
         $lookup = new Lookup();
         foreach($sections as $section){
-            $lookup->add($section, $this->getUsersInSection($domain, $section));
+            $lookup->add($section, $this->getUsersInSection($section, $enrollmentRoleFilter));
         }
         return $lookup;
     }

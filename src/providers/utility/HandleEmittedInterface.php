@@ -10,5 +10,5 @@ interface HandleEmittedInterface{
      * @param ModelInterface[] $context A list of context data.
      * @return void
      */
-    public function HandleEmitted(mixed $data, $context);
+    public function HandleEmitted(mixed $data, array $context);
 }

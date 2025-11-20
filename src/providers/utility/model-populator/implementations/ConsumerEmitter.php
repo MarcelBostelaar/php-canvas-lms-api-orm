@@ -16,11 +16,11 @@ class ConsumerEmitter implements ConsumerInterface{
      * @param AbstractCanvasPopulatedModel $model A model instance to mutate/populate
      * @return string[] List of error messages encountered during consumption (empty when none)
      */
-    public function consumeData(mixed $data, AbstractCanvasPopulatedModel $model): array{
+    public function consumeData(mixed $data, AbstractCanvasPopulatedModel $model, ...$context): array{
         if($data === null){
             return ["Cannot pass null data to emittion handler"];
         }
-        $this->emitHandler->HandleEmitted($data, $model->getContext());
+        $this->emitHandler->HandleEmitted($data, $context);
         return [];
     }
 

@@ -4,11 +4,13 @@ namespace CanvasApiLibrary\Providers;
 use CanvasApiLibrary\Models as Models;
 use CanvasApiLibrary\Models\Assignment;
 use CanvasApiLibrary\Models\Course;
+use CanvasApiLibrary\Models\Section;
 use CanvasApiLibrary\Models\Submission;
 use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Providers\UserProvider;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Providers\Utility\Lookup;
+use CanvasApiLibrary\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 
 
 
@@ -20,25 +22,34 @@ use CanvasApiLibrary\Providers\Utility\Lookup;
 class SubmissionProvider extends AbstractProvider{
     use SubmissionProviderProperties;
 
+    protected static $modelPopulator =
+    new ModelPopulationConfigBuilder(Submission::class)
+    ->from("user_id")->to("user")->asModel(User::class)
+    ->keyCopy("url")->nullable()
+    ->keyCopy("submitted_at")->asDateTime()->nullable()
+    ->keyCopy("section")->asModel(Section::class)->nullable();
+
     /**
-     * @param \CanvasApiLibrary\Models\Domain $domain
-     * @param \CanvasApiLibrary\Models\Course $course
-     * @param \CanvasApiLibrary\Models\Assignment $assignment
-     * @param mixed $userProvider Optional, if provided will be used to pre-fetch user info and emit to user provider
+     * @param Models\Assignment $assignment
+     * @param ?UserProvider $userProvider If provided, will also fetch the users associated with these submissions and pass them to the emitted in the user provider.
      * @return Submission[]
      */
-    protected function getSubmissionsForAssignment(Domain $domain, Course $course, Assignment $assignment, ?UserProvider $userProvider = null) : array{
-        $postfix = $userProvider ? "?include[]=user" : "";
-        return $this->Get($domain, "courses/$course->id/assignments/$assignment->id/submissions$postfix",
-            $userProvider ? [["user", $userProvider]] : []
+    protected function getSubmissionsForAssignment(Assignment $assignment, ?UserProvider $userProvider = null) : array{
+        $postfix = "";
+        $builder = self::$modelPopulator;
+        if($userProvider !== null){
+            $postfix = "?include[]=user";
+            $builder = $builder->from("user")->emittingConsumer($userProvider);
+        }
+        $courseID = $assignment->course->id;
+        return $this->GetMany("courses/$courseID/assignments/$assignment->id/submissions$postfix", $assignment->getContext(),
+            $builder
         );
     }
 
-    protected function populateModel(Models\Domain $domain, $model, mixed $data): Models\Utility\AbstractCanvasPopulatedModel{
-        //todo
-    }
-
-    public function populateSubmission(Submission $submission){
-        //todo
+    public function populateSubmission(Submission $submission): Submission{
+        $this->Get("/courses/{$submission->course->id}/assignments/{$submission->assignment->id}/submissions/{$submission->user->id}",
+        $submission->getContext(), self::$modelPopulator->withInstance($submission));
+        return $submission;
     }
 }
