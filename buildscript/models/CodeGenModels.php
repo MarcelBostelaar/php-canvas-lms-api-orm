@@ -20,11 +20,6 @@ use CanvasApiLibrary\Models\<?=$modelName?>;
 <?php endforeach ?>
 
 trait <?=$classname?>{
-    public abstract Domain $domain{
-        get;
-        protected set(Domain $value);
-    }
-    
 <?php 
 }
 
@@ -118,7 +113,7 @@ function modelProp($modelname, $propertyname, $nullable, $originalModelName){
 function getSkeletonMethod($minimumProperties, $minimumModels, $modelName){
     ?>
     abstract public function getMinimumDataRepresentation();
-    abstract public static function newFromMinimumDataRepresentation(mixed $data): <?=$modelName?>;
+    abstract public static function newFromMinimumDataRepresentation(mixed $data): static;
     <?php
 }
 

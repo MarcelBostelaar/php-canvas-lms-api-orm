@@ -1,0 +1,25 @@
+{
+    "name": "your-vendor/php-canvas-lms-api-orm",
+    "description": "A PHP library that provides an ORM for the Canvas LMS API",
+    "type": "library",
+    "license": "All-rights-reserved",
+    "autoload": {
+        "psr-4": {
+            "CanvasApiLibrary\\": "./",
+            "CanvasApiLibrary\\Providers\\": [
+                "Providers/",
+                "Providers/Generated/",
+                "Providers/Utility/"
+            ]
+        },
+        "classmap": [
+            "Providers/Utility/ModelPopulator/"
+        ]
+    },
+    "require": {
+        "php": ">=8.4"
+    },
+    "scripts": {
+        "serve": "php -S localhost:8000 test.php"
+    }
+}

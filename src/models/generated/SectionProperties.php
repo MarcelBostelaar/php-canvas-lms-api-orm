@@ -9,11 +9,6 @@ use CanvasApiLibrary\Models\Course;
 use CanvasApiLibrary\Models\Section;
 
 trait SectionProperties{
-    public abstract Domain $domain{
-        get;
-        protected set(Domain $value);
-    }
-    
     public string $name{
         get {
             return $this->name;
@@ -41,5 +36,5 @@ trait SectionProperties{
     }
 
     abstract public function getMinimumDataRepresentation();
-    abstract public static function newFromMinimumDataRepresentation(mixed $data): Section;
+    abstract public static function newFromMinimumDataRepresentation(mixed $data): static;
     }

@@ -11,11 +11,6 @@ use CanvasApiLibrary\Models\User;
 use CanvasApiLibrary\Models\SubmissionComment;
 
 trait SubmissionCommentProperties{
-    public abstract Domain $domain{
-        get;
-        protected set(Domain $value);
-    }
-    
     public string $feedback_giver{
         get {
             return $this->feedback_giver;
@@ -95,5 +90,5 @@ trait SubmissionCommentProperties{
     }
 
     abstract public function getMinimumDataRepresentation();
-    abstract public static function newFromMinimumDataRepresentation(mixed $data): SubmissionComment;
+    abstract public static function newFromMinimumDataRepresentation(mixed $data): static;
     }

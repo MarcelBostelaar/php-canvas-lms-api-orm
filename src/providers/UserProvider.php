@@ -7,6 +7,8 @@ use CanvasApiLibrary\Models as Models;
 use CanvasApiLibrary\Models\User;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Providers\Utility\Lookup;
+use CanvasApiLibrary\Services\CanvasCommunicator;
+use CanvasApiLibrary\Services\StatusHandlerInterface;
 use Exception;
 use InvalidArgumentException;
 
@@ -19,9 +21,14 @@ use InvalidArgumentException;
 class UserProvider extends AbstractProvider{
     use UserProviderProperties;
 
-    protected static $modelPopulator = 
-    new ModelPopulationConfigBuilder(User::class)
-    ->keyCopy("name");
+    public function __construct(
+        public readonly StatusHandlerInterface $statusHandler,
+        public readonly CanvasCommunicator $canvasCommunicator
+    ) {
+        parent::__construct($statusHandler, $canvasCommunicator,
+        new ModelPopulationConfigBuilder(User::class)
+                ->keyCopy("name"));
+    }
 
     public function getUsersInGroup(Models\Group $group): array{
         return $this->GetMany( "/groups/{$group->id}/users", $group->getContext());
@@ -49,12 +56,12 @@ class UserProvider extends AbstractProvider{
                 throw new InvalidArgumentException("Cannot pass $enrollmentRoleFilter as the role, must be null for no filtering, or one of following: Student, Teacher, Ta, Observer, Designer");
         }
         return $this->GetMany( "/sections/{$section->id}/enrollments&per_page=100$postfix", 
-        $section->getContext(), self::$modelPopulator, fn($item) => $item["user"]);
+        $section->getContext(), $this->modelPopulator, fn($item) => $item["user"]);
     }
 
     public function populateUser(User $user): User{
         $this->Get("users/:id{$user->id}",
-        $user->getContext(), self::$modelPopulator->withInstance($user));
+        $user->getContext(), $this->modelPopulator->withInstance($user));
         return $user;
     }
 }

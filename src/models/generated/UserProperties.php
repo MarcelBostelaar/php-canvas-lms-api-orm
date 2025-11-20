@@ -8,11 +8,6 @@ use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\User;
 
 trait UserProperties{
-    public abstract Domain $domain{
-        get;
-        protected set(Domain $value);
-    }
-    
     public string $name{
         get {
             return $this->name;
@@ -23,5 +18,5 @@ trait UserProperties{
     }
 
     abstract public function getMinimumDataRepresentation();
-    abstract public static function newFromMinimumDataRepresentation(mixed $data): User;
+    abstract public static function newFromMinimumDataRepresentation(mixed $data): static;
     }

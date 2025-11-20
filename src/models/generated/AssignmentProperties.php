@@ -10,11 +10,6 @@ use CanvasApiLibrary\Models\Course;
 use CanvasApiLibrary\Models\Assignment;
 
 trait AssignmentProperties{
-    public abstract Domain $domain{
-        get;
-        protected set(Domain $value);
-    }
-    
     protected mixed $group_category_identity;
     public GroupCategory $group_category{
         get { 
@@ -50,5 +45,5 @@ trait AssignmentProperties{
     }
 
     abstract public function getMinimumDataRepresentation();
-    abstract public static function newFromMinimumDataRepresentation(mixed $data): Assignment;
+    abstract public static function newFromMinimumDataRepresentation(mixed $data): static;
     }

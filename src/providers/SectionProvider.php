@@ -8,6 +8,8 @@ use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\Course;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Providers\Utility\Lookup;
+use CanvasApiLibrary\Services\CanvasCommunicator;
+use CanvasApiLibrary\Services\StatusHandlerInterface;
 
 
 /**
@@ -18,9 +20,14 @@ use CanvasApiLibrary\Providers\Utility\Lookup;
 class SectionProvider extends AbstractProvider{
     use SectionProviderProperties;
 
-    protected static $modelPopulator = 
-    new ModelPopulationConfigBuilder(Section::class)
-    ->keyCopy("name");
+    public function __construct(
+        public readonly StatusHandlerInterface $statusHandler,
+        public readonly CanvasCommunicator $canvasCommunicator
+    ) {
+        parent::__construct($statusHandler, $canvasCommunicator,
+        new ModelPopulationConfigBuilder(Section::class)
+                ->keyCopy("name"));
+    }
 
     /**
      * @param \CanvasApiLibrary\Models\Course $course
@@ -32,7 +39,7 @@ class SectionProvider extends AbstractProvider{
 
     public function populateSection(Section $section): Section{
         $courseID = $section->course->id;
-        $this->Get("/courses/$courseID/sections/$section->id", $section->getContext(), self::$modelPopulator->withInstance($section));
+        $this->Get("/courses/$courseID/sections/$section->id", $section->getContext(), $this->modelPopulator->withInstance($section));
         return $section;
     }
 }

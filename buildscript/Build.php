@@ -11,13 +11,13 @@ $srcFolder = __DIR__ . '/../src';
 
 function build(){
     global $srcFolder;
-    $modelTraitFolder = $srcFolder . "/models/generated";
-    $providerTraitFolder = $srcFolder . "/providers/generated";
+    $modelTraitFolder = $srcFolder . "/Models/Generated";
+    $providerTraitFolder = $srcFolder . "/Providers/Generated";
     clearFolder(__DIR__ . "/test");
     clearFolder($modelTraitFolder);
     clearFolder($providerTraitFolder);
-    $models = buildModels($srcFolder . "/models", $modelTraitFolder);
-    $providers = buildProviders($srcFolder . "/providers", $models); //provide category for testing
+    $models = buildModels($srcFolder . "/Models", $modelTraitFolder);
+    $providers = buildProviders($srcFolder . "/Providers", $models); //provide category for testing
 }
 
 function clearFolder($folder){

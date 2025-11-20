@@ -7,6 +7,7 @@ namespace CanvasApiLibrary\Providers;
 
 use CanvasApiLibrary\Providers\Utility\Lookup;
 use CanvasApiLibrary\Models\Submission;
+use CanvasApiLibrary\Models\Assignment;
 
 trait SubmissionProviderProperties{
     abstract public function populateSubmission(Submission $submission);

@@ -7,6 +7,8 @@ use CanvasApiLibrary\Services as Services;
 use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Providers\Utility\Lookup;
+use CanvasApiLibrary\Services\CanvasCommunicator;
+use CanvasApiLibrary\Services\StatusHandlerInterface;
 
 
 /**
@@ -17,6 +19,14 @@ use CanvasApiLibrary\Providers\Utility\Lookup;
 class GroupProvider extends AbstractProvider{
     use GroupProviderProperties;
 
+    public function __construct(
+        public readonly StatusHandlerInterface $statusHandler,
+        public readonly CanvasCommunicator $canvasCommunicator
+    ) {
+        parent::__construct($statusHandler, $canvasCommunicator,
+            new ModelPopulationConfigBuilder(Group::class)->keyCopy("name"));
+    }
+
     /**
      * @param Models\GroupCategory $category
      * @return Group[]
@@ -25,12 +35,9 @@ class GroupProvider extends AbstractProvider{
         return $this->GetMany( "/group_categories/$category->id/groups", $category->getContext());
     }
 
-    protected static ModelPopulationConfigBuilder $modelPopulator = 
-        new ModelPopulationConfigBuilder(Group::class)->keyCopy("name");
-
     public function populateGroup(Group $group): Group{
         $this->Get( "/api/v1/groups/$group->id", $group->getContext(),
-        self::$modelPopulator->withInstance($group));
+        $this->modelPopulator->withInstance($group));
         return $group;
     }
 }

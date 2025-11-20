@@ -17,7 +17,7 @@ abstract class AbstractCanvasPopulatedModel implements ModelInterface{
         get{
             return $this->domain;
         }
-        protected set(Domain $value){
+        set(Domain $value){
             if(isset($this->domain)){
                 throw new ChangingIdException("Tried to change the domain of a model.");
             }

@@ -9,7 +9,7 @@ use CanvasApiLibrary\Models\ContextPopulationTraits\CourseIdentityTrait;
 class Assignment extends AbstractCanvasPopulatedModel{
     use AssignmentProperties;
     use CourseIdentityTrait;
-    protected static $properties = [
+    protected static array $properties = [
         [GroupCategory::class, "group_category"],
         [Course::class, "course"]
     ];

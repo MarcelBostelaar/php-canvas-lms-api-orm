@@ -8,11 +8,6 @@ use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\Group;
 
 trait GroupProperties{
-    public abstract Domain $domain{
-        get;
-        protected set(Domain $value);
-    }
-    
     public string $name{
         get {
             return $this->name;
@@ -23,5 +18,5 @@ trait GroupProperties{
     }
 
     abstract public function getMinimumDataRepresentation();
-    abstract public static function newFromMinimumDataRepresentation(mixed $data): Group;
+    abstract public static function newFromMinimumDataRepresentation(mixed $data): static;
     }

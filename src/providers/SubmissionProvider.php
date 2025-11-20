@@ -7,10 +7,13 @@ use CanvasApiLibrary\Models\Course;
 use CanvasApiLibrary\Models\Section;
 use CanvasApiLibrary\Models\Submission;
 use CanvasApiLibrary\Models\Domain;
+use CanvasApiLibrary\Models\User;
 use CanvasApiLibrary\Providers\UserProvider;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Providers\Utility\Lookup;
 use CanvasApiLibrary\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
+use CanvasApiLibrary\Services\CanvasCommunicator;
+use CanvasApiLibrary\Services\StatusHandlerInterface;
 
 
 
@@ -22,12 +25,19 @@ use CanvasApiLibrary\Providers\Utility\ModelPopulator\ModelPopulationConfigBuild
 class SubmissionProvider extends AbstractProvider{
     use SubmissionProviderProperties;
 
-    protected static $modelPopulator =
-    new ModelPopulationConfigBuilder(Submission::class)
-    ->from("user_id")->to("user")->asModel(User::class)
-    ->keyCopy("url")->nullable()
-    ->keyCopy("submitted_at")->asDateTime()->nullable()
-    ->keyCopy("section")->asModel(Section::class)->nullable();
+    
+
+    public function __construct(
+        public readonly StatusHandlerInterface $statusHandler,
+        public readonly CanvasCommunicator $canvasCommunicator
+    ) {
+        parent::__construct($statusHandler, $canvasCommunicator,
+        new ModelPopulationConfigBuilder(Submission::class)
+                ->from("user_id")->to("user")->asModel(User::class)
+                ->keyCopy("url")->nullable()
+                ->keyCopy("submitted_at")->asDateTime()->nullable()
+                ->keyCopy("section")->asModel(Section::class)->nullable());
+    }
 
     /**
      * @param Models\Assignment $assignment
@@ -36,7 +46,7 @@ class SubmissionProvider extends AbstractProvider{
      */
     function getSubmissionsForAssignment(Assignment $assignment, ?UserProvider $userProvider = null) : array{
         $postfix = "";
-        $builder = self::$modelPopulator;
+        $builder = $this->modelPopulator;
         if($userProvider !== null){
             $postfix = "?include[]=user";
             $builder = $builder->from("user")->emittingConsumer($userProvider);
@@ -49,7 +59,7 @@ class SubmissionProvider extends AbstractProvider{
 
     public function populateSubmission(Submission $submission): Submission{
         $this->Get("/courses/{$submission->course->id}/assignments/{$submission->assignment->id}/submissions/{$submission->user->id}",
-        $submission->getContext(), self::$modelPopulator->withInstance($submission));
+        $submission->getContext(), $this->modelPopulator->withInstance($submission));
         return $submission;
     }
 }

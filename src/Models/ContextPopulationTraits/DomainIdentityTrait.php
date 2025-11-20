@@ -7,15 +7,15 @@ use CanvasApiLibrary\Models\Utility\ModelInterface;
 use CanvasApiLibrary\Models\Domain;
 
 trait DomainIdentityTrait{
-    public Domain $domain{
-        abstract protected set(Domain $value);
-        abstract get;
-    }
+    // public abstract Domain $domain{
+    //     set(Domain $value);
+    //     get;
+    // }
 
-    abstract public int $id{
-        get;
-        set;
-    }
+    // abstract public int $id{
+    //     get;
+    //     set;
+    // }
     
     /**
      * Populates the model using the provided other models, filling in missing data.
@@ -50,7 +50,11 @@ trait DomainIdentityTrait{
         ];
     }
 
-    public static function newFromMinimumDataRepresentation($data){
+    /**
+     * @param mixed $data
+     * @return $this
+     */
+    public static function newFromMinimumDataRepresentation(mixed $data):static{
         $item = new (self::class)();
         $item->id = $data[self::class];
         $item->domain = new Domain($data[Domain::class]);

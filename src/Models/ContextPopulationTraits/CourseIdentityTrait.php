@@ -8,20 +8,20 @@ use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\Course;
 
 trait CourseIdentityTrait{
-    abstract public Domain $domain{
-        protected set(Domain $value);
-        get;
-    }
+    // abstract public Domain $domain{
+    //     protected set(Domain $value);
+    //     get;
+    // }
 
-    abstract public int $id{
-        get;
-        set;
-    }
+    // abstract public int $id{
+    //     get;
+    //     set;
+    // }
 
-    abstract public Course $course{
-        get;
-        set;
-    }
+    // abstract public Course $course{
+    //     get;
+    //     set;
+    // }
     
     /**
      * Populates the model using the provided other models, filling in missing data.
@@ -67,7 +67,7 @@ trait CourseIdentityTrait{
         ];
     }
 
-    public static function newFromMinimumDataRepresentation($data){
+    public static function newFromMinimumDataRepresentation($data): static{
         $item = new (self::class)();
         $item->id = $data[self::class];
         $item->domain = new Domain($data[Domain::class]);

@@ -12,11 +12,6 @@ use CanvasApiLibrary\Models\Section;
 use CanvasApiLibrary\Models\Submission;
 
 trait SubmissionProperties{
-    public abstract Domain $domain{
-        get;
-        protected set(Domain $value);
-    }
-    
     public ?string $url{
         get {
             return $this->url;
@@ -111,5 +106,5 @@ trait SubmissionProperties{
     }
 
     abstract public function getMinimumDataRepresentation();
-    abstract public static function newFromMinimumDataRepresentation(mixed $data): Submission;
+    abstract public static function newFromMinimumDataRepresentation(mixed $data): static;
     }

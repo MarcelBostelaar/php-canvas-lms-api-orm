@@ -10,7 +10,8 @@ use Exception;
 abstract class AbstractProvider implements HandleEmittedInterface{
     public function __construct(
         public readonly StatusHandlerInterface $statusHandler,
-        public readonly CanvasCommunicator $canvasCommunicator
+        public readonly CanvasCommunicator $canvasCommunicator,
+        protected readonly ModelPopulationConfigBuilder $modelPopulator
         ){}
 
     /**
@@ -24,8 +25,6 @@ abstract class AbstractProvider implements HandleEmittedInterface{
     public function HandleEmitted(mixed $data, array $context){
         //Do nothing by default.
     }
-
-    abstract protected static ModelPopulationConfigBuilder $modelPopulator;
 
     private static function GetDomainFromContext($context){
         foreach($context as $item){

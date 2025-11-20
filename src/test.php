@@ -1,5 +1,5 @@
 <?php
-namespace CanvasApiLibrary\Test;
+require_once __DIR__ . '/vendor/autoload.php';
 
 use CanvasApiLibrary\Models\Assignment;
 use CanvasApiLibrary\Models\Course;
@@ -12,7 +12,6 @@ use CanvasApiLibrary\Providers\UserProvider;
 use CanvasApiLibrary\Services\CanvasCommunicator;
 use CanvasApiLibrary\Services\CanvasReturnStatus;
 use CanvasApiLibrary\Services\StatusHandlerInterface;
-use Exception;
 
 function formatted_vardump($data) {
     echo '<pre>' . htmlspecialchars(var_export($data, true)) . '</pre>';
