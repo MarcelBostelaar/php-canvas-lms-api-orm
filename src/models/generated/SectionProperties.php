@@ -21,9 +21,7 @@ trait SectionProperties{
     protected mixed $course_identity;
     public Course $course{
         get { 
-            $item = new Course();
-            $item->newFromMinimumDataRepresentation($this->course_identity);
-            return $item;
+            return Course::newFromMinimumDataRepresentation($this->course_identity);
         }
         set (Course $value) {
             if($value->domain != $this->domain){

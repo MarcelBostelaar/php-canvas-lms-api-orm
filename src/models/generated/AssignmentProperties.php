@@ -13,9 +13,7 @@ trait AssignmentProperties{
     protected mixed $group_category_identity;
     public GroupCategory $group_category{
         get { 
-            $item = new GroupCategory();
-            $item->newFromMinimumDataRepresentation($this->group_category_identity);
-            return $item;
+            return GroupCategory::newFromMinimumDataRepresentation($this->group_category_identity);
         }
         set (GroupCategory $value) {
             if($value->domain != $this->domain){
@@ -30,9 +28,7 @@ trait AssignmentProperties{
     protected mixed $course_identity;
     public Course $course{
         get { 
-            $item = new Course();
-            $item->newFromMinimumDataRepresentation($this->course_identity);
-            return $item;
+            return Course::newFromMinimumDataRepresentation($this->course_identity);
         }
         set (Course $value) {
             if($value->domain != $this->domain){

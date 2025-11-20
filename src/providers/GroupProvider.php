@@ -20,8 +20,8 @@ class GroupProvider extends AbstractProvider{
     use GroupProviderProperties;
 
     public function __construct(
-        public readonly StatusHandlerInterface $statusHandler,
-        public readonly CanvasCommunicator $canvasCommunicator
+        StatusHandlerInterface $statusHandler,
+        CanvasCommunicator $canvasCommunicator
     ) {
         parent::__construct($statusHandler, $canvasCommunicator,
             new ModelPopulationConfigBuilder(Group::class)->keyCopy("name"));

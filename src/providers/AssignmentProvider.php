@@ -16,8 +16,8 @@ class AssignmentProvider extends AbstractProvider{
     use AssignmentProviderProperties;
 
     public function __construct(
-        public readonly StatusHandlerInterface $statusHandler,
-        public readonly CanvasCommunicator $canvasCommunicator
+        StatusHandlerInterface $statusHandler,
+        CanvasCommunicator $canvasCommunicator
     ) {
         parent::__construct($statusHandler, $canvasCommunicator,
         new ModelPopulationConfigBuilder(Assignment::class)
@@ -26,6 +26,7 @@ class AssignmentProvider extends AbstractProvider{
     }
 
     public function populateAssignment(Assignment $assignment) : Assignment{
+        echo $assignment->course->id;
         $this->Get(
         "/api/v1/courses/{$assignment->course->id}/assignments/$assignment->id",
         $assignment->getContext(),

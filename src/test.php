@@ -14,7 +14,7 @@ use CanvasApiLibrary\Services\CanvasReturnStatus;
 use CanvasApiLibrary\Services\StatusHandlerInterface;
 
 function formatted_vardump($data) {
-    echo '<pre>' . htmlspecialchars(var_export($data, true)) . '</pre>';
+    echo '<pre>' . htmlspecialchars(var_dump($data, true)) . '</pre>';
 }
 class DummyHandler implements StatusHandlerInterface{
     public function HandleStatus(mixed $data, $status): mixed {
@@ -45,6 +45,7 @@ $assignment = new Assignment();
 $assignment->id = 146427;
 $assignment->domain = $domain;
 $assignment->course = $course;
+formatted_vardump($assignment);
 if(!$assignment->validateIdentityIntegrity()){
     throw new Exception("Assignment identity integrity validation failed.");
 }

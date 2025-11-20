@@ -24,12 +24,9 @@ use CanvasApiLibrary\Services\StatusHandlerInterface;
  */
 class SubmissionProvider extends AbstractProvider{
     use SubmissionProviderProperties;
-
-    
-
     public function __construct(
-        public readonly StatusHandlerInterface $statusHandler,
-        public readonly CanvasCommunicator $canvasCommunicator
+        StatusHandlerInterface $statusHandler,
+        CanvasCommunicator $canvasCommunicator
     ) {
         parent::__construct($statusHandler, $canvasCommunicator,
         new ModelPopulationConfigBuilder(Submission::class)

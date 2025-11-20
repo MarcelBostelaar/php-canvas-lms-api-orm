@@ -21,8 +21,8 @@ class SectionProvider extends AbstractProvider{
     use SectionProviderProperties;
 
     public function __construct(
-        public readonly StatusHandlerInterface $statusHandler,
-        public readonly CanvasCommunicator $canvasCommunicator
+        StatusHandlerInterface $statusHandler,
+        CanvasCommunicator $canvasCommunicator
     ) {
         parent::__construct($statusHandler, $canvasCommunicator,
         new ModelPopulationConfigBuilder(Section::class)

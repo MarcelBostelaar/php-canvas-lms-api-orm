@@ -41,9 +41,7 @@ trait SubmissionCommentProperties{
     protected mixed $course_identity;
     public Course $course{
         get { 
-            $item = new Course();
-            $item->newFromMinimumDataRepresentation($this->course_identity);
-            return $item;
+            return Course::newFromMinimumDataRepresentation($this->course_identity);
         }
         set (Course $value) {
             if($value->domain != $this->domain){
@@ -58,9 +56,7 @@ trait SubmissionCommentProperties{
     protected mixed $assignment_identity;
     public Assignment $assignment{
         get { 
-            $item = new Assignment();
-            $item->newFromMinimumDataRepresentation($this->assignment_identity);
-            return $item;
+            return Assignment::newFromMinimumDataRepresentation($this->assignment_identity);
         }
         set (Assignment $value) {
             if($value->domain != $this->domain){
@@ -75,9 +71,7 @@ trait SubmissionCommentProperties{
     protected mixed $user_identity;
     public User $user{
         get { 
-            $item = new User();
-            $item->newFromMinimumDataRepresentation($this->user_identity);
-            return $item;
+            return User::newFromMinimumDataRepresentation($this->user_identity);
         }
         set (User $value) {
             if($value->domain != $this->domain){

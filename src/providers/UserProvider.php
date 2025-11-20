@@ -22,8 +22,8 @@ class UserProvider extends AbstractProvider{
     use UserProviderProperties;
 
     public function __construct(
-        public readonly StatusHandlerInterface $statusHandler,
-        public readonly CanvasCommunicator $canvasCommunicator
+        StatusHandlerInterface $statusHandler,
+        CanvasCommunicator $canvasCommunicator
     ) {
         parent::__construct($statusHandler, $canvasCommunicator,
         new ModelPopulationConfigBuilder(User::class)
