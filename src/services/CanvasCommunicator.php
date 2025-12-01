@@ -6,7 +6,11 @@ use CanvasApiLibrary\Models\Domain;
 class CanvasCommunicator{
     public function __construct(
         public readonly string $apiKey
-    ){}
+    ){
+        if($this->apiKey === null || $this->apiKey === ""){
+            throw new \Exception("API Key cannot be null");
+        }
+    }
 
     private static function checkForStatusErrors(mixed $data): CanvasReturnStatus{
         if(!is_array($data)){

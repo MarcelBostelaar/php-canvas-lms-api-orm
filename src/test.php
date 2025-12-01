@@ -29,6 +29,8 @@ class DummyHandler implements StatusHandlerInterface{
     }
 }
 
+$_ENV = parse_ini_file('.env');
+
 $canvasCommunicator = new CanvasCommunicator($_ENV['CANVAS_API_TOKEN'] ?? getenv('CANVAS_API_TOKEN'));
 $handler = new DummyHandler();
 
