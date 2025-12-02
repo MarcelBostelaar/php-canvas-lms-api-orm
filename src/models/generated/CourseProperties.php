@@ -8,6 +8,4 @@ use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\Course;
 
 trait CourseProperties{
-    abstract public function getMinimumDataRepresentation();
-    abstract public static function newFromMinimumDataRepresentation(mixed $data): static;
-    }
+}

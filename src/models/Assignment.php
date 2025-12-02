@@ -2,16 +2,15 @@
 
 namespace CanvasApiLibrary\Models;
 
+use CanvasApiLibrary\Models\IdentityTraits\CourseBoundIdTrait;
 use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
 use CanvasApiLibrary\Models\Generated\AssignmentProperties;
-use CanvasApiLibrary\Models\ContextPopulationTraits\CourseIdentityTrait;
 
 class Assignment extends AbstractCanvasPopulatedModel{
     use AssignmentProperties;
-    use CourseIdentityTrait;
+    use CourseBoundIdTrait;
     protected static array $properties = [
-        [GroupCategory::class, "group_category"],
-        [Course::class, "course"]
+        [GroupCategory::class, "group_category"]
     ];
 
     public static array $plurals = ["Assignments"];

@@ -17,6 +17,4 @@ trait UserProperties{
         }
     }
 
-    abstract public function getMinimumDataRepresentation();
-    abstract public static function newFromMinimumDataRepresentation(mixed $data): static;
-    }
+}

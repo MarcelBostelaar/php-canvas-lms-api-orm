@@ -1,16 +1,15 @@
 <?php
 
 namespace CanvasApiLibrary\Models;
-use CanvasApiLibrary\Models\ContextPopulationTraits\CourseIdentityTrait;
+use CanvasApiLibrary\Models\IdentityTraits\CourseBoundIdTrait;
 use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
 use CanvasApiLibrary\Models\Generated\SectionProperties;
 
 final class Section extends AbstractCanvasPopulatedModel{
     use SectionProperties;
-    use CourseIdentityTrait;
+    use CourseBoundIdTrait;
     protected static array $properties = [
-        ["string", "name"],
-        [Course::class, "course"]
+        ["string", "name"]
     ];
 
     

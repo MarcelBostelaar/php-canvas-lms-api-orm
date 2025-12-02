@@ -5,9 +5,6 @@ namespace CanvasApiLibrary\Models\Generated;
 use CanvasApiLibrary\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Models\Domain;
-use CanvasApiLibrary\Models\Course;
-use CanvasApiLibrary\Models\Assignment;
-use CanvasApiLibrary\Models\User;
 use CanvasApiLibrary\Models\SubmissionComment;
 
 trait SubmissionCommentProperties{
@@ -38,51 +35,4 @@ trait SubmissionCommentProperties{
         }
     }
 
-    protected mixed $course_identity;
-    public Course $course{
-        get { 
-            return Course::newFromMinimumDataRepresentation($this->course_identity);
-        }
-        set (Course $value) {
-            if($value->domain != $this->domain){
-                $selfDomain = $this->domain->domain;
-                $otherDomain = $value->domain->domain;
-                throw new MixingDomainsException("Tried to save a Course from domain '$otherDomain' to SubmissionComment.course from domain '$selfDomain'.");
-            }
-            $this->course_identity = $value->getMinimumDataRepresentation();
-        }
-    }
-
-    protected mixed $assignment_identity;
-    public Assignment $assignment{
-        get { 
-            return Assignment::newFromMinimumDataRepresentation($this->assignment_identity);
-        }
-        set (Assignment $value) {
-            if($value->domain != $this->domain){
-                $selfDomain = $this->domain->domain;
-                $otherDomain = $value->domain->domain;
-                throw new MixingDomainsException("Tried to save a Assignment from domain '$otherDomain' to SubmissionComment.assignment from domain '$selfDomain'.");
-            }
-            $this->assignment_identity = $value->getMinimumDataRepresentation();
-        }
-    }
-
-    protected mixed $user_identity;
-    public User $user{
-        get { 
-            return User::newFromMinimumDataRepresentation($this->user_identity);
-        }
-        set (User $value) {
-            if($value->domain != $this->domain){
-                $selfDomain = $this->domain->domain;
-                $otherDomain = $value->domain->domain;
-                throw new MixingDomainsException("Tried to save a User from domain '$otherDomain' to SubmissionComment.user from domain '$selfDomain'.");
-            }
-            $this->user_identity = $value->getMinimumDataRepresentation();
-        }
-    }
-
-    abstract public function getMinimumDataRepresentation();
-    abstract public static function newFromMinimumDataRepresentation(mixed $data): static;
-    }
+}

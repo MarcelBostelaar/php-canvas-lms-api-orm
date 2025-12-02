@@ -4,8 +4,70 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f27ac517323ad978ae9e1c20ea5b6092",
-    "packages": [],
+    "content-hash": "a92a14b718cbc0844403dc29aa48d4e8",
+    "packages": [
+        {
+            "name": "vaimo/topological-sort",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vaimo/topological-sort.git",
+                "reference": "100f3bcc903a45f3ad7d559fe239fd9fa659d3c0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vaimo/topological-sort/zipball/100f3bcc903a45f3ad7d559fe239fd9fa659d3c0",
+                "reference": "100f3bcc903a45f3ad7d559fe239fd9fa659d3c0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "phpcompatibility/php-compatibility": "^9",
+                "phpunit/phpunit": "~6.0 || ~7.0 || ~8.0 || ~9.0",
+                "squizlabs/php_codesniffer": "^2.9.2 || ^3.13",
+                "symfony/console": "~3.0 || ~4.0 || ~5.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Vaimo\\TopSort\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marc J. Schmidt",
+                    "email": "marc@marcjschmidt.de"
+                }
+            ],
+            "description": "High-Performance TopSort/Dependency resolving algorithm (compatibility version to work with 7.0 - 7.2)",
+            "keywords": [
+                "dependency resolving",
+                "topological sort",
+                "topsort"
+            ],
+            "support": {
+                "source": "https://github.com/vaimo/topological-sort/tree/2.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/marcj",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-08-01T11:07:43+00:00"
+        }
+    ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",

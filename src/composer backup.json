@@ -12,7 +12,7 @@
                 "models/context-population-traits/",
                 "models/utility/"
             ],
-            "CanvasApiLibrary\\Models\\ContextPopulationTraits\\": [
+            "CanvasApiLibrary\\Models\\IdentityTraits\\": [
                 "models/context-population-traits/"
             ],
             "CanvasApiLibrary\\Providers\\": [

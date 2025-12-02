@@ -6,7 +6,6 @@ use CanvasApiLibrary\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\GroupCategory;
-use CanvasApiLibrary\Models\Course;
 use CanvasApiLibrary\Models\Assignment;
 
 trait AssignmentProperties{
@@ -25,21 +24,4 @@ trait AssignmentProperties{
         }
     }
 
-    protected mixed $course_identity;
-    public Course $course{
-        get { 
-            return Course::newFromMinimumDataRepresentation($this->course_identity);
-        }
-        set (Course $value) {
-            if($value->domain != $this->domain){
-                $selfDomain = $this->domain->domain;
-                $otherDomain = $value->domain->domain;
-                throw new MixingDomainsException("Tried to save a Course from domain '$otherDomain' to Assignment.course from domain '$selfDomain'.");
-            }
-            $this->course_identity = $value->getMinimumDataRepresentation();
-        }
-    }
-
-    abstract public function getMinimumDataRepresentation();
-    abstract public static function newFromMinimumDataRepresentation(mixed $data): static;
-    }
+}

@@ -81,11 +81,10 @@ function ModelGetter($modelname, $propertyIdName){
  * @param bool $nullable
  */
 function modelProp($modelname, $propertyname, $nullable, $originalModelName){ 
-    $intType = $nullable ? "?mixed" : "mixed";
     $modelType = ($nullable ? "?" : "") . $modelname;
     $propertyIdName = $propertyname . "_identity";
     ?>
-    protected <?=$intType?> $<?=$propertyIdName?>;
+    protected mixed $<?=$propertyIdName?>;
     public <?=$modelType?> $<?=$propertyname?>{
 <?= $nullable ? 
         NullableModelGetter($modelname,  $propertyIdName) 
@@ -106,13 +105,6 @@ function modelProp($modelname, $propertyname, $nullable, $originalModelName){
         }
     }
 <?php
-}
-
-function getSkeletonMethod($minimumProperties, $minimumModels, $modelName){
-    ?>
-    abstract public function getMinimumDataRepresentation();
-    abstract public static function newFromMinimumDataRepresentation(mixed $data): static;
-    <?php
 }
 
 function fileEnd(){
@@ -167,8 +159,6 @@ function GenerateFullModelTrait($originalModelName, $chosenTraitName, array $reg
         modelProp($p["type"],  $p["name"], true, $originalModelName);
         echo "\n";
     }
-
-    getSkeletonMethod($minimumProperties, $minimumModelProperties, $originalModelName);
 
     fileEnd();
 

@@ -5,9 +5,6 @@ namespace CanvasApiLibrary\Models\Generated;
 use CanvasApiLibrary\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Models\Domain;
-use CanvasApiLibrary\Models\User;
-use CanvasApiLibrary\Models\Assignment;
-use CanvasApiLibrary\Models\Course;
 use CanvasApiLibrary\Models\Section;
 use CanvasApiLibrary\Models\Submission;
 
@@ -30,39 +27,7 @@ trait SubmissionProperties{
         }
     }
 
-    protected mixed $user_identity;
-    public User $user{
-        get { 
-            return User::newFromMinimumDataRepresentation($this->user_identity);
-        }
-        set (User $value) {
-            if($value->domain != $this->domain){
-                $selfDomain = $this->domain->domain;
-                $otherDomain = $value->domain->domain;
-                throw new MixingDomainsException("Tried to save a User from domain '$otherDomain' to Submission.user from domain '$selfDomain'.");
-            }
-            $this->user_identity = $value->getMinimumDataRepresentation();
-        }
-    }
-
-    
-
-    protected mixed $course_identity;
-    public Course $course{
-        get { 
-            return Course::newFromMinimumDataRepresentation($this->course_identity);
-        }
-        set (Course $value) {
-            if($value->domain != $this->domain){
-                $selfDomain = $this->domain->domain;
-                $otherDomain = $value->domain->domain;
-                throw new MixingDomainsException("Tried to save a Course from domain '$otherDomain' to Submission.course from domain '$selfDomain'.");
-            }
-            $this->course_identity = $value->getMinimumDataRepresentation();
-        }
-    }
-
-    protected ?mixed $section_identity;
+    protected mixed $section_identity;
     public ?Section $section{
         get {
             if($this->section_identity === null){
@@ -86,6 +51,4 @@ trait SubmissionProperties{
         }
     }
 
-    abstract public function getMinimumDataRepresentation();
-    abstract public static function newFromMinimumDataRepresentation(mixed $data): static;
-    }
+}
