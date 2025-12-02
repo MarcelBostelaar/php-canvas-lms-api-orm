@@ -33,9 +33,9 @@ class ModelPopulationConfigBuilder{
     protected function getInstructionsFinished(){
         $stepped = $this->newInstruction();
         $lastInstruction = end($stepped->instructions);
-        if($lastInstruction[0] === null & $lastInstruction[1] === null & $lastInstruction[2] === null){
+        if($lastInstruction[0] === null & $lastInstruction[1] === [] & $lastInstruction[2] === null){
             //last instruction is empty, so final command was complete
-            $popped = clone $stepped->instructions;
+            $popped = $stepped->instructions;
             array_pop($popped);
             return $popped;
         }
@@ -183,7 +183,7 @@ class ModelPopulationConfigBuilder{
      * @param ModelInterface[] $context 
      * @return AbstractCanvasPopulatedModel
      */
-    public function build($data, ...$context) : AbstractCanvasPopulatedModel{
+    public function build(array $data, ...$context) : AbstractCanvasPopulatedModel{
         $errors = [];
 
         $toPopulate = $this->instance === null ? new ($this->model)() : $this->instance;
@@ -229,16 +229,12 @@ class ModelPopulationConfigBuilder{
      */
     private static function buildOneInstruction($toBuild, $data, $context, $provider, $processors, $consumer): array{
         $errors = [];
-        [$item, $error] = $provider->getData($data);
-        if($error !== null){
-            $errors[] = $error;
-        }
+        ['data' => $item, 'errors' => $error] = $provider->getData($data);
+        array_push($errors, ...$error);
 
         foreach($processors as $processor){
-            [$item, $error, $continue] = $processor->process($item, $context);
-            if($error !== null){
-                $errors[] = $error;
-            }
+            ["data" => $item, "errros" => $error, "continue" => $continue] = $processor->process($item, $context);
+            array_push($errors, ...$error);
             if(!$continue){
                 //Processor indicated not to continue processing this value.
                 return $errors;
@@ -253,10 +249,7 @@ class ModelPopulationConfigBuilder{
             }
         }
         $error = $consumer->consumeData($item, $toBuild, $context);
-        
-        if($error !== null){
-            array_push($errors, ...$error);
-        }
+        array_push($errors, ...$error);
         return $errors;
     }
 }

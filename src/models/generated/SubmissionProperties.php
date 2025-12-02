@@ -45,20 +45,7 @@ trait SubmissionProperties{
         }
     }
 
-    protected mixed $assignment_identity;
-    public Assignment $assignment{
-        get { 
-            return Assignment::newFromMinimumDataRepresentation($this->assignment_identity);
-        }
-        set (Assignment $value) {
-            if($value->domain != $this->domain){
-                $selfDomain = $this->domain->domain;
-                $otherDomain = $value->domain->domain;
-                throw new MixingDomainsException("Tried to save a Assignment from domain '$otherDomain' to Submission.assignment from domain '$selfDomain'.");
-            }
-            $this->assignment_identity = $value->getMinimumDataRepresentation();
-        }
-    }
+    
 
     protected mixed $course_identity;
     public Course $course{

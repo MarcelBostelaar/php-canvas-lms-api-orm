@@ -11,6 +11,17 @@
             "noDebug": true,
             "program": "${workspaceRoot}/buildscript/Build.php",
             "cwd": "${workspaceRoot}/buildscript"
+        },
+        {
+            "name": "Xdebug remote",
+            "type": "php",
+            "request": "launch",
+            "port": 9003,
+            "stopOnEntry": false,
+            "exclude": [
+                "**/vendor/**/*.php",
+                "**/autoload.php"
+            ]
         }
     ]
 }

@@ -7,15 +7,35 @@ use CanvasApiLibrary\Models\Utility\ModelInterface;
 use CanvasApiLibrary\Models\Domain;
 
 trait DomainIdentityTrait{
-    // public abstract Domain $domain{
-    //     set(Domain $value);
-    //     get;
-    // }
+    public Domain $domain{
+        get{
+            return $this->domain;
+        }
+        set(Domain $value){
+            if(isset($this->domain)){
+                if($this->domain != $value){
+                    throw new ChangingIdException("Tried to change the domain of a model.");
+                }
+                return;
+            }
+            $this->domain = $value;
+        }
+    }
 
-    // abstract public int $id{
-    //     get;
-    //     set;
-    // }
+    public int $id{
+        get{
+            return $this->id;
+        }
+        set (int $value){
+            if(isset($this->id)){
+                if($this->id != $value){
+                    throw new ChangingIdException("Tried to change the id of a model what already has it's id set.");
+                }
+                return;
+            }
+            $this->id = $value;
+        }
+    }
     
     /**
      * Populates the model using the provided other models, filling in missing data.
@@ -27,12 +47,6 @@ trait DomainIdentityTrait{
     public function populateWithContext(array $context){
         foreach($context as $item){
             if($item instanceof Domain){
-                if(isset($this->domain)){
-                    if($this->domain != $item){
-                        throw new ChangingIdException("Tried to set the domain of a model that already exists.");
-                    }
-                    //same domain
-                }
                 $this->domain = $item;
                 continue;
             }

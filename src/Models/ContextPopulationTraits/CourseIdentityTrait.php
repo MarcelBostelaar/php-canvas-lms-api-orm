@@ -1,54 +1,50 @@
 <?php
 
 namespace CanvasApiLibrary\Models\ContextPopulationTraits;
-use CanvasApiLibrary\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Exceptions\ChangingIdException;
-use CanvasApiLibrary\Models\Utility\ModelInterface;
-use CanvasApiLibrary\Models\Domain;
+use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Models\Course;
 
 trait CourseIdentityTrait{
-    // abstract public Domain $domain{
-    //     protected set(Domain $value);
-    //     get;
-    // }
 
-    // abstract public int $id{
-    //     get;
-    //     set;
-    // }
+    use DomainIdentityTrait {
+        DomainIdentityTrait::populateWithContext as private dit_populateWithContext;
+        DomainIdentityTrait::getContext as private dit_getContext;
+        DomainIdentityTrait::getMinimumDataRepresentation as private dit_getMinimumDataRepresentation;
+        DomainIdentityTrait::newFromMinimumDataRepresentation as private dit_newFromMinimumDataRepresentation;
+        DomainIdentityTrait::validateIdentityIntegrity as private dit_validateIdentityIntegrity;
+        DomainIdentityTrait::getUniqueId as private dit_getUniqueId;
+    }
 
-    // abstract public Course $course{
-    //     get;
-    //     set;
-    // }
     
-    /**
-     * Populates the model using the provided other models, filling in missing data.
-     * @param ModelInterface[] $context A list of context items from which to pull the needed data to populate.
-     * @return void
-     * @throws ChangingIdException When already set context data is provided again
-     * @throws NotPopulatedException When not all required fields are set
-     */
-    public function populateWithContext(array $context){
-        foreach($context as $item){
-            if($item instanceof Domain){
-                if(isset($this->domain)){
-                    if($this->domain != $item){
-                        throw new ChangingIdException("Tried to set the domain of a model that already exists.");
-                    }
-                    //same domain
+    protected mixed $course_identity;
+    public Course $course{
+        get { 
+            return Course::newFromMinimumDataRepresentation($this->course_identity);
+        }
+        set (Course $value) {
+            if(!isset($this->course_identity)){
+                if($this->domain != $value->domain){
+                    $selfDomain = $this->domain->domain;
+                    $otherDomain = $value->domain->domain;
+                    throw new MixingDomainsException("Tried to save a Course from domain '$otherDomain' to Section.course from domain '$selfDomain'.");
                 }
-                $this->domain = $item;
-                continue;
+                //same domain, allowed to save
+                $this->course_identity = $value->getMinimumDataRepresentation();
             }
-            if($item instanceof Course){
-                if(isset($this->course)){
-                    if($this->course != $item){
-                        throw new ChangingIdException("Tried to set the course of a model that already exists.");
-                    }
-                    //same course
+            else{
+                if($this->course_identity != $value->getMinimumDataRepresentation()){
+                    throw new ChangingIdException("Tried to change the course of this item");
                 }
+                //Same course, pass.
+            }
+        }
+    }
+
+    public function populateWithContext(array $context){
+        $this->dit_populateWithContext($context);
+        foreach($context as $item){
+            if($item instanceof Course){
                 $this->course = $item;
                 continue;
             }
@@ -56,30 +52,27 @@ trait CourseIdentityTrait{
     }
 
     public function getContext(): array{
-        return [$this, $this->domain, $this->course];
+        return [...$this->dit_getContext(), $this->course];
     }
 
     public function getMinimumDataRepresentation(): mixed{
         return [
-            self::class => $this->id,
-            Domain::class => $this->domain->domain,
+            ...$this->dit_getMinimumDataRepresentation(),
             Course::class => $this->course->id
         ];
     }
 
     public static function newFromMinimumDataRepresentation($data): static{
-        $item = new (self::class)();
-        $item->id = $data[self::class];
-        $item->domain = new Domain($data[Domain::class]);
+        $item = static::dit_newFromMinimumDataRepresentation($data);
         $item->course = Course::newFromMinimumDataRepresentation($data);
         return $item;
     }
 
     public function validateIdentityIntegrity() : bool{
-        return isset($this->id) && isset($this->domain) && isset($this->course);
+        return $this->dit_validateIdentityIntegrity() && isset($this->course);
     }
 
     public function getUniqueId(): string{
-        return static::class . "-" . $this->domain->domain . "-Course:" . $this->course->id . "-" . $this->id;
+        return $this->dit_getUniqueId() . "-Course:" . $this->course->id;
     }
 }

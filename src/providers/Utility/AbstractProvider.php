@@ -38,6 +38,9 @@ abstract class AbstractProvider implements HandleEmittedInterface{
     private function GetInternal(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null){
         $domain = self::GetDomainFromContext($context);
         [$data, $status] = $this->canvasCommunicator->Get($route, $domain);
+        if($data === null){
+            throw new Exception("Not data found in route");
+        }
         $data = $this->statusHandler->HandleStatus($data, $status);
         if($customBuilder === null){
             $customBuilder = static::$modelPopulator;

@@ -2,7 +2,6 @@
 
 namespace CanvasApiLibrary\Models;
 use CanvasApiLibrary\Models\ContextPopulationTraits\AssignmentAndUserIdentityTrait;
-use CanvasApiLibrary\Models\ContextPopulationTraits\AssignmentIdentityTrait;
 use CanvasApiLibrary\Models\Utility\AbstractCanvasPopulatedModel;
 use CanvasApiLibrary\Models\Generated\SubmissionProperties;
 

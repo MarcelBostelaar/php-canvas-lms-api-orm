@@ -13,6 +13,14 @@ use CanvasApiLibrary\Services\CanvasCommunicator;
 use CanvasApiLibrary\Services\CanvasReturnStatus;
 use CanvasApiLibrary\Services\StatusHandlerInterface;
 
+
+set_error_handler(function ($severity, $message, $file, $line) {
+    if (str_starts_with($message, 'Undefined array key')) {
+        throw new ErrorException($message, 0, $severity, $file, $line);
+    }
+    return false; // let other errors behave normally
+});
+
 function formatted_vardump($data) {
     echo '<pre>' . htmlspecialchars(var_dump($data, true)) . '</pre>';
 }

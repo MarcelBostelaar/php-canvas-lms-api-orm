@@ -1,6 +1,7 @@
 <?php
 
 namespace CanvasApiLibrary\Models\ContextPopulationTraits;
+use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Exceptions\ChangingIdException;
 use CanvasApiLibrary\Models\Utility\ModelInterface;
@@ -10,30 +11,42 @@ use CanvasApiLibrary\Models\Assignment;
 use CanvasApiLibrary\Models\User;
 
 trait AssignmentAndUserIdentityTrait{
-    // abstract public Domain $domain{
-    //     protected set(Domain $value);
-    //     get;
-    // }
+    /**
+     * Note to future devs. If the need arises for an identity of just the user, without an assignment,
+     * consider reworking the structure of these traits to a subscription type, where instead of inheriting, you 
+     */
 
-    // abstract public int $id{
-    //     get;
-    //     set;
-    // }
-
-    // abstract public Course $course{
-    //     get;
-    //     set;
-    // }
-
-    // abstract public Assignment $assignment{
-    //     get;
-    //     set;
-    // }
-
-    // abstract public User $user{
-    //     get;
-    //     set;
-    // }
+    use AssignmentIdentityTrait {
+        AssignmentIdentityTrait::populateWithContext as private ait_populateWithContext;
+        AssignmentIdentityTrait::getContext as private ait_getContext;
+        AssignmentIdentityTrait::getMinimumDataRepresentation as private ait_getMinimumDataRepresentation;
+        AssignmentIdentityTrait::newFromMinimumDataRepresentation as private ait_newFromMinimumDataRepresentation;
+        AssignmentIdentityTrait::validateIdentityIntegrity as private ait_validateIdentityIntegrity;
+        AssignmentIdentityTrait::getUniqueId as private ait_getUniqueId;
+    }
+    protected mixed $user_identity;
+    public User $user{
+        get { 
+            return User::newFromMinimumDataRepresentation($this->user_identity);
+        }
+        set (User $value) {
+            if(!isset($this->user_identity)){
+                if($this->domain != $value->domain){
+                    $selfDomain = $this->domain->domain;
+                    $otherDomain = $value->domain->domain;
+                    throw new MixingDomainsException("Tried to save a User from domain '$otherDomain' to an item from domain '$selfDomain'.");
+                }
+                //same course, allowed to save
+                $this->user_identity = $value->getMinimumDataRepresentation();
+            }
+            else{
+                if($this->user_identity != $value->getMinimumDataRepresentation()){
+                    throw new ChangingIdException("Tried to change the user of this item");
+                }
+                //Same user, pass.
+            }
+        }
+    }
     
     /**
      * Populates the model using the provided other models, filling in missing data.
@@ -43,44 +56,9 @@ trait AssignmentAndUserIdentityTrait{
      * @throws NotPopulatedException When not all required fields are set
      */
     public function populateWithContext(array $context){
+        $this->ait_populateWithContext($context);
         foreach($context as $item){
-            if($item instanceof Domain){
-                if(isset($this->domain)){
-                    if($this->domain != $item){
-                        throw new ChangingIdException("Tried to set the domain of a model that already exists.");
-                    }
-                    //same domain
-                }
-                $this->domain = $item;
-                continue;
-            }
-            if($item instanceof Course){
-                if(isset($this->course)){
-                    if($this->course != $item){
-                        throw new ChangingIdException("Tried to set the course of a model that already exists.");
-                    }
-                    //same course
-                }
-                $this->course = $item;
-                continue;
-            }
-            if($item instanceof Assignment){
-                if(isset($this->assignment)){
-                    if($this->assignment != $item){
-                        throw new ChangingIdException("Tried to set the assignment of a model that already exists.");
-                    }
-                    //same assignment
-                }
-                $this->assignment = $item;
-                continue;
-            }
             if($item instanceof User){
-                if(isset($this->user)){
-                    if($this->user != $item){
-                        throw new ChangingIdException("Tried to set the user of a model that already exists.");
-                    }
-                    //same assignment
-                }
                 $this->user = $item;
                 continue;
             }

@@ -28,7 +28,7 @@ class AssignmentProvider extends AbstractProvider{
     public function populateAssignment(Assignment $assignment) : Assignment{
         echo $assignment->course->id;
         $this->Get(
-        "/api/v1/courses/{$assignment->course->id}/assignments/$assignment->id",
+        "/courses/{$assignment->course->id}/assignments/$assignment->id",
         $assignment->getContext(),
         $this->modelPopulator->withInstance($assignment));
         return $assignment;

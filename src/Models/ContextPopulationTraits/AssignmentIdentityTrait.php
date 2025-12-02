@@ -1,34 +1,47 @@
 <?php
 
 namespace CanvasApiLibrary\Models\ContextPopulationTraits;
+use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Exceptions\ChangingIdException;
 use CanvasApiLibrary\Models\Utility\ModelInterface;
-use CanvasApiLibrary\Models\Domain;
-use CanvasApiLibrary\Models\Course;
 use CanvasApiLibrary\Models\Assignment;
 
 trait AssignmentIdentityTrait{
-    // abstract public Domain $domain{
-    //     protected set(Domain $value);
-    //     get;
-    // }
 
-    // abstract public int $id{
-    //     get;
-    //     set;
-    // }
+    use CourseIdentityTrait {
+        CourseIdentityTrait::populateWithContext as private cit_populateWithContext;
+        CourseIdentityTrait::getContext as private cit_getContext;
+        CourseIdentityTrait::getMinimumDataRepresentation as private cit_getMinimumDataRepresentation;
+        CourseIdentityTrait::newFromMinimumDataRepresentation as private cit_newFromMinimumDataRepresentation;
+        CourseIdentityTrait::validateIdentityIntegrity as private cit_validateIdentityIntegrity;
+        CourseIdentityTrait::getUniqueId as private cit_getUniqueId;
+    }
 
-    // abstract public Course $course{
-    //     get;
-    //     set;
-    // }
+    protected mixed $assignment_identity;
+    public Assignment $assignment{
+        get { 
+            return Assignment::newFromMinimumDataRepresentation($this->assignment_identity);
+        }
+        set (Assignment $value) {
+            if(!isset($this->assignment_identity)){
+                if($this->course_identity != $value->course->getMinimumDataRepresentation()){
+                    $selfCourse = implode($this->course_identity);
+                    $otherCourse = implode($value->course->getMinimumDataRepresentation());
+                    throw new MixingDomainsException("Tried to save an assignment from '$otherCourse' to an item from '$selfCourse'.");
+                }
+                //same course, allowed to save
+                $this->assignment_identity = $value->getMinimumDataRepresentation();
+            }
+            else{
+                if($this->assignment_identity != $value->getMinimumDataRepresentation()){
+                    throw new ChangingIdException("Tried to change the assignment of this item");
+                }
+                //Same assignment, pass.
+            }
+        }
+    }
 
-    // abstract public Assignment $assignment{
-    //     get;
-    //     set;
-    // }
-    
     /**
      * Populates the model using the provided other models, filling in missing data.
      * @param ModelInterface[] $context A list of context items from which to pull the needed data to populate.
@@ -37,34 +50,9 @@ trait AssignmentIdentityTrait{
      * @throws NotPopulatedException When not all required fields are set
      */
     public function populateWithContext(array $context){
+        $this->cit_populateWithContext($context);
         foreach($context as $item){
-            if($item instanceof Domain){
-                if(isset($this->domain)){
-                    if($this->domain != $item){
-                        throw new ChangingIdException("Tried to set the domain of a model that already exists.");
-                    }
-                    //same domain
-                }
-                $this->domain = $item;
-                continue;
-            }
-            if($item instanceof Course){
-                if(isset($this->course)){
-                    if($this->course != $item){
-                        throw new ChangingIdException("Tried to set the course of a model that already exists.");
-                    }
-                    //same course
-                }
-                $this->course = $item;
-                continue;
-            }
             if($item instanceof Assignment){
-                if(isset($this->assignment)){
-                    if($this->assignment != $item){
-                        throw new ChangingIdException("Tried to set the assignment of a model that already exists.");
-                    }
-                    //same assignment
-                }
                 $this->assignment = $item;
                 continue;
             }
@@ -72,32 +60,27 @@ trait AssignmentIdentityTrait{
     }
 
     public function getContext(): array{
-        return [$this, $this->domain, $this->course, $this->assignment];
+        return [...$this->cit_getContext(), $this->assignment];
     }
 
     public function getMinimumDataRepresentation(): mixed{
         return [
-            self::class => $this->id,
-            Domain::class => $this->domain->domain,
-            Course::class => $this->course->id,
+            ...$this->cit_getMinimumDataRepresentation(),
             Assignment::class => $this->assignment->id
         ];
     }
 
     public static function newFromMinimumDataRepresentation($data): static{
-        $item = new (self::class)();
-        $item->id = $data[self::class];
-        $item->domain = new Domain($data[Domain::class]);
-        $item->course = Course::newFromMinimumDataRepresentation($data);
+        $item = static::cit_newFromMinimumDataRepresentation($data);
         $item->assignment = Assignment::newFromMinimumDataRepresentation($data);
         return $item;
     }
     
     public function validateIdentityIntegrity() : bool{
-        return isset($this->id) && isset($this->domain) && isset($this->course) && isset($this->assignment);
+        return $this->cit_validateIdentityIntegrity() && isset($this->assignment);
     }
 
     public function getUniqueId(): string{
-        return static::class . "-" . $this->domain->domain . "-Course:" . $this->course->id . "-"  . "-Assignment:" . $this->assignment->id . "-" . $this->id;
+        return $this->cit_getUniqueId() . "-Assignment:" . $this->assignment->id;
     }
 }

@@ -6,35 +6,7 @@ use CanvasApiLibrary\Exceptions\ChangingIdException;
 
 abstract class AbstractCanvasPopulatedModel implements ModelInterface{
 
-    /**
-     * Constructs a new basemodel. Do not override the constructor with non-optional parameters.
-     * @param Domain $domain The domain of the canvas object
-     */
     public function __construct(){
-    }
-    
-    public Domain $domain{
-        get{
-            return $this->domain;
-        }
-        set(Domain $value){
-            if(isset($this->domain)){
-                throw new ChangingIdException("Tried to change the domain of a model.");
-            }
-            $this->domain = $value;
-        }
-    }
-
-    public int $id{
-        get{
-            return $this->id;
-        }
-        set (int $value){
-            if(isset($this->id)){
-                throw new ChangingIdException("Tried to change the id of a model what already has it's id set.");
-            }
-            $this->id = $value;
-        }
     }
 
     /**
