@@ -2,12 +2,16 @@
 
 namespace CanvasApiLibrary\Models\IdentityTraits\Base;
 
-use Vaimo\TopSort\Implementations\StringSort;
-
 /**
- * Base trait providing the event-subscription mechanism for identity handling.
- * All specific identity traits (Domain, Course, Assignment, User) register their
- * handlers with this base, which executes them in the order traits are used.
+ * Modular model identity system. Traits provide functionality for properties which function as identities for the models, 
+ * and serialization and deserialization functionality to go along with it.
+ * Identities which have dependencies on each other (such as a course which depends on the domain)
+ * should be initialized in order. It is adviced to make ergonomic combined traits out of these component traits, 
+ * and to declare the initialization in that, so make the models easier to comprehend.
+ * 
+ * This is the base trait providing the event-subscription mechanism for identity handling.
+ * All specific identity traits (Domain, Course, Assignment, User, etc) register their
+ * handlers with this base, which executes them in the order the traits are initialized.
  */
 trait IdentityBoiletplateTrait {
     
@@ -35,6 +39,12 @@ trait IdentityBoiletplateTrait {
 /**
      * Populates the model using the provided other models, filling in missing data.
      * Executes all registered context processors in order.
+     * Because the properties that make up the model's identity are unchangable, 
+     * this method at the same time checks against changing core identity information, 
+     * and against the mixing of incompatible identity components (such as two different domains or courses).
+     * 
+     * To be used when creating a new model from just an id, within the same context as an existing model,
+     * such as when reading the id in an api call of a parent/child item.
      * 
      * @param array $context A list of context items from which to pull the needed data to populate.
      * @return void
@@ -54,7 +64,7 @@ trait IdentityBoiletplateTrait {
     }
     
     /**
-     * Returns all context items for this model.
+     * Returns all context items for this model, that is to say, all model properties that make up the model's identity.
      * Collects results from all registered context getters.
      * 
      * @return array Array of model instances representing this model's context
@@ -132,40 +142,12 @@ trait IdentityBoiletplateTrait {
     }
 
     /**
-     * Automatically discovers all initialize*Identity methods and their dependencies,
-     * then calls them in topologically sorted order.
+     * Called before each identity based action, ensures traits are loaded.
      */
     private function ensureIdentityInitialized(): void {
         if (!$this->identityInitialized) {
             $this->identityInitialized = true;
             $this->initIdentityTraits();
-            
-            //old code that used reflection to try and load traits in dependency order, doing it manually to avoid headaces
-            // // Find all initialize*Identity methods (excluding *Dependencies methods)
-            // $reflection = new \ReflectionClass($this);
-            // $methods = $reflection->getMethods(\ReflectionMethod::IS_PROTECTED | \ReflectionMethod::IS_PUBLIC);
-            
-            // //Toplogical sorts dependencies so they are loaded in the correct order.
-            // $initMethods = new StringSort();
-
-            // foreach ($methods as $method) {
-            //     $name = $method->getName();
-            //     if (str_starts_with($name, 'initialize') 
-            //         && str_ends_with($name, 'Identity')
-            //         && !str_contains($name, 'Dependencies')) {
-            //         $depMethod = $name . 'Dependencies';
-            //         $dependencies = method_exists($this, $depMethod) ?
-            //             $this->$depMethod() : [];
-            //         $initMethods->add($name, $dependencies);
-            //     }
-            // }
-            
-            // $sorted = $initMethods->sort();
-            
-            // // Call each initialization method in dependency order
-            // foreach ($sorted as $method) {
-            //     $this->$method();
-            // }
         }
     }
 }

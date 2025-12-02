@@ -17,8 +17,7 @@
         ]
     },
     "require": {
-        "php": ">=8.4",
-        "vaimo/topological-sort": "^2.0"
+        "php": ">=8.4"
     },
     "scripts": {
         "serve": "php -S localhost:8000 test.php"
