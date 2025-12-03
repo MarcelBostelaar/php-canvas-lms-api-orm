@@ -1,25 +1,28 @@
 <?php
 namespace CanvasApiLibrary\Providers;
 
+use CanvasApiLibrary\Models\Course;
 use CanvasApiLibrary\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
-use CanvasApiLibrary\Services as Services;
 use CanvasApiLibrary\Models as Models;
 use CanvasApiLibrary\Models\User;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
-use CanvasApiLibrary\Providers\Utility\Lookup;
 use CanvasApiLibrary\Services\CanvasCommunicator;
+use CanvasApiLibrary\Services\ErrorOnNotFoundStatusHandlerWrapper;
 use CanvasApiLibrary\Services\StatusHandlerInterface;
 use Exception;
 use InvalidArgumentException;
 
 
 /**
- * Provider for Canvas API User operations
- * 
- * @method Lookup<Models\Group, Models\User> getUsersInGroups() Virtual method to get all user in groups
+ * Provider for Canvas API User operations. 
+ * Can be run in admin mode, enabling global operations for users, provided your API key has rights to do so.
+ * Otherwise must be provided with the course that will be used as the context of the user operations, such as reading personal data.
  */
 class UserProvider extends AbstractProvider{
     use UserProviderProperties;
+
+    private bool $asAdminBool = false;
+    private ?Course $currentCourseContext;
 
     public function __construct(
         StatusHandlerInterface $statusHandler,
@@ -28,6 +31,29 @@ class UserProvider extends AbstractProvider{
         parent::__construct($statusHandler, $canvasCommunicator,
         new ModelPopulationConfigBuilder(User::class)
                 ->keyCopy("name"));
+    }
+
+    /**
+     * Enables admin mode on this provider. This enables access to admin-only global user endpoints.
+     * Returns new user provider, does not modify original.
+     * @return UserProvider
+     */
+    public function asAdmin(): UserProvider{
+        $newProvider = new UserProvider($this->statusHandler, $this->canvasCommunicator);
+        $newProvider->asAdminBool = true;
+        return $newProvider;
+    }
+
+    /**
+     * Makes provider work within the context of a specific course. Required to retrieve users if your API key does not have full global admin rights.
+     * Returns new user provider, does not modify original.
+     * @param Course $course The course to set the current context to.
+     * @return UserProvider
+     */
+    public function withinCourse(Course $course): UserProvider{
+        $newProvider = new UserProvider($this->statusHandler, $this->canvasCommunicator);
+        $newProvider->currentCourseContext = $course;
+        return $newProvider;
     }
 
     public function getUsersInGroup(Models\Group $group): array{
@@ -55,13 +81,38 @@ class UserProvider extends AbstractProvider{
             default:
                 throw new InvalidArgumentException("Cannot pass $enrollmentRoleFilter as the role, must be null for no filtering, or one of following: Student, Teacher, Ta, Observer, Designer");
         }
-        return $this->GetMany( "/sections/{$section->id}/enrollments&per_page=100$postfix", 
+        return $this->GetMany( "/sections/{$section->id}/enrollments?per_page=100$postfix", 
         $section->getContext(), $this->modelPopulator, fn($item) => $item["user"]);
     }
 
+    /**
+     * Populates a user from the canvas API.
+     * @param Models\User $user
+     * @throws Exception Exception if run in normal mode without a course set as context.
+     * @throws Exception Exception if run in admin mode without admin permissions for the API key.
+     * @return Models\User
+     */
     public function populateUser(User $user): User{
-        $this->Get("users/:id{$user->id}",
-        $user->getContext(), $this->modelPopulator->withInstance($user));
+        if($this->asAdminBool){
+            //Admins can view user info globally
+            $this->Get("/users/{$user->id}",
+            $user->getContext(), 
+            $this->modelPopulator->withInstance($user),
+            null,
+                //Wrap the handler for this specific call to throw an explanatory exception with a message on 404 not found instead.
+            new ErrorOnNotFoundStatusHandlerWrapper($this->statusHandler, "Api route returned not found. Admin mode is enabled on the user provider. Ensure that your API key has admin rights in your Canvas LMS api environment.")
+        );
+            return $user;
+        }
+        if($this->currentCourseContext === null){
+            throw new Exception("User provider is not set to admin mode, and no course context is set. Cannot retrieve users globally with admin rights, please provide either a course in which to find this user or enable admoin mode.");
+        }
+        
+        //Try to find the user within the course provided as the current context.
+        $this->Get("courses/{$this->currentCourseContext->id}/users/{$user->id}",
+            $user->getContext(), 
+            $this->modelPopulator->withInstance($user)
+        );
         return $user;
     }
 }

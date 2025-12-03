@@ -1,6 +1,6 @@
 <?php
 
-namespace CanvasApiLibrary\Models\IdentityTraits\Base;
+namespace CanvasApiLibrary\Models\IdentityTraits\Atomic;
 
 /**
  * Modular model identity system. Traits provide functionality for properties which function as identities for the models, 
@@ -16,25 +16,25 @@ namespace CanvasApiLibrary\Models\IdentityTraits\Base;
 trait IdentityBoiletplateTrait {
     
     /** @var callable[] Functions that process context array to populate identity fields */
-    private array $contextProcessors = [];
+    protected array $contextProcessors = [];
     
     /** @var callable[] Functions that return context items for this model */
-    private array $contextGetters = [];
+    protected array $contextGetters = [];
     
     /** @var callable[] Functions that return minimum data representation parts */
-    private array $mdrGetters = [];
+    protected array $mdrGetters = [];
     
     /** @var callable[] Functions that populate from minimum data representation */
-    private array $mdrSetters = [];
+    protected array $mdrSetters = [];
     
     /** @var callable[] Functions that validate identity integrity */
-    private array $integrityValidators = [];
+    protected array $integrityValidators = [];
     
     /** @var callable[] Functions that return unique ID parts */
-    private array $uniqueIdParts = [];
+    protected array $uniqueIdParts = [];
     
     /** @var bool Tracks if identity traits have been initialized */
-    private bool $identityInitialized = false;
+    protected bool $identityInitialized = false;
     
 /**
      * Populates the model using the provided other models, filling in missing data.

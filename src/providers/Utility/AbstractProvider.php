@@ -35,28 +35,33 @@ abstract class AbstractProvider implements HandleEmittedInterface{
         throw new Exception("Domain not found in context");
     }
 
-    private function GetInternal(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null){
+    private function GetInternal(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null, ?StatusHandlerInterface $customHandler = null){
+        if($customBuilder === null){
+            $customBuilder = $this->modelPopulator;
+        }
+        if($customHandler === null){
+            $customHandler = $this->statusHandler;
+        }
+        
         $domain = self::GetDomainFromContext($context);
         [$data, $status] = $this->canvasCommunicator->Get($route, $domain);
         if($data === null){
             throw new Exception("Not data found in route");
         }
-        $data = $this->statusHandler->HandleStatus($data, $status);
-        if($customBuilder === null){
-            $customBuilder = static::$modelPopulator;
-        }
+        $data = $customHandler->HandleStatus($data, $status);
+        
         return [$data, $customBuilder];
     }
 
-    protected function GetMany(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null, ?callable $postProcessor = null): array{
-        [$data, $builder] = $this->GetInternal($route, $context, $customBuilder);
+    protected function GetMany(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null, ?callable $postProcessor = null, ?StatusHandlerInterface $customHandler = null): array{
+        [$data, $builder] = $this->GetInternal($route, $context, $customBuilder, $customHandler);
         if($postProcessor){
             $data = $postProcessor($data);
         }
         return $builder->buildMany($data, ...$context);
     }
-    protected function Get(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null, ?callable $postProcessor = null): ModelInterface{
-        [$data, $builder] = $this->GetInternal($route, $context, $customBuilder);
+    protected function Get(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null, ?callable $postProcessor = null, ?StatusHandlerInterface $customHandler = null): ModelInterface{
+        [$data, $builder] = $this->GetInternal($route, $context, $customBuilder, $customHandler);
         if($postProcessor){
             $data = array_map($postProcessor, $data);
         }

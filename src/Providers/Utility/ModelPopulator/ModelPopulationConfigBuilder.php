@@ -163,7 +163,8 @@ class ModelPopulationConfigBuilder{
      * @return ModelPopulationConfigBuilder
      */
     public function asDateTime(): ModelPopulationConfigBuilder{
-        return $this->addProcessor(new ProcessorClosure(fn($x) => new DateTime($x)));
+        return $this->addProcessor(new ProcessorClosure(fn($x) => 
+                                                $x === null ? null : new DateTime($x)));
     }
 
     /**
@@ -196,7 +197,7 @@ class ModelPopulationConfigBuilder{
 
         foreach($instructions as $instruction){
             [$provider, $processors, $consumer] = $instruction;
-            array_push($errors, $this->buildOneInstruction($toPopulate, $data, $context, $provider, $processors, $consumer));
+            array_push($errors, ...$this->buildOneInstruction($toPopulate, $data, $context, $provider, $processors, $consumer));
         }
 
         if(count($errors) > 0){
@@ -233,7 +234,7 @@ class ModelPopulationConfigBuilder{
         array_push($errors, ...$error);
 
         foreach($processors as $processor){
-            ["data" => $item, "errros" => $error, "continue" => $continue] = $processor->process($item, $context);
+            ["data" => $item, "errors" => $error, "continue" => $continue] = $processor->process($item, $context);
             array_push($errors, ...$error);
             if(!$continue){
                 //Processor indicated not to continue processing this value.
@@ -249,6 +250,9 @@ class ModelPopulationConfigBuilder{
             }
         }
         $error = $consumer->consumeData($item, $toBuild, $context);
+        if($error == []){
+            return []; //earlier errors did not prevent finishing of instruction, return no errors.
+        }
         array_push($errors, ...$error);
         return $errors;
     }

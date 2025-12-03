@@ -18,12 +18,17 @@ set_error_handler(function ($severity, $message, $file, $line) {
     if (str_starts_with($message, 'Undefined array key')) {
         throw new ErrorException($message, 0, $severity, $file, $line);
     }
+    if (str_contains($message, 'Passing null to parameter #1 ($datetime) of type string is deprecated')) {
+        throw new ErrorException($message, 0, $severity, $file, $line);
+    }
     return false; // let other errors behave normally
 });
 
+
 function formatted_vardump($data) {
-    echo '<pre>' . htmlspecialchars(var_dump($data, true)) . '</pre>';
+    echo '<pre>' . htmlspecialchars(var_dump($data)) . '</pre>';
 }
+
 class DummyHandler implements StatusHandlerInterface{
     public function HandleStatus(mixed $data, $status): mixed {
         if($status === CanvasReturnStatus::NOT_FOUND){
@@ -52,7 +57,7 @@ if(!$course->validateIdentityIntegrity()){
 }
 
 $assignment = new Assignment();
-$assignment->id = 146427;
+$assignment->id = 152202;
 $assignment->domain = $domain;
 $assignment->course = $course;
 formatted_vardump($assignment);
@@ -64,7 +69,7 @@ $assignmentProvider = new AssignmentProvider($handler, $canvasCommunicator);
 $groupProvider = new GroupProvider($handler, $canvasCommunicator);
 $sectionProvider = new SectionProvider($handler, $canvasCommunicator);
 $submissionProvider = new SubmissionProvider($handler, $canvasCommunicator);
-$userProvider = new UserProvider($handler, $canvasCommunicator);
+$userProvider = new UserProvider($handler, $canvasCommunicator)->withinCourse($course);
 
 $assignment = $assignmentProvider->populateAssignment($assignment);
 echo "<h2>Populated Assignment</h2>";

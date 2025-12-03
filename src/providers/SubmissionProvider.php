@@ -49,7 +49,7 @@ class SubmissionProvider extends AbstractProvider{
             $builder = $builder->from("user")->emittingConsumer($userProvider);
         }
         $courseID = $assignment->course->id;
-        return $this->GetMany("courses/$courseID/assignments/$assignment->id/submissions$postfix", $assignment->getContext(),
+        return $this->GetMany("/courses/$courseID/assignments/$assignment->id/submissions$postfix", $assignment->getContext(),
             $builder
         );
     }

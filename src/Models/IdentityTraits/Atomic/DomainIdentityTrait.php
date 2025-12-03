@@ -1,13 +1,10 @@
 <?php
 
-namespace CanvasApiLibrary\Models\IdentityTraits\Base;
+namespace CanvasApiLibrary\Models\IdentityTraits\Atomic;
 use CanvasApiLibrary\Exceptions\ChangingIdException;
 use CanvasApiLibrary\Models\Domain;
 
 trait DomainIdentityTrait{
-
-    use NumberIdentityTrait;
-
     public Domain $domain{
         get{
             return $this->domain;

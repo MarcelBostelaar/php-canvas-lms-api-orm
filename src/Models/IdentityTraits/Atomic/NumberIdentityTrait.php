@@ -1,12 +1,9 @@
 <?php
 
-namespace CanvasApiLibrary\Models\IdentityTraits\Base;
+namespace CanvasApiLibrary\Models\IdentityTraits\Atomic;
 use CanvasApiLibrary\Exceptions\ChangingIdException;
 
 trait NumberIdentityTrait{
-
-    use IdentityBoiletplateTrait;
-
     public int $id{
         get{
             return $this->id;

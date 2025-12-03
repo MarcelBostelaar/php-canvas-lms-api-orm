@@ -27,12 +27,27 @@ class CanvasCommunicator{
         return CanvasReturnStatus::SUCCESS;
     }
 
+    private static function combineUrls(...$elements) : string{
+        if(\count($elements) <= 1){
+            return $elements[0];
+        }
+        $head = array_shift($elements);
+        $head2 = array_shift($elements);
+        if(str_ends_with($head, "/") xor str_starts_with($head2, "/")){
+            return self::combineUrls("$head$head2", ...$elements);
+        }
+        if(str_ends_with($head, "/") and str_starts_with($head2, "/")){
+            return self::combineUrls(substr($head, 0, -1) . $head2, ...$elements);
+        }
+        return self::combineUrls("$head/$head2", ...$elements);
+    }
+
     public function Get(string $route, Domain $domain) : array{
-        return self::curlGet($domain->domain . $route, $this->apiKey);
+        return self::curlGet(self::combineUrls($domain->domain, $route), $this->apiKey);
     }
 
     public function Put(string $route, Domain $domain, mixed $data) : array{
-        return self::curlPut($domain->domain . $route, $this->apiKey, $data);
+        return self::curlPut(self::combineUrls($domain->domain, $route), $this->apiKey, $data);
     }
 
     //Static cURL calls
@@ -76,27 +91,31 @@ class CanvasCommunicator{
         curl_close($ch);
         // var_dump($data);
         //if a next link for paginated results was found, call it recursively, append all results together.
-        if($nextURLHandler->nextURL !== null){
-            $topKey = null;
-            if(!array_is_list($data)){
-                //Non-list results need special handling to merge properly
-                //Assume the top key is the one that contains the list of results
-                $topKey = array_key_first($data);
-                if(count($data) != 1 || !array_is_list($data[$topKey])){
-                    throw new \Exception("Unexpected data structure when handling pagination for URL $url");
-                }
-                $data = $data[$topKey];
-                $additionalData = self::curlGet($nextURLHandler->nextURL, $apiKey)[$topKey];
-                $data = array_merge($data, $additionalData);
-                $data = [$topKey => $data];
-            }
-            else{
-                $additionalData = self::curlGet($nextURLHandler->nextURL, $apiKey);
-                $data = array_merge($data, $additionalData);
-            }
+        if($nextURLHandler->nextURL === null){
+            //No pagination/end of pagination.
+            return [$data, self::checkForStatusErrors($data)];
         }
-        // echo "Total data: " . count($data) . "<br>";
-        return [$data, self::checkForStatusErrors($data)];
+
+        $selfstatus = self::checkForStatusErrors($data);
+
+        $topKey = null;
+        if(!array_is_list($data)){
+            //Non-list results need special handling to merge properly
+            //Assume the top key is the one that contains the list of results
+            $topKey = array_key_first($data);
+            if(count($data) != 1 || !array_is_list($data[$topKey])){
+                throw new \Exception("Unexpected data structure when handling pagination for URL $url");
+            }
+            $data = $data[$topKey];
+            [$additionalData, $additionalStatus] = self::curlGet($nextURLHandler->nextURL, $apiKey)[$topKey];
+            $data = array_merge($data, $additionalData);
+            $data = [$topKey => $data];
+        }
+        else{
+            [$additionalData, $additionalStatus] = self::curlGet($nextURLHandler->nextURL, $apiKey);
+            $data = array_merge($data, $additionalData);
+        }
+        return [$data, $selfstatus->combineWith($additionalStatus)];
     }
 
     /**

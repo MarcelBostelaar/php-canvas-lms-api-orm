@@ -3,10 +3,12 @@
 namespace CanvasApiLibrary\Models\Utility;
 use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Exceptions\ChangingIdException;
+use CanvasApiLibrary\Models\IdentityTraits\Atomic\IdentityBoiletplateTrait;
 
 abstract class AbstractCanvasPopulatedModel implements ModelInterface{
-
+    use IdentityBoiletplateTrait;
     public function __construct(){
+       $this->ensureIdentityInitialized();
     }
 
     /**

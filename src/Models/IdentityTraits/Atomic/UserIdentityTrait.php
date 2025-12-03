@@ -1,14 +1,11 @@
 <?php
 
-namespace CanvasApiLibrary\Models\IdentityTraits\Base;
+namespace CanvasApiLibrary\Models\IdentityTraits\Atomic;
 use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Exceptions\ChangingIdException;
 use CanvasApiLibrary\Models\User;
 
 trait UserIdentityTrait{
-
-    use DomainIdentityTrait;
-
     protected mixed $user_identity;
     public User $user{
         get { 

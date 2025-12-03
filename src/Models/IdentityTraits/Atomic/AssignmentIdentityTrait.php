@@ -1,14 +1,11 @@
 <?php
 
-namespace CanvasApiLibrary\Models\IdentityTraits\Base;
+namespace CanvasApiLibrary\Models\IdentityTraits\Atomic;
 use CanvasApiLibrary\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Exceptions\ChangingIdException;
 use CanvasApiLibrary\Models\Assignment;
 
 trait AssignmentIdentityTrait{
-
-    use CourseIdentityTrait;
-
     protected mixed $assignment_identity;
     public Assignment $assignment{
         get { 

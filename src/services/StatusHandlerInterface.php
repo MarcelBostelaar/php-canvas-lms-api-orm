@@ -8,5 +8,5 @@ interface StatusHandlerInterface {
      * @param string $message Optional message to include in error handling
      * @return mixed Returns the data if no error occurs, or new data if modified.
      */
-    public function HandleStatus(mixed $data, Services\CanvasReturnStatus $status): mixed;
+    public function HandleStatus(mixed $data, CanvasReturnStatus $status): mixed;
 }

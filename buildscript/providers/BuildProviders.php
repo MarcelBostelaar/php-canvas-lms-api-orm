@@ -8,7 +8,7 @@ use function Buildscript\prettified;
 
 function buildProviders($folder, $models){
     echo "Building providers in folder: $folder\n";
-    $files = glob($folder . '/*.php');
+    $files = glob($folder . '/*Provider.php');
     $names = array_map(fn($f) => [
         'file' => $f,
         'providername' => basename($f, "Provider.php"),
