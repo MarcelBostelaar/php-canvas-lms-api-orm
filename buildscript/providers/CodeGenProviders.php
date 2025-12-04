@@ -9,7 +9,18 @@ use function Buildscript\tryExtractModelClassName;
  * @param string $modelname
  * @param string[] $modelPlurals
  * @param string[] $usedModels
- * @return void
+ * @return array{
+ *     name: string,
+ *     parameters: array{
+ *          type: string,
+ *          name: string,
+ *          annotatedtype: string
+ *     },
+ *     returnType: array{
+ *          type: string,
+ *          annotatedtype: string
+ *     }
+ * } The created method
  */
 function fileTop($traitname, $modelname, $modelPlurals, $usedModels){
 ?>
@@ -17,7 +28,7 @@ function fileTop($traitname, $modelname, $modelPlurals, $usedModels){
 as well as missing alias methods for models with multiple plural names.
 Using provider and plurals defined in the models. */
 
-namespace CanvasApiLibrary\Providers;
+namespace CanvasApiLibrary\Providers\Generated\Traits;
 
 use CanvasApiLibrary\Providers\Utility\Lookup;
 <?php
@@ -45,6 +56,18 @@ trait <?=$traitname?>{
     }
 <?php
     }
+    return [
+        "name" => "populate$pluralName",
+        "parameters" => [[
+            "name" => lcfirst($pluralName),
+            "type" => "array",
+            "annotatedtype" => $modelname.'[]'
+        ]],
+        "returnType" => [
+            "type" => "array",
+            "annotatedtype" => $modelname.'[]'
+        ]
+    ];
 }
 
 /**
@@ -77,7 +100,17 @@ function generateAbstractOriginal($name, $params){
  *          type: string,
  *          name: string
  *     }, returnType: string} $original
- * @return void
+ * @return array{
+ *     name: string,
+ *     parameters: array{
+ *          type: string,
+ *          name: string
+ *     },
+ *     returnType: array{
+ *          type: string,
+ *          annotatedtype: string
+ *     }
+ * }
  */
 function generateAlias($aliasInfo, $original){
     $newMethodName = $aliasInfo['methodPrefix'] . $aliasInfo['originalModelPlural'] . 'In' . $aliasInfo['originalSubjectSingular'];
@@ -94,6 +127,11 @@ function generateAlias($aliasInfo, $original){
         return $this-><?=$originalMethodName?>(<?=$originalParamString?>);
     }
     <?php
+    return [
+        "name" => $newMethodName,
+        "parameters" => $aliasInfo['parameters'],
+        "returnType" => $aliasInfo['returnType']
+    ];
 }
 
 /**
@@ -108,7 +146,17 @@ function generateAlias($aliasInfo, $original){
  *  name: string,
  *  type: string
  * }} $params Unmodified params of the original. Will be inline replaced.
- * @return void
+ * @return array{
+ *     name: string,
+ *     parameters: array{
+ *          type: string,
+ *          name: string
+ *     },
+ *     returnType: array{
+ *          type: string,
+ *          annotatedtype: string
+ *     }
+ * }
  */
 function generateMultiMethod($methodPrefix, $originalSubjectName, $subjectPluralName, $modelName, $modelPluralName, $params){
     $multiParams = array_map(function($p) use ($originalSubjectName, $subjectPluralName){
@@ -116,12 +164,14 @@ function generateMultiMethod($methodPrefix, $originalSubjectName, $subjectPlural
             return [
                 'name' => lcfirst($subjectPluralName),
                 'type' => 'array',
+                'annotatedtype' => $originalSubjectName . "[]",
                 'isArrayVariant' => true
             ];
         }
         return [
             'name' => $p['name'],
             'type' => $p['type'],
+            'annotatedtype' => $p['type'],
             'isArrayVariant' => false
         ];
     }, $params);
@@ -146,6 +196,14 @@ function generateMultiMethod($methodPrefix, $originalSubjectName, $subjectPlural
         return $lookup;
     }
 <?php
+    return [
+        "name" => $multiMethodName,
+        "parameters" => $multiParams,
+        "returnType" => [
+            "type" => "Lookup",
+            "annotatedtype" => "Lookup<$originalSubjectName, $modelName>"
+        ]
+    ];
 }
 
 function fileEnd(){
@@ -258,10 +316,11 @@ function createAliasItems($originalMethods, $modelPlurals){
  * } $methodsToGenerate $methodsToGenerate
  * @param array<string, string[]> $pluralLookup Mapping of singular to plural names.
  * @param array<string, string> $reversePluralLookup Mapping of plural to singular names.
- * @return string
+ * @return array
  */
 function generateFullProviderTrait($traitname, $modelname, $modelPlurals, $methodsToGenerateFor, $pluralLookup){
     echo "Generating trait: $traitname for provider of model: $modelname\n";
+    $allMethodsCreated = [];
     //clean up the parameter types to use model names instead of full class names, also collect used models
     $usedModelsInParams = [$modelname];
     foreach($methodsToGenerateFor as &$method){
@@ -294,11 +353,11 @@ function generateFullProviderTrait($traitname, $modelname, $modelPlurals, $metho
     $fullAliasNames = array_map(fn($alias) => $alias['methodPrefix'] . $alias['originalModelPlural'] . 'In' . $alias['originalSubjectSingular'], $aliasItems);
 
     ob_start();
-    fileTop($traitname, $modelname, $modelPlurals, $usedModelsInParams);
+    $allMethodsCreated[] = fileTop($traitname, $modelname, $modelPlurals, $usedModelsInParams);
     //Aliases
     foreach($aliasItems as $aliasInfo){
         $original = $aliasInfo['original'];
-        generateAlias($aliasInfo, $original);
+        $allMethodsCreated[] = generateAlias($aliasInfo, $original);
     }
 
     //multi methods
@@ -311,7 +370,7 @@ function generateFullProviderTrait($traitname, $modelname, $modelPlurals, $metho
             generateAbstractOriginal($methodInfo['methodPrefix'] . $methodInfo['originalModelPlural'] . 'In' . $subjectSingular, $methodInfo['parameters']);//ide error about how the 6th arg is a string should not exist
         }
         foreach($subjectPlurals as $subjectPlural){
-            generateMultiMethod(
+            $allMethodsCreated[] = generateMultiMethod(
                 $methodInfo['methodPrefix'],
                 $subjectSingular,
                 $subjectPlural,
@@ -324,5 +383,9 @@ function generateFullProviderTrait($traitname, $modelname, $modelPlurals, $metho
 
     fileEnd();
     $generated = ob_get_clean();
-    return $generated;
+    return [
+        "trait" => $generated,
+        "createdMethods" => $allMethodsCreated,
+        "usedModels" => $usedModelsInParams
+    ];
 }

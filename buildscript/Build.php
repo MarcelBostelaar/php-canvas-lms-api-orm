@@ -12,10 +12,12 @@ $srcFolder = __DIR__ . '/../src';
 function build(){
     global $srcFolder;
     $modelTraitFolder = $srcFolder . "/Models/Generated";
-    $providerTraitFolder = $srcFolder . "/Providers/Generated";
+    $providerTraitFolder = $srcFolder . "/Providers/Generated/Traits";
+    $providerInterfaceFolder = $srcFolder . "/Providers/Generated/Interfaces";
     clearFolder(__DIR__ . "/test");
     clearFolder($modelTraitFolder);
     clearFolder($providerTraitFolder);
+    clearFolder($providerInterfaceFolder);
     $models = buildModels($srcFolder . "/Models", $modelTraitFolder);
     $providers = buildProviders($srcFolder . "/Providers", $models); //provide category for testing
 }

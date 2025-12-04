@@ -5,6 +5,7 @@ use Exception;
 use function Buildscript\Providers\processProviderFile;
 use function Buildscript\varDumpNoAst;
 use function Buildscript\prettified;
+use function Buildscript\Providers\generateInterface;
 
 function buildProviders($folder, $models){
     echo "Building providers in folder: $folder\n";
@@ -31,14 +32,26 @@ function buildProviders($folder, $models){
     }
 
     foreach($mapped as $provider){
-        $traitContent = generateFullProviderTrait(
+        [
+            "trait" => $traitContent, 
+            "createdMethods" => $createdMethods,
+            "usedModels" => $usedModels
+            ] = generateFullProviderTrait(
             $provider['traitname'],
             $provider['modelname'],
             $pluralLookup[$provider['modelname']],
             $provider['methods'],
             $pluralLookup
         );
-        file_put_contents("$folder/generated/" . $provider['traitname'] . '.php', prettified("<?php\n" . $traitContent));
+        file_put_contents("$folder/Generated/Traits/" . $provider['traitname'] . '.php', prettified("<?php\n" . $traitContent));
+        $generatedInterface = generateInterface($provider['providername'] . "Interface", array_merge($createdMethods, $provider['methods']), $usedModels);
+        file_put_contents("$folder/Generated/Interfaces/" . $provider['providername'] . "Interface" . '.php', prettified("<?php\n" . $generatedInterface));
+        // echo "Provider: " . $provider["providername"] . "<br>";
+        // echo "Original methods: \n";
+        // var_dump($provider["methods"]);
+        // echo "<br>Generated methods: \n";
+        // var_dump($createdMethods);
+        // echo "\n";
     }
 
     return $mapped;

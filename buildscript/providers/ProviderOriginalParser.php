@@ -36,11 +36,18 @@ class ExtractProviderMethodsVisitor extends AbstractExtractorVisitor {
         $params = [];
         foreach($node->params as $param){
             $paramType = $param->type instanceof \PhpParser\Node\NullableType ? "?" . $param->type->type->toString() : ($param->type instanceof \PhpParser\Node\Name ? $param->type->toString() : (is_string($param->type) ? $param->type : "mixed"));
-            $params[] = ["name" => $param->var->name, "type" => $paramType];
+            $params[] = ["name" => $param->var->name, "type" => $paramType, "annotatedtype" => $paramType];
         }
         //get return type
         $returnType = $node->getReturnType() instanceof \PhpParser\Node\NullableType ? "?" . $node->getReturnType()->type->toString() : ($node->getReturnType() instanceof \PhpParser\Node\Name ? $node->getReturnType()->toString() : (is_string($node->getReturnType()) ? $node->getReturnType() : "mixed"));
-        $this->methods[] = ["name" => $name, 'parameters' => $params, "returnType" => $returnType];
+        $this->methods[] = [
+            "name" => $name, 
+            'parameters' => $params, 
+            "returnType" => [
+                "type" => $returnType,
+                "annotatedtype" => $returnType
+            ]
+        ];
         return null;
     }
 }

@@ -4,6 +4,7 @@ namespace CanvasApiLibrary\Providers;
 use CanvasApiLibrary\Models as Models;
 use CanvasApiLibrary\Models\Assignment;
 use CanvasApiLibrary\Models\Course;
+use CanvasApiLibrary\Models\Generated\SubmissionProperties;
 use CanvasApiLibrary\Models\Section;
 use CanvasApiLibrary\Models\Submission;
 use CanvasApiLibrary\Models\Domain;
@@ -23,7 +24,7 @@ use CanvasApiLibrary\Services\StatusHandlerInterface;
  * @method Lookup<Models\Assignment, Models\Submission> getSubmissionsForAssignments() Virtual method to get all groups in group categories
  */
 class SubmissionProvider extends AbstractProvider{
-    use SubmissionProviderProperties;
+    use SubmissionProperties;
     public function __construct(
         StatusHandlerInterface $statusHandler,
         CanvasCommunicator $canvasCommunicator

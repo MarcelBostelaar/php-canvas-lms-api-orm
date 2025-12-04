@@ -1,6 +1,7 @@
 <?php
 namespace CanvasApiLibrary\Providers;
 use CanvasApiLibrary\Models as Models;
+use CanvasApiLibrary\Models\Generated\SectionProperties;
 use CanvasApiLibrary\Models\Section;
 use CanvasApiLibrary\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Services as Services;
@@ -18,7 +19,7 @@ use CanvasApiLibrary\Services\StatusHandlerInterface;
  * @method Lookup<Models\Course, Models\Section> getAllSectionsInCourses() Virtual method to get all sections in a course
  */
 class SectionProvider extends AbstractProvider{
-    use SectionProviderProperties;
+    use SectionProperties;
 
     public function __construct(
         StatusHandlerInterface $statusHandler,

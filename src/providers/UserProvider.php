@@ -2,6 +2,7 @@
 namespace CanvasApiLibrary\Providers;
 
 use CanvasApiLibrary\Models\Course;
+use CanvasApiLibrary\Models\Generated\UserProperties;
 use CanvasApiLibrary\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Models as Models;
 use CanvasApiLibrary\Models\User;
@@ -19,7 +20,7 @@ use InvalidArgumentException;
  * Otherwise must be provided with the course that will be used as the context of the user operations, such as reading personal data.
  */
 class UserProvider extends AbstractProvider{
-    use UserProviderProperties;
+    use UserProperties;
 
     private bool $asAdminBool = false;
     private ?Course $currentCourseContext;

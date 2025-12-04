@@ -3,7 +3,7 @@
 as well as missing alias methods for models with multiple plural names.
 Using provider and plurals defined in the models. */
 
-namespace CanvasApiLibrary\Providers;
+namespace CanvasApiLibrary\Providers\Generated\Traits;
 
 use CanvasApiLibrary\Providers\Utility\Lookup;
 use CanvasApiLibrary\Models\Section;
