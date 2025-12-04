@@ -3,12 +3,11 @@
 namespace CanvasApiLibrary\Providers;
 use CanvasApiLibrary\Models as Models;
 use CanvasApiLibrary\Models\Assignment;
-use CanvasApiLibrary\Models\Course;
-use CanvasApiLibrary\Models\Generated\SubmissionProperties;
 use CanvasApiLibrary\Models\Section;
 use CanvasApiLibrary\Models\Submission;
-use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Models\User;
+use CanvasApiLibrary\Providers\Generated\Traits\SubmissionProviderProperties;
+use CanvasApiLibrary\Providers\Interfaces\SubmissionProviderInterface;
 use CanvasApiLibrary\Providers\UserProvider;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Providers\Utility\Lookup;
@@ -23,8 +22,8 @@ use CanvasApiLibrary\Services\StatusHandlerInterface;
  * 
  * @method Lookup<Models\Assignment, Models\Submission> getSubmissionsForAssignments() Virtual method to get all groups in group categories
  */
-class SubmissionProvider extends AbstractProvider{
-    use SubmissionProperties;
+class SubmissionProvider extends AbstractProvider implements SubmissionProviderInterface{
+    use SubmissionProviderProperties;
     public function __construct(
         StatusHandlerInterface $statusHandler,
         CanvasCommunicator $canvasCommunicator
@@ -42,7 +41,7 @@ class SubmissionProvider extends AbstractProvider{
      * @param ?UserProvider $userProvider If provided, will also fetch the users associated with these submissions and pass them to the emitted in the user provider.
      * @return Submission[]
      */
-    function getSubmissionsForAssignment(Assignment $assignment, ?UserProvider $userProvider = null) : array{
+    function getSubmissionsInAssignment(Assignment $assignment, ?UserProvider $userProvider = null) : array{
         $postfix = "";
         $builder = $this->modelPopulator;
         if($userProvider !== null){

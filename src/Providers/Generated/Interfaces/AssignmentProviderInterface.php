@@ -1,10 +1,13 @@
 <?php
 namespace CanvasApiLibrary\Providers\Interfaces;
 
+use CanvasApiLibrary;
 use CanvasApiLibrary\Providers\Utility\Lookup;
+use CanvasApiLibrary\Providers\Utility\HandleEmittedInterface;
+
 use CanvasApiLibrary\Models\Assignment;
 
-interface AssignmentInterface{
+interface AssignmentProviderInterface extends HandleEmittedInterface{
 
     /**
     * @param Assignment[] $assignments

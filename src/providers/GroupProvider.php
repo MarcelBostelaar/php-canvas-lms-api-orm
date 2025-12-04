@@ -1,11 +1,10 @@
 <?php
 namespace CanvasApiLibrary\Providers;
 use CanvasApiLibrary\Models as Models;
-use CanvasApiLibrary\Models\Generated\GroupProperties;
 use CanvasApiLibrary\Models\Group;
+use CanvasApiLibrary\Providers\Generated\Traits\GroupProviderProperties;
+use CanvasApiLibrary\Providers\Interfaces\GroupProviderInterface;
 use CanvasApiLibrary\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
-use CanvasApiLibrary\Services as Services;
-use CanvasApiLibrary\Models\Domain;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Providers\Utility\Lookup;
 use CanvasApiLibrary\Services\CanvasCommunicator;
@@ -17,8 +16,8 @@ use CanvasApiLibrary\Services\StatusHandlerInterface;
  * 
  * @method Lookup<Models\GroupCategory, Models\Group> GetAllGroupsInGroupCategories() Virtual method to get all groups in group categories
  */
-class GroupProvider extends AbstractProvider{
-    use GroupProperties;
+class GroupProvider extends AbstractProvider implements GroupProviderInterface{
+    use GroupProviderProperties;
 
     public function __construct(
         StatusHandlerInterface $statusHandler,

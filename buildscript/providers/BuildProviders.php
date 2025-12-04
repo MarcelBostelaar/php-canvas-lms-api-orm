@@ -44,8 +44,8 @@ function buildProviders($folder, $models){
             $pluralLookup
         );
         file_put_contents("$folder/Generated/Traits/" . $provider['traitname'] . '.php', prettified("<?php\n" . $traitContent));
-        $generatedInterface = generateInterface($provider['providername'] . "Interface", array_merge($createdMethods, $provider['methods']), $usedModels);
-        file_put_contents("$folder/Generated/Interfaces/" . $provider['providername'] . "Interface" . '.php', prettified("<?php\n" . $generatedInterface));
+        $generatedInterface = generateInterface($provider['providername'] . "ProviderInterface", array_merge($createdMethods, $provider['methods']), $usedModels);
+        file_put_contents("$folder/Generated/Interfaces/" . $provider['providername'] . "ProviderInterface" . '.php', prettified("<?php\n" . $generatedInterface));
         // echo "Provider: " . $provider["providername"] . "<br>";
         // echo "Original methods: \n";
         // var_dump($provider["methods"]);

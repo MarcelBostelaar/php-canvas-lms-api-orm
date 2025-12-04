@@ -5,6 +5,7 @@ Using provider and plurals defined in the models. */
 
 namespace CanvasApiLibrary\Providers\Generated\Traits;
 
+use CanvasApiLibrary;
 use CanvasApiLibrary\Providers\Utility\Lookup;
 use CanvasApiLibrary\Models\User;
 use CanvasApiLibrary\Models\Course;

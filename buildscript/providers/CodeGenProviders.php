@@ -30,6 +30,7 @@ Using provider and plurals defined in the models. */
 
 namespace CanvasApiLibrary\Providers\Generated\Traits;
 
+use CanvasApiLibrary;
 use CanvasApiLibrary\Providers\Utility\Lookup;
 <?php
     foreach($usedModels as $usedModel){ ?>

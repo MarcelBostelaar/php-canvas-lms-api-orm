@@ -1,13 +1,16 @@
 <?php
 namespace CanvasApiLibrary\Providers\Interfaces;
 
+use CanvasApiLibrary;
 use CanvasApiLibrary\Providers\Utility\Lookup;
+use CanvasApiLibrary\Providers\Utility\HandleEmittedInterface;
+
 use CanvasApiLibrary\Models\User;
 use CanvasApiLibrary\Models\Course;
 use CanvasApiLibrary\Models\Group;
 use CanvasApiLibrary\Models\Section;
 
-interface UserInterface{
+interface UserProviderInterface extends HandleEmittedInterface{
 
     /**
     * @param User[] $users

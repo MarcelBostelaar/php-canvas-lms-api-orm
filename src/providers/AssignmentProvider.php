@@ -4,17 +4,17 @@ namespace CanvasApiLibrary\Providers;
 
 use CanvasApiLibrary\Models\Assignment;
 use CanvasApiLibrary\Models\Course;
-use CanvasApiLibrary\Models\Domain;
-use CanvasApiLibrary\Models\Generated\AssignmentProperties;
 use CanvasApiLibrary\Models\GroupCategory;
+use CanvasApiLibrary\Providers\Generated\Traits\AssignmentProviderProperties;
+use CanvasApiLibrary\Providers\Interfaces\AssignmentProviderInterface;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Services\CanvasCommunicator;
 use CanvasApiLibrary\Services\StatusHandlerInterface;
 
 
-class AssignmentProvider extends AbstractProvider{
-    use AssignmentProperties;
+class AssignmentProvider extends AbstractProvider implements AssignmentProviderInterface{
+    use AssignmentProviderProperties;
 
     public function __construct(
         StatusHandlerInterface $statusHandler,

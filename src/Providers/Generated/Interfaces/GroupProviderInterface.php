@@ -1,11 +1,14 @@
 <?php
 namespace CanvasApiLibrary\Providers\Interfaces;
 
+use CanvasApiLibrary;
 use CanvasApiLibrary\Providers\Utility\Lookup;
+use CanvasApiLibrary\Providers\Utility\HandleEmittedInterface;
+
 use CanvasApiLibrary\Models\Group;
 use CanvasApiLibrary\Models\GroupCategory;
 
-interface GroupInterface{
+interface GroupProviderInterface extends HandleEmittedInterface{
 
     /**
     * @param Group[] $groups

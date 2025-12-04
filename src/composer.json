@@ -6,9 +6,11 @@
     "autoload": {
         "psr-4": {
             "CanvasApiLibrary\\": "./",
+            "CanvasApiLibrary\\Providers\\Interfaces\\": [
+                "Providers/Generated/Interfaces"
+            ],
             "CanvasApiLibrary\\Providers\\": [
                 "Providers/",
-                "Providers/Generated/",
                 "Providers/Utility/"
             ]
         },

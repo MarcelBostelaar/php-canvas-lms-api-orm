@@ -26,14 +26,17 @@ function generateInterface(string $interfacename, array $methods, $usedModels):s
     ?>
 namespace CanvasApiLibrary\Providers\Interfaces;
 
+use CanvasApiLibrary;
 use CanvasApiLibrary\Providers\Utility\Lookup;
+use CanvasApiLibrary\Providers\Utility\HandleEmittedInterface;
+
 <?php
     foreach($usedModels as $usedModel){ ?>
 use CanvasApiLibrary\Models\<?=$usedModel?>;
 <?php
 }?>
 
-interface <?=$interfacename?>{
+interface <?=$interfacename?> extends HandleEmittedInterface{
 
 <?php
 foreach($methods as $method){

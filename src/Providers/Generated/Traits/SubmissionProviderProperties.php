@@ -5,6 +5,7 @@ Using provider and plurals defined in the models. */
 
 namespace CanvasApiLibrary\Providers\Generated\Traits;
 
+use CanvasApiLibrary;
 use CanvasApiLibrary\Providers\Utility\Lookup;
 use CanvasApiLibrary\Models\Submission;
 use CanvasApiLibrary\Models\Assignment;
@@ -19,5 +20,20 @@ trait SubmissionProviderProperties{
      */
     public function populateSubmissions(array $submissions): array{
         return array_map(fn($x) => $this->populateSubmission($x), $submissions);
+    }
+
+    abstract public function getSubmissionsInAssignment(Assignment $assignment, ?CanvasApiLibrary\Providers\UserProvider $userProvider) : array;
+    
+    /**
+     * Summary of getSubmissionsInAssignments
+     * @param Assignment[] $assignments
+     * @return Lookup<Assignment, Submission>
+     */
+    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Providers\UserProvider $userProvider): Lookup{
+        $lookup = new Lookup();
+        foreach($assignments as $assignment){
+            $lookup->add($assignment, $this->getSubmissionsInAssignment($assignment, $userProvider));
+        }
+        return $lookup;
     }
 }

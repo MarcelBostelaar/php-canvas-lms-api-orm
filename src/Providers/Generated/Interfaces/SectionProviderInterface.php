@@ -1,11 +1,14 @@
 <?php
 namespace CanvasApiLibrary\Providers\Interfaces;
 
+use CanvasApiLibrary;
 use CanvasApiLibrary\Providers\Utility\Lookup;
+use CanvasApiLibrary\Providers\Utility\HandleEmittedInterface;
+
 use CanvasApiLibrary\Models\Section;
 use CanvasApiLibrary\Models\Course;
 
-interface SectionInterface{
+interface SectionProviderInterface extends HandleEmittedInterface{
 
     /**
     * @param Section[] $sections

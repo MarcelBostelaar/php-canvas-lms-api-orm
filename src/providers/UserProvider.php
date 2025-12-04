@@ -2,7 +2,8 @@
 namespace CanvasApiLibrary\Providers;
 
 use CanvasApiLibrary\Models\Course;
-use CanvasApiLibrary\Models\Generated\UserProperties;
+use CanvasApiLibrary\Providers\Generated\Traits\UserProviderProperties;
+use CanvasApiLibrary\Providers\Interfaces\UserProviderInterface;
 use CanvasApiLibrary\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Models as Models;
 use CanvasApiLibrary\Models\User;
@@ -19,8 +20,8 @@ use InvalidArgumentException;
  * Can be run in admin mode, enabling global operations for users, provided your API key has rights to do so.
  * Otherwise must be provided with the course that will be used as the context of the user operations, such as reading personal data.
  */
-class UserProvider extends AbstractProvider{
-    use UserProperties;
+class UserProvider extends AbstractProvider implements UserProviderInterface{
+    use UserProviderProperties;
 
     private bool $asAdminBool = false;
     private ?Course $currentCourseContext;
