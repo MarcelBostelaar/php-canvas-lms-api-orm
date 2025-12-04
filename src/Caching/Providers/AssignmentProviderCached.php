@@ -2,26 +2,21 @@
 
 namespace CanvasApiLibrary\Caching\Providers;
 
-use CanvasApiLibrary\Caching\Interfaces\CacheProviderInterface;
+use CanvasApiLibrary\Caching\CacheRules\UndefinedCacherule;
+use CanvasApiLibrary\Caching\Utility\FullCacheProviderInterface;
+use CanvasApiLibrary\Caching\Utility\CacheRule;
 use CanvasApiLibrary\Providers\AssignmentProvider;
 use CanvasApiLibrary\Providers\Generated\Traits\AssignmentProviderProperties;
 use CanvasApiLibrary\Providers\Interfaces\AssignmentProviderInterface;
 
-/**
- * @template METADATA
- */
 class AssignmentProviderCached implements AssignmentProviderInterface{
 
     use AssignmentProviderProperties;
 
-    /**
-     * @param CacheProviderInterface<METADATA> $cache
-     * @param METADATA $metadataPopulateAssignment
-     */
     public function __construct(
         private readonly AssignmentProvider $wrapped,
-        private readonly CacheProviderInterface $cache,
-        private readonly mixed $metadataPopulateAssignment = null
+        private readonly FullCacheProviderInterface $cache,
+        private readonly CacheRule $populateAssignmentCR = new UndefinedCacherule()
     ) {
     }
 
@@ -30,10 +25,14 @@ class AssignmentProviderCached implements AssignmentProviderInterface{
     }
 
     public function populateAssignment(\CanvasApiLibrary\Models\Assignment $assignment): \CanvasApiLibrary\Models\Assignment{
-        $cachedVal = $this->cache->getCached("populateAssignment", $this->metadataPopulateAssignment, $assignment->getMinimumDataRepresentation());
-        if($cachedVal->isCacheHit){
-            return $cachedVal->value;
+        [$cachedItem, $set] = $this->cache->get(
+            $this->populateAssignmentCR,
+            $this->wrapped->getClientID(),
+            "populateAssignment",
+            $assignment);
+        if($cachedItem->isCacheHit){
+            return $cachedItem->value;
         }
-        return $this->wrapped->populateAssignment($assignment);
+        return $set($this->wrapped->populateAssignment($assignment));
     }
 }

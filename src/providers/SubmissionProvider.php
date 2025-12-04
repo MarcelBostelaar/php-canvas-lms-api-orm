@@ -8,6 +8,7 @@ use CanvasApiLibrary\Models\Submission;
 use CanvasApiLibrary\Models\User;
 use CanvasApiLibrary\Providers\Generated\Traits\SubmissionProviderProperties;
 use CanvasApiLibrary\Providers\Interfaces\SubmissionProviderInterface;
+use CanvasApiLibrary\Providers\Interfaces\UserProviderInterface;
 use CanvasApiLibrary\Providers\UserProvider;
 use CanvasApiLibrary\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Providers\Utility\Lookup;
@@ -41,7 +42,7 @@ class SubmissionProvider extends AbstractProvider implements SubmissionProviderI
      * @param ?UserProvider $userProvider If provided, will also fetch the users associated with these submissions and pass them to the emitted in the user provider.
      * @return Submission[]
      */
-    function getSubmissionsInAssignment(Assignment $assignment, ?UserProvider $userProvider = null) : array{
+    function getSubmissionsInAssignment(Assignment $assignment, ?UserProviderInterface $userProvider = null) : array{
         $postfix = "";
         $builder = $this->modelPopulator;
         if($userProvider !== null){

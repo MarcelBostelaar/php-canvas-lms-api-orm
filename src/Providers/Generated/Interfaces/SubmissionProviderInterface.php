@@ -17,16 +17,16 @@ interface SubmissionProviderInterface extends HandleEmittedInterface{
     public function populateSubmissions(array $submissions) : array;
 
     /**
-    * @param Assignment[] $assignments	 * @param ?CanvasApiLibrary\Providers\UserProvider $userProvider
+    * @param Assignment[] $assignments	 * @param ?CanvasApiLibrary\Providers\Interfaces\UserProviderInterface $userProvider
     * @return Lookup<Assignment, Submission>
     */
-    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Providers\UserProvider $userProvider) : Lookup;
+    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Providers\Interfaces\UserProviderInterface $userProvider) : Lookup;
 
     /**
-    * @param Assignment $assignment	 * @param ?CanvasApiLibrary\Providers\UserProvider $userProvider
+    * @param Assignment $assignment	 * @param ?CanvasApiLibrary\Providers\Interfaces\UserProviderInterface $userProvider
     * @return mixed
     */
-    public function getSubmissionsInAssignment(Assignment $assignment, ?CanvasApiLibrary\Providers\UserProvider $userProvider) : mixed;
+    public function getSubmissionsInAssignment(Assignment $assignment, ?CanvasApiLibrary\Providers\Interfaces\UserProviderInterface $userProvider) : mixed;
 
     /**
     * @param Submission $submission

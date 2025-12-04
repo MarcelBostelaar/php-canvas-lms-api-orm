@@ -38,9 +38,9 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
     /**
      * Enables admin mode on this provider. This enables access to admin-only global user endpoints.
      * Returns new user provider, does not modify original.
-     * @return UserProvider
+     * @return UserProviderInterface
      */
-    public function asAdmin(): UserProvider{
+    public function asAdmin(): UserProviderInterface{
         $newProvider = new UserProvider($this->statusHandler, $this->canvasCommunicator);
         $newProvider->asAdminBool = true;
         return $newProvider;
@@ -50,9 +50,9 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
      * Makes provider work within the context of a specific course. Required to retrieve users if your API key does not have full global admin rights.
      * Returns new user provider, does not modify original.
      * @param Course $course The course to set the current context to.
-     * @return UserProvider
+     * @return UserProviderInterface
      */
-    public function withinCourse(Course $course): UserProvider{
+    public function withinCourse(Course $course): UserProviderInterface{
         $newProvider = new UserProvider($this->statusHandler, $this->canvasCommunicator);
         $newProvider->currentCourseContext = $course;
         return $newProvider;

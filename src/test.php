@@ -74,7 +74,7 @@ $userProvider = new UserProvider($handler, $canvasCommunicator)->withinCourse($c
 $assignment = $assignmentProvider->populateAssignment($assignment);
 echo "<h2>Populated Assignment</h2>";
 formatted_vardump($assignment);
-$submissions = $submissionProvider->getSubmissionsForAssignment($assignment);
+$submissions = $submissionProvider->getSubmissionsInAssignment($assignment);
 echo "<h2>Submissions for Assignment</h2>";
 formatted_vardump($submissions);
 echo "<h2>Raw Users</h2>";

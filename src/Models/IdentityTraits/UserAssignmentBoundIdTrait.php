@@ -13,6 +13,7 @@ use CanvasApiLibrary\Models\IdentityTraits\Atomic\UserIdentityTrait;
  * Identity trait for models bound to: A user and an assignment -> course -> domain & id
  */
 trait UserAssignmentBoundIdTrait{
+    use IdentityBoiletplateTrait;
     use NumberIdentityTrait;
     use DomainIdentityTrait;
     use CourseIdentityTrait;

@@ -22,14 +22,14 @@ trait SubmissionProviderProperties{
         return array_map(fn($x) => $this->populateSubmission($x), $submissions);
     }
 
-    abstract public function getSubmissionsInAssignment(Assignment $assignment, ?CanvasApiLibrary\Providers\UserProvider $userProvider) : array;
+    abstract public function getSubmissionsInAssignment(Assignment $assignment, ?CanvasApiLibrary\Providers\Interfaces\UserProviderInterface $userProvider) : array;
     
     /**
      * Summary of getSubmissionsInAssignments
      * @param Assignment[] $assignments
      * @return Lookup<Assignment, Submission>
      */
-    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Providers\UserProvider $userProvider): Lookup{
+    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Providers\Interfaces\UserProviderInterface $userProvider): Lookup{
         $lookup = new Lookup();
         foreach($assignments as $assignment){
             $lookup->add($assignment, $this->getSubmissionsInAssignment($assignment, $userProvider));

@@ -32,15 +32,15 @@ interface UserProviderInterface extends HandleEmittedInterface{
 
     /**
     
-    * @return CanvasApiLibrary\Providers\UserProvider
+    * @return CanvasApiLibrary\Providers\Interfaces\UserProviderInterface
     */
-    public function asAdmin() : CanvasApiLibrary\Providers\UserProvider;
+    public function asAdmin() : CanvasApiLibrary\Providers\Interfaces\UserProviderInterface;
 
     /**
     * @param Course $course
-    * @return CanvasApiLibrary\Providers\UserProvider
+    * @return CanvasApiLibrary\Providers\Interfaces\UserProviderInterface
     */
-    public function withinCourse(Course $course) : CanvasApiLibrary\Providers\UserProvider;
+    public function withinCourse(Course $course) : CanvasApiLibrary\Providers\Interfaces\UserProviderInterface;
 
     /**
     * @param Group $group

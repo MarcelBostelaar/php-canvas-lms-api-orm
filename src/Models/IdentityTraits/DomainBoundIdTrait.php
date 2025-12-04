@@ -10,6 +10,7 @@ use CanvasApiLibrary\Models\IdentityTraits\Atomic\NumberIdentityTrait;
  * Identity trait for models bound to: domain & id
  */
 trait DomainBoundIdTrait{
+    use IdentityBoiletplateTrait;
     use NumberIdentityTrait;
     use DomainIdentityTrait;
 

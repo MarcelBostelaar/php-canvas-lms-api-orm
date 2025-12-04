@@ -25,6 +25,11 @@ abstract class AbstractProvider implements HandleEmittedInterface{
     public function HandleEmitted(mixed $data, array $context){
         //Do nothing by default.
     }
+    
+    /**Returns an id that identifies the current client uniquely */
+    public function getClientID(): string{
+        return hash("sha256", $this->canvasCommunicator->apiKey);
+    }
 
     private static function GetDomainFromContext($context){
         foreach($context as $item){
