@@ -1,13 +1,13 @@
 <?php
 
-namespace CanvasApiLibrary\Caching\Providers;
+namespace CanvasApiLibrary\Caching\AccessAware\Providers;
 
-use CanvasApiLibrary\Caching\CacheRules\UndefinedCacherule;
-use CanvasApiLibrary\Caching\Utility\FullCacheProviderInterface;
-use CanvasApiLibrary\Caching\Utility\CacheRule;
-use CanvasApiLibrary\Providers\UserProvider;
-use CanvasApiLibrary\Providers\Generated\Traits\UserProviderProperties;
-use CanvasApiLibrary\Providers\Interfaces\UserProviderInterface;
+use CanvasApiLibrary\Core\Caching\CacheRules\UndefinedCacherule;
+use CanvasApiLibrary\Core\Caching\Utility\FullCacheProviderInterface;
+use CanvasApiLibrary\Core\Caching\Utility\CacheRule;
+use CanvasApiLibrary\Core\Providers\UserProvider;
+use CanvasApiLibrary\Core\Providers\Generated\Traits\UserProviderProperties;
+use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
 
 class UserProviderCached implements UserProviderInterface{
 
@@ -31,13 +31,13 @@ class UserProviderCached implements UserProviderInterface{
         return $cloned;
     }
 
-    public function withinCourse(\CanvasApiLibrary\Models\Course $course): UserProviderCached{
+    public function withinCourse(\CanvasApiLibrary\Core\Models\Course $course): UserProviderCached{
         $cloned = clone $this;
         $cloned->wrapped = $this->wrapped->withinCourse($course);
         return $cloned;
     }
 
-    public function getUsersInGroup(\CanvasApiLibrary\Models\Group $group): array{
+    public function getUsersInGroup(\CanvasApiLibrary\Core\Models\Group $group): array{
         [$cachedItem, $set] = $this->cache->get(
             $this->getUsersInGroupCR,
             $this->wrapped->getClientID(),
@@ -49,7 +49,7 @@ class UserProviderCached implements UserProviderInterface{
         return $set($this->wrapped->getUsersInGroup($group));
     }
 
-    public function getUsersInSection(\CanvasApiLibrary\Models\Section $section, ?string $enrollmentRoleFilter = null): array{
+    public function getUsersInSection(\CanvasApiLibrary\Core\Models\Section $section, ?string $enrollmentRoleFilter = null): array{
         [$cachedItem, $set] = $this->cache->get(
             $this->getUsersInSectionCR,
             $this->wrapped->getClientID(),
@@ -61,7 +61,7 @@ class UserProviderCached implements UserProviderInterface{
         return $set($this->wrapped->getUsersInSection($section, $enrollmentRoleFilter));
     }
 
-    public function populateUser(\CanvasApiLibrary\Models\User $user): \CanvasApiLibrary\Models\User{
+    public function populateUser(\CanvasApiLibrary\Core\Models\User $user): \CanvasApiLibrary\Core\Models\User{
         [$cachedItem, $set] = $this->cache->get(
             $this->populateUserCR,
             $this->wrapped->getClientID(),

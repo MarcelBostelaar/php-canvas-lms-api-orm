@@ -1,20 +1,19 @@
 <?php
 
-namespace CanvasApiLibrary\Caching\Providers;
+namespace CanvasApiLibrary\Caching\AccessAware\Providers;
 
-use CanvasApiLibrary\Caching\CacheRules\UndefinedCacherule;
-use CanvasApiLibrary\Caching\Utility\FullCacheProviderInterface;
-use CanvasApiLibrary\Caching\Utility\CacheRule;
-use CanvasApiLibrary\Providers\AssignmentProvider;
-use CanvasApiLibrary\Providers\Generated\Traits\AssignmentProviderProperties;
-use CanvasApiLibrary\Providers\Interfaces\AssignmentProviderInterface;
+use CanvasApiLibrary\Core\Caching\CacheRules\UndefinedCacherule;
+use CanvasApiLibrary\Core\Caching\Utility\FullCacheProviderInterface;
+use CanvasApiLibrary\Core\Caching\Utility\CacheRule;
+use CanvasApiLibrary\Core\Providers\Generated\Traits\AssignmentProviderProperties;
+use CanvasApiLibrary\Core\Providers\Interfaces\AssignmentProviderInterface;
 
 class AssignmentProviderCached implements AssignmentProviderInterface{
 
     use AssignmentProviderProperties;
 
     public function __construct(
-        private readonly AssignmentProvider $wrapped,
+        private readonly AssignmentProviderInterface $wrapped,
         private readonly FullCacheProviderInterface $cache,
         private readonly CacheRule $populateAssignmentCR = new UndefinedCacherule()
     ) {
@@ -24,7 +23,11 @@ class AssignmentProviderCached implements AssignmentProviderInterface{
         return $this->wrapped->HandleEmitted($data, $context);
     }
 
-    public function populateAssignment(\CanvasApiLibrary\Models\Assignment $assignment): \CanvasApiLibrary\Models\Assignment{
+    public function getClientID(): string{
+        return $this->wrapped->getClientID();
+    }
+
+    public function populateAssignment(\CanvasApiLibrary\Core\Models\Assignment $assignment): \CanvasApiLibrary\Core\Models\Assignment{
         [$cachedItem, $set] = $this->cache->get(
             $this->populateAssignmentCR,
             $this->wrapped->getClientID(),

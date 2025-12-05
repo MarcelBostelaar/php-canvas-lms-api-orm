@@ -1,13 +1,13 @@
 <?php
 
-namespace CanvasApiLibrary\Caching\Providers;
+namespace CanvasApiLibrary\Caching\AccessAware\Providers;
 
-use CanvasApiLibrary\Caching\CacheRules\UndefinedCacherule;
-use CanvasApiLibrary\Caching\Utility\FullCacheProviderInterface;
-use CanvasApiLibrary\Caching\Utility\CacheRule;
-use CanvasApiLibrary\Providers\GroupProvider;
-use CanvasApiLibrary\Providers\Generated\Traits\GroupProviderProperties;
-use CanvasApiLibrary\Providers\Interfaces\GroupProviderInterface;
+use CanvasApiLibrary\Core\Caching\CacheRules\UndefinedCacherule;
+use CanvasApiLibrary\Core\Caching\Utility\FullCacheProviderInterface;
+use CanvasApiLibrary\Core\Caching\Utility\CacheRule;
+use CanvasApiLibrary\Core\Providers\GroupProvider;
+use CanvasApiLibrary\Core\Providers\Generated\Traits\GroupProviderProperties;
+use CanvasApiLibrary\Core\Providers\Interfaces\GroupProviderInterface;
 
 class GroupProviderCached implements GroupProviderInterface{
 
@@ -24,7 +24,7 @@ class GroupProviderCached implements GroupProviderInterface{
         return $this->wrapped->HandleEmitted($data, $context);
     }
 
-    public function getAllGroupsInGroupCategory(\CanvasApiLibrary\Models\GroupCategory $category): array{
+    public function getAllGroupsInGroupCategory(\CanvasApiLibrary\Core\Models\GroupCategory $category): array{
         [$cachedItem, $set] = $this->cache->get(
             $this->getAllGroupsInGroupCategoryCR,
             $this->wrapped->getClientID(),
@@ -36,7 +36,7 @@ class GroupProviderCached implements GroupProviderInterface{
         return $set($this->wrapped->getAllGroupsInGroupCategory($category));
     }
 
-    public function populateGroup(\CanvasApiLibrary\Models\Group $group): \CanvasApiLibrary\Models\Group{
+    public function populateGroup(\CanvasApiLibrary\Core\Models\Group $group): \CanvasApiLibrary\Core\Models\Group{
         [$cachedItem, $set] = $this->cache->get(
             $this->populateGroupCR,
             $this->wrapped->getClientID(),

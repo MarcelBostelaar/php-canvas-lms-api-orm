@@ -1,13 +1,13 @@
 <?php
 
-namespace CanvasApiLibrary\Caching\Providers;
+namespace CanvasApiLibrary\Caching\AccessAware\Providers;
 
-use CanvasApiLibrary\Caching\CacheRules\UndefinedCacherule;
-use CanvasApiLibrary\Caching\Utility\FullCacheProviderInterface;
-use CanvasApiLibrary\Caching\Utility\CacheRule;
-use CanvasApiLibrary\Providers\SectionProvider;
-use CanvasApiLibrary\Providers\Generated\Traits\SectionProviderProperties;
-use CanvasApiLibrary\Providers\Interfaces\SectionProviderInterface;
+use CanvasApiLibrary\Core\Caching\CacheRules\UndefinedCacherule;
+use CanvasApiLibrary\Core\Caching\Utility\FullCacheProviderInterface;
+use CanvasApiLibrary\Core\Caching\Utility\CacheRule;
+use CanvasApiLibrary\Core\Providers\SectionProvider;
+use CanvasApiLibrary\Core\Providers\Generated\Traits\SectionProviderProperties;
+use CanvasApiLibrary\Core\Providers\Interfaces\SectionProviderInterface;
 
 class SectionProviderCached implements SectionProviderInterface{
 
@@ -24,7 +24,7 @@ class SectionProviderCached implements SectionProviderInterface{
         return $this->wrapped->HandleEmitted($data, $context);
     }
 
-    public function getAllSectionsInCourse(\CanvasApiLibrary\Models\Course $course): array{
+    public function getAllSectionsInCourse(\CanvasApiLibrary\Core\Models\Course $course): array{
         [$cachedItem, $set] = $this->cache->get(
             $this->getAllSectionsInCourseCR,
             $this->wrapped->getClientID(),
@@ -36,7 +36,7 @@ class SectionProviderCached implements SectionProviderInterface{
         return $set($this->wrapped->getAllSectionsInCourse($course));
     }
 
-    public function populateSection(\CanvasApiLibrary\Models\Section $section): \CanvasApiLibrary\Models\Section{
+    public function populateSection(\CanvasApiLibrary\Core\Models\Section $section): \CanvasApiLibrary\Core\Models\Section{
         [$cachedItem, $set] = $this->cache->get(
             $this->populateSectionCR,
             $this->wrapped->getClientID(),

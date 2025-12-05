@@ -1,14 +1,14 @@
 <?php
 
-namespace CanvasApiLibrary\Caching\Providers;
+namespace CanvasApiLibrary\Caching\AccessAware\Providers;
 
-use CanvasApiLibrary\Caching\CacheRules\UndefinedCacherule;
-use CanvasApiLibrary\Caching\Utility\FullCacheProviderInterface;
-use CanvasApiLibrary\Caching\Utility\CacheRule;
-use CanvasApiLibrary\Providers\Interfaces\UserProviderInterface;
-use CanvasApiLibrary\Providers\SubmissionProvider;
-use CanvasApiLibrary\Providers\Generated\Traits\SubmissionProviderProperties;
-use CanvasApiLibrary\Providers\Interfaces\SubmissionProviderInterface;
+use CanvasApiLibrary\Core\Caching\CacheRules\UndefinedCacherule;
+use CanvasApiLibrary\Core\Caching\Utility\FullCacheProviderInterface;
+use CanvasApiLibrary\Core\Caching\Utility\CacheRule;
+use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
+use CanvasApiLibrary\Core\Providers\SubmissionProvider;
+use CanvasApiLibrary\Core\Providers\Generated\Traits\SubmissionProviderProperties;
+use CanvasApiLibrary\Core\Providers\Interfaces\SubmissionProviderInterface;
 
 class SubmissionProviderCached implements SubmissionProviderInterface{
 
@@ -25,7 +25,7 @@ class SubmissionProviderCached implements SubmissionProviderInterface{
         return $this->wrapped->HandleEmitted($data, $context);
     }
 
-    public function getSubmissionsInAssignment(\CanvasApiLibrary\Models\Assignment $assignment, ?UserProviderInterface $userProvider = null): array{
+    public function getSubmissionsInAssignment(\CanvasApiLibrary\Core\Models\Assignment $assignment, ?UserProviderInterface $userProvider = null): array{
         [$cachedItem, $set] = $this->cache->get(
             $this->getSubmissionsInAssignmentCR,
             $this->wrapped->getClientID(),
@@ -37,7 +37,7 @@ class SubmissionProviderCached implements SubmissionProviderInterface{
         return $set($this->wrapped->getSubmissionsInAssignment($assignment, $userProvider));
     }
 
-    public function populateSubmission(\CanvasApiLibrary\Models\Submission $submission): \CanvasApiLibrary\Models\Submission{
+    public function populateSubmission(\CanvasApiLibrary\Core\Models\Submission $submission): \CanvasApiLibrary\Core\Models\Submission{
         [$cachedItem, $set] = $this->cache->get(
             $this->populateSubmissionCR,
             $this->wrapped->getClientID(),
