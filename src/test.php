@@ -1,17 +1,17 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
 
-use CanvasApiLibrary\Models\Assignment;
-use CanvasApiLibrary\Models\Course;
-use CanvasApiLibrary\Models\Domain;
-use CanvasApiLibrary\Providers\AssignmentProvider;
-use CanvasApiLibrary\Providers\GroupProvider;
-use CanvasApiLibrary\Providers\SectionProvider;
-use CanvasApiLibrary\Providers\SubmissionProvider;
-use CanvasApiLibrary\Providers\UserProvider;
-use CanvasApiLibrary\Services\CanvasCommunicator;
-use CanvasApiLibrary\Services\CanvasReturnStatus;
-use CanvasApiLibrary\Services\StatusHandlerInterface;
+use CanvasApiLibrary\Core\Models\Assignment;
+use CanvasApiLibrary\Core\Models\Course;
+use CanvasApiLibrary\Core\Models\Domain;
+use CanvasApiLibrary\Core\Providers\AssignmentProvider;
+use CanvasApiLibrary\Core\Providers\GroupProvider;
+use CanvasApiLibrary\Core\Providers\SectionProvider;
+use CanvasApiLibrary\Core\Providers\SubmissionProvider;
+use CanvasApiLibrary\Core\Providers\UserProvider;
+use CanvasApiLibrary\Core\Services\CanvasCommunicator;
+use CanvasApiLibrary\Core\Services\CanvasReturnStatus;
+use CanvasApiLibrary\Core\Services\StatusHandlerInterface;
 
 
 set_error_handler(function ($severity, $message, $file, $line) {

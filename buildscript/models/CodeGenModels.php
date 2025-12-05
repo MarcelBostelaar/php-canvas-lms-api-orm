@@ -10,13 +10,13 @@ function fileTop($classname, array $usedModels){
     echo "<?php\n";
     ?>
 /* Automatically generated based on model properties.*/
-namespace CanvasApiLibrary\Models\Generated;
+namespace CanvasApiLibrary\Core\Models\Generated;
 
-use CanvasApiLibrary\Exceptions\NotPopulatedException;
-use CanvasApiLibrary\Exceptions\MixingDomainsException;
-use CanvasApiLibrary\Models\Domain;
+use CanvasApiLibrary\Core\Exceptions\NotPopulatedException;
+use CanvasApiLibrary\Core\Exceptions\MixingDomainsException;
+use CanvasApiLibrary\Core\Models\Domain;
 <?php foreach($usedModels as $modelName): ?>
-use CanvasApiLibrary\Models\<?=$modelName?>;
+use CanvasApiLibrary\Core\Models\<?=$modelName?>;
 <?php endforeach ?>
 
 trait <?=$classname?>{

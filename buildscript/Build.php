@@ -7,7 +7,7 @@ use function Buildscript\Providers\buildProviders;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 
-$srcFolder = __DIR__ . '/../src';
+$srcFolder = __DIR__ . '/../src/Core';
 
 function build(){
     global $srcFolder;

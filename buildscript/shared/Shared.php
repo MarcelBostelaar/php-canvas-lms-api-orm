@@ -26,7 +26,7 @@ function parseFile($filePath){
 }
 
 function tryExtractModelClassName($typeString){
-    if(preg_match('/CanvasApiLibrary\\\\Models\\\\([A-Z][a-zA-Z0-9_]*)$/', $typeString, $matches)){
+    if(preg_match('/CanvasApiLibrary\\\\Core\\\\Models\\\\([A-Z][a-zA-Z0-9_]*)$/', $typeString, $matches)){
         return $matches[1];
     }
     return null;

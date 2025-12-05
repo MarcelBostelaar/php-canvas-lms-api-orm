@@ -28,13 +28,13 @@ function fileTop($traitname, $modelname, $modelPlurals, $usedModels){
 as well as missing alias methods for models with multiple plural names.
 Using provider and plurals defined in the models. */
 
-namespace CanvasApiLibrary\Providers\Generated\Traits;
+namespace CanvasApiLibrary\Core\Providers\Generated\Traits;
 
 use CanvasApiLibrary;
-use CanvasApiLibrary\Providers\Utility\Lookup;
+use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 <?php
     foreach($usedModels as $usedModel){ ?>
-use CanvasApiLibrary\Models\<?=$usedModel?>;
+use CanvasApiLibrary\Core\Models\<?=$usedModel?>;
 <?php
     }
 ?>

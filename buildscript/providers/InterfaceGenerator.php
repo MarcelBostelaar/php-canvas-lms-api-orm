@@ -24,20 +24,21 @@ function generateInterface(string $interfacename, array $methods, $usedModels):s
     
     ob_start();
     ?>
-namespace CanvasApiLibrary\Providers\Interfaces;
+namespace CanvasApiLibrary\Core\Providers\Interfaces;
 
 use CanvasApiLibrary;
-use CanvasApiLibrary\Providers\Utility\Lookup;
-use CanvasApiLibrary\Providers\Utility\HandleEmittedInterface;
+use CanvasApiLibrary\Core\Providers\Utility\Lookup;
+use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
 
 <?php
     foreach($usedModels as $usedModel){ ?>
-use CanvasApiLibrary\Models\<?=$usedModel?>;
+use CanvasApiLibrary\Core\Models\<?=$usedModel?>;
 <?php
 }?>
 
 interface <?=$interfacename?> extends HandleEmittedInterface{
 
+    public function getClientID(): string;
 <?php
 foreach($methods as $method){
     generateInterfaceMethod($method, $usedModels);
