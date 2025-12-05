@@ -27,7 +27,7 @@ class AssignmentProviderCached implements AssignmentProviderInterface{
     }
 
     public function populateAssignment(\CanvasApiLibrary\Core\Models\Assignment $assignment): \CanvasApiLibrary\Core\Models\Assignment{
-        return $this->cache->trySingleValue(
+        return $this->cache->ensureThenTrySingleValue(
             $assignment->getUniqueId(),
             $this->ttl,
             $assignment->course,

@@ -38,6 +38,10 @@ class PermissionsHandler{
         //todo implement
     }
 
+    public static function individualPermission(string $uniqueID): string{
+        //todo implement
+    }
+
     public static function userPermission(Course $course, User $user): string{
         //TODO implement
     }

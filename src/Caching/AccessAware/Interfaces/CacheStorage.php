@@ -31,14 +31,14 @@ class CacheStorage{
      * @param string $key
      * @param mixed $value
      * @param int $ttl Times in seconds to keep cache
-     * @param string $permissionsRequired Required permission token to access this cache. 
-     *      User has to provide this tokens in order to allow for cache hit.
+     * @param string $permissionsRequired Permission tokens to access this cache. 
+     *      User has to provide this tokens in order to allow for cache hit. If client has any of the permissions, can access item.
      * @param string $clientID The ID by which to identify this user in the system. 
      *      Items added automatically have the associated permissions added to the clients permissions list.
      * @return void
      */
     public function setSingleItem(string $key, mixed $value, int $ttl, 
-    string $permissionRequired, string $clientID){
+    string $permissionRequired, string $clientID){//TODO put permissions at the end, make it ...args, so you can add an arbitrary amount of permissions.
         $this->cache->set($key, $value, $ttl, $permissionRequired);
         $this->cache->addPermission($clientID, $permissionRequired, $ttl);
     }
@@ -62,13 +62,13 @@ class CacheStorage{
      * @param mixed $value
      * @param int $ttl Times in seconds to keep cache
      * @param string $itemPermissionRequired Required permission token to access this individual item. 
-     *      User has to provide this tokens in order to allow for cache hit.
+     *      User has to provide this tokens in order to allow for cache hit. 
      * @param string $clientID The ID by which to identify this user in the system.
      *      Items added automatically have the associated permissions added to the clients permissions list.
      * @return void
      */
     public function setCollectionItem(string $collectionKey, string $itemKey, mixed $value, int $ttl, 
-    string $itemPermissionRequired, string $clientID){
+    string $itemPermissionRequired, string $clientID){//TODO put permissions at end, allow many
         $this->cache->set($itemKey, $value, $ttl, $itemPermissionRequired);
         $this->cache->addPermission($clientID, $itemPermissionRequired, $ttl);
         $this->cache->ensureCollection($collectionKey, PermissionsHandler::contextFrom($itemPermissionRequired), $ttl);
@@ -181,7 +181,17 @@ class CacheStorage{
         $this->setCollection($collectionKey, $itemKeys, $ttl, $clientID);
     }
 
-    public function trySingleValue(string $itemKey, int $ttl, Course $course, string $clientID, string $permission, callable $wrappedFunc): mixed{
+    public function trySingleValue(string $itemKey, int $ttl, string $clientID, string $permission, callable $wrappedFunc): mixed{
+        $found = $this->getSingleItem($itemKey, $clientID);
+        if($found->hit){
+            return $found->value;
+        }
+        $actualValue = $wrappedFunc();
+        $this->setSingleItem($itemKey, $actualValue, $ttl, $permission, $clientID);
+        return $actualValue;
+    }
+
+    public function ensureThenTrySingleValue(string $itemKey, int $ttl, Course $course, string $clientID, string $permission, callable $wrappedFunc): mixed{
         $this->ensurePermissions($course, $clientID);
         $found = $this->getSingleItem($itemKey, $clientID);
         if($found->hit){
