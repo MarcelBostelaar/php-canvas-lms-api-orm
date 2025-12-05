@@ -61,6 +61,10 @@ class UserProviderCached implements UserProviderInterface{
         return $set($this->wrapped->getUsersInSection($section, $enrollmentRoleFilter));
     }
 
+    public function getUsersInCourse(\CanvasApiLibrary\Core\Models\Course $course, ?string $enrollmentRoleFilter = null): array{
+        //DO NOT ENSURE COURSE PERMISSIONS, this method is used to ensure those, otherwise we get infite recursion.
+    }
+
     public function populateUser(\CanvasApiLibrary\Core\Models\User $user): \CanvasApiLibrary\Core\Models\User{
         [$cachedItem, $set] = $this->cache->get(
             $this->populateUserCR,

@@ -26,10 +26,18 @@ interface UserProviderInterface extends HandleEmittedInterface{
     public function getUsersInGroups(array $groups) : Lookup;
 
     /**
-    * @param Section[] $sections	 * @param ?string $enrollmentRoleFilter
+    * @param Section[] $sections	
+ * @param ?string $enrollmentRoleFilter
     * @return Lookup<Section, User>
     */
     public function getUsersInSections(array $sections, ?string $enrollmentRoleFilter) : Lookup;
+
+    /**
+    * @param Course[] $courses	
+ * @param ?string $enrollmentRoleFilter
+    * @return Lookup<Course, User>
+    */
+    public function getUsersInCourses(array $courses, ?string $enrollmentRoleFilter) : Lookup;
 
     /**
     
@@ -50,10 +58,18 @@ interface UserProviderInterface extends HandleEmittedInterface{
     public function getUsersInGroup(Group $group) : mixed;
 
     /**
-    * @param Section $section	 * @param ?string $enrollmentRoleFilter
+    * @param Section $section	
+ * @param ?string $enrollmentRoleFilter
     * @return mixed
     */
     public function getUsersInSection(Section $section, ?string $enrollmentRoleFilter) : mixed;
+
+    /**
+    * @param Course $course	
+ * @param ?string $enrollmentRoleFilter
+    * @return mixed
+    */
+    public function getUsersInCourse(Course $course, ?string $enrollmentRoleFilter) : mixed;
 
     /**
     * @param User $user

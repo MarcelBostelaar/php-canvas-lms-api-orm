@@ -65,7 +65,7 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
     /**
      * Gets all users in a section.
      * @param Models\Section $section
-     * @param mixed $enrollmentRoleFilter Filter to only retrieve a specific type of user. Allowed values: Student, Teacher, Ta, Observer, Designer
+     * @param ?string $enrollmentRoleFilter Filter to only retrieve a specific type of user. Allowed values: Student, Teacher, Ta, Observer, Designer
      * @return User[]
      */
     public function getUsersInSection(Models\Section $section, ?string $enrollmentRoleFilter): array{
@@ -85,6 +85,31 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
         }
         return $this->GetMany( "/sections/{$section->id}/enrollments?per_page=100$postfix", 
         $section->getContext(), $this->modelPopulator, fn($item) => $item["user"]);
+    }
+
+    /**
+     * Gets all users in a course.
+     * @param Models\Course $course
+     * @param ?string $enrollmentRoleFilter Filter to only retrieve a specific type of user. Allowed values: student, teacher, ta, observer, designer
+     * @return User[]
+     */
+    public function getUsersInCourse(Models\Course $course, ?string $enrollmentRoleFilter): array{
+        $postfix = "";
+        switch($enrollmentRoleFilter){
+            case null:
+                break;
+            case "student":
+            case "teacher":
+            case "ta":
+            case "observer":
+            case "designer":
+                $postfix = "&enrollment_type[]=$enrollmentRoleFilter";
+                break;
+            default:
+                throw new InvalidArgumentException("Cannot pass $enrollmentRoleFilter as the role, must be null for no filtering, or one of following: student, teacher, ta, observer, designer");
+        }
+        return $this->GetMany( "/courses/{$course->id}/users?per_page=100$postfix", 
+        $course->getContext());
     }
 
     /**

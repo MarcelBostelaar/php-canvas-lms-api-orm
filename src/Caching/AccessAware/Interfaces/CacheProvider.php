@@ -35,12 +35,12 @@ abstract class CacheProvider{
      * Creates a new empty collection in the cache if it does not exist already. Otherwise does nothing.
      * Unbound cache operation.
      * @param string $key Key by which to identify the collection.
-     * @param ?string $collectionItemPermission A permission for an item in the collection. 
-     *  Saved to act as a context filter in other operations. If null, will not be saved.
+     * @param ?string $collectionItemPermissionContext The context of the permissions for this collection.
+     * If none provided, not saved.
      * @param mixed $ttl Time to keep in cache in seconds.
      * @return void
      */
-    abstract public function ensureCollection(string $key, ?string $collectionItemPermission, int $ttl);
+    abstract public function ensureCollection(string $key, ?string $collectionItemPermissionContext, int $ttl);
 
     /**
      * Saves a set of item keys for a given client and a given collection key.
@@ -114,18 +114,18 @@ abstract class CacheProvider{
     /**
      * Returns a boolean indicating whether or not the client has any permissions in the given context.
      * @param string $clientID The client ID
-     * @param string $examplePermission A permission from the context to check for client permissions.
+     * @param string $contextFilter The context filter for the permissions in which to check for client permissions.
      * @return bool True if any permission was found. False is no permission found.
      */
-    public function hasPermissionsInContext(string $clientID, string $examplePermission): bool{
+    public function hasPermissionsInContext(string $clientID, string $contextFilter): bool{
         $permissions = $this->getClientPermissions($clientID);
-        return \count(PermissionsHandler::filterOnContext($examplePermission, $permissions)) > 0;
+        return \count(PermissionsHandler::filterOnContext($contextFilter, $permissions)) > 0;
     }
 
     /**
-     * Returns the permission that was saved with the collection as context filter.
+     * Returns the context filter for the permissions of a collection.
      * @param string $key The collection key.
-     * @return ?string The permission that was saved with the collection as a filter. Null is no filter was ever supplied.
+     * @return ?string The context filter for the permissions that was saved with the collection. Null is no filter was ever supplied.
      */
     abstract public function getCollectionPermissionFilter(string $key): ?string;
 

@@ -53,4 +53,19 @@ trait UserProviderProperties{
         }
         return $lookup;
     }
+
+    abstract public function getUsersInCourse(Course $course, ?string $enrollmentRoleFilter) : array;
+    
+    /**
+     * Summary of getUsersInCourses
+     * @param Course[] $courses
+     * @return Lookup<Course, User>
+     */
+    public function getUsersInCourses(array $courses, ?string $enrollmentRoleFilter): Lookup{
+        $lookup = new Lookup();
+        foreach($courses as $course){
+            $lookup->add($course, $this->getUsersInCourse($course, $enrollmentRoleFilter));
+        }
+        return $lookup;
+    }
 }
