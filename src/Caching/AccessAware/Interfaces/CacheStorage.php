@@ -38,7 +38,7 @@ class CacheStorage{
      * @return void
      */
     public function setSingleItem(string $key, mixed $value, int $ttl, 
-    string $permissionRequired, string $clientID){//TODO put permissions at the end, make it ...args, so you can add an arbitrary amount of permissions.
+    string $permissionRequired, string $clientID){
         $this->cache->set($key, $value, $ttl, $permissionRequired);
         $this->cache->addPermission($clientID, $permissionRequired, $ttl);
     }
@@ -65,13 +65,13 @@ class CacheStorage{
      *      User has to provide this tokens in order to allow for cache hit. 
      * @param string $clientID The ID by which to identify this user in the system.
      *      Items added automatically have the associated permissions added to the clients permissions list.
+     * @param ?string $doBackPropagationToItemKey Set the 
      * @return void
      */
     public function setCollectionItem(string $collectionKey, string $itemKey, mixed $value, int $ttl, 
-    string $itemPermissionRequired, string $clientID){//TODO put permissions at end, allow many
+    string $itemPermissionRequired, string $clientID){
         $this->cache->set($itemKey, $value, $ttl, $itemPermissionRequired);
         $this->cache->addPermission($clientID, $itemPermissionRequired, $ttl);
-        $this->cache->ensureCollection($collectionKey, PermissionsHandler::contextFrom($itemPermissionRequired), $ttl);
         $this->cache->addToCollection($collectionKey, $itemKey, $ttl);
     }
     
@@ -88,8 +88,22 @@ class CacheStorage{
      */
     public function setCollection(string $collectionKey, array $itemKeys, int $ttl, 
     string $clientID){
-        $this->cache->ensureCollection($collectionKey, null, $ttl);
         $this->cache->setCollectionSet($clientID, $collectionKey, $itemKeys, $ttl);
+    }
+
+    /**
+     * Creates a new collection (if it does not already exist) endpoint. Must be called before saving items to this collection.
+     * @param string $collectionKey Key
+     * @param ?string $collectionItemPersmissionContext Context filter for the items in this collection. Leave empty if unknown.
+     * @param int $ttl Time to keep this collection in cache, in seconds.
+     * @return void
+     */
+    public function ensureCollection(string $collectionKey, ?string $collectionItemPersmissionContext, int $ttl){
+        $this->cache->ensureCollection($collectionKey, $collectionItemPersmissionContext, $ttl);
+    }
+
+    public function setBackpropagation(string $collectionKey, int $permissionType, string $target){
+        $this->cache->setBackpropagation($collectionKey, $permissionType, $target);
     }
     
     /**
@@ -114,17 +128,22 @@ class CacheStorage{
             return $setResult;
         }
         
-        //array<string,bool>
         $requiredPermissions = $this->cache->getCollectionItemPermissionsRequired($collectionKey);
-        $filter = $this->cache->getCollectionPermissionFilter($collectionKey);
-        $clientPermissions = $filter !== null ? 
-            PermissionsHandler::filterOnContext($filter, $this->cache->getClientPermissions($clientID)) :
-            [];
+        $filter = $this->cache->getCollectionPermissionContext($collectionKey);
+        if($filter == null){
+            //Cant perform special check below
+            return new CacheResult(null, false);
+        }
+
+        $clientPermissions = PermissionsHandler::filterOnContext($filter, $this->cache->getClientPermissions($clientID));
 
         //if the required permissions of all known items in this collection 
         // is a superset of the required permissions (for this context) that the client has, 
-        // then the request can be fullfilled with cached data.
-        //client without permission is valid case, just returns empty results.
+        // then the request can be fullfilled with cached data. 
+        // (ie for each domain-course-user requirement there is an item that carries the permissions, 
+        // so all normally returned items for this user will be returned. 
+        // We assume the user already has maximum permissions in this context.)
+        //client without permission is valid case, just returns empty results, they arent allowed to see anything.
         if(self::is_superset($requiredPermissions, $clientPermissions)){
             //return a filtered list of all cached items
             return $this->cache->getCollectionItems($collectionKey, $clientPermissions, $clientID);
@@ -132,7 +151,7 @@ class CacheStorage{
 
         //Cannot ensure the stored items are everything the client would normally get, 
         // as they have permissions for data in this context that has no corresponding item stored.
-        return new CacheResult(null, false, true);
+        return new CacheResult(null, false);
     }
 
     //Methods to ensure users get all permissions first.
@@ -146,8 +165,8 @@ class CacheStorage{
      */
     public function ensurePermissions(Course $course, string $clientID){
         if(
-            $this->hasPermissionsInContext($clientID, PermissionsHandler::contextFilterCoursebound($course)) ||
-            $this->hasPermissionsInContext($clientID, PermissionsHandler::contextFilterUserbound($course))){
+            $this->hasPermissionsInContext($clientID, PermissionsHandler::contextFilterDomainCourse($course)) ||
+            $this->hasPermissionsInContext($clientID, PermissionsHandler::contextFilterDomainCourseUser($course))){
             return;
         }
         //call saved, cached, user provider. 

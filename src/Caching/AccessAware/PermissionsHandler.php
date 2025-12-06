@@ -22,27 +22,41 @@ class PermissionsHandler{
         //TODO implement
     }
 
+    /**
+     * Filters a given list of permissions to only those of a certain type
+     * @param int $contextType The context type to filter on.
+     * @param string[] $permissions The permissions to filter
+     * @return string[] Filtered permissions
+     */
+    public static function filterOnType(int $contextType, array $permissions) : array{
+        //todo implement
+    }
+
     public static function contextFrom(string $permission): string{
         //todo implement
     }
 
-    public static function contextFilterUserbound(Course $course): string{
+    public static function contextFilterDomainCourseUser(Course $course): string{
         //TODO implement
     }
 
-    public static function contextFilterCoursebound(Course $course): string{
+    public static function contextFilterDomainCourse(Course $course): string{
         //TODO implement
     }
 
-    public static function coursePermission(Course $course): string{
+    public static function domainCoursePermission(Course $course): string{
         //todo implement
     }
 
-    public static function individualPermission(string $uniqueID): string{
+    public static function domainCourseUserPermission(Course $course, User $user): string{
+        //TODO implement
+    }
+
+    public static function typeFromPermissiom(string $permission) : int{
         //todo implement
     }
 
-    public static function userPermission(Course $course, User $user): string{
-        //TODO implement
+    public static function typeFromContextFilter(string $contextFilter) : int{
+        //todo implement
     }
 }

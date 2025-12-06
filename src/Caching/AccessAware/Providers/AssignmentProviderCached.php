@@ -32,7 +32,7 @@ class AssignmentProviderCached implements AssignmentProviderInterface{
             $this->ttl,
             $assignment->course,
             $this->getClientID(),
-            PermissionsHandler::contextFilterCoursebound($assignment->course),
+            PermissionsHandler::contextFilterDomainCourse($assignment->course),
             fn()=> $this->wrapped->populateAssignment($assignment)
         );
     }

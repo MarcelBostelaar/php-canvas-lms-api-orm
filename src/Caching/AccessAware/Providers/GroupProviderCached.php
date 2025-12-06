@@ -40,6 +40,21 @@ class GroupProviderCached implements GroupProviderInterface{
         // Ik denk dat handmatig de backpropagation relatief definieren genoeg is, want het is niet nodig
         // om assignment de permissions van een group category te geven, 
         // want de assignment hoord al bij een course, een van de 3 soorten permission (user/course/domain, course/domain, individual)
+        
+        //Cant ensure permissions for a course because GC is not neccecarily course bound.
+        $collectionKey = "getAllGroupsInGroupCategory" . $category->getUniqueId();
+        $item = $this->cache->getCollection(
+            $collectionKey,
+            $this->getClientID()
+        );
+        if($item->hit){
+            return $item->value;
+        }
+        $this->cache->ensureCollection(
+            $collectionKey,
+            
+        );
+
     }
 
     public function populateGroup(\CanvasApiLibrary\Core\Models\Group $group): \CanvasApiLibrary\Core\Models\Group{

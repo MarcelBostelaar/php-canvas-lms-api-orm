@@ -35,12 +35,11 @@ abstract class CacheProvider{
      * Creates a new empty collection in the cache if it does not exist already. Otherwise does nothing.
      * Unbound cache operation.
      * @param string $key Key by which to identify the collection.
-     * @param ?string $collectionItemPermissionContext The context of the permissions for this collection.
-     * If none provided, not saved.
-     * @param mixed $ttl Time to keep in cache in seconds.
+     * @param ?string $itemPermissionContextFilter The filter for permissions for items in this collection.
+     * @param int $ttl Time to keep in cache in seconds.
      * @return void
      */
-    abstract public function ensureCollection(string $key, ?string $collectionItemPermissionContext, int $ttl);
+    abstract public function ensureCollection(string $key, ?string $itemPermissionContextFilter, int $ttl);
 
     /**
      * Saves a set of item keys for a given client and a given collection key.
@@ -92,16 +91,8 @@ abstract class CacheProvider{
      */
     public function getCollectionItemPermissionsRequired(string $key): array{
         $allPermissions = $this->getCollectionItemAllPermissionsRequired($key);
-        $filter = $this->getCollectionPermissionFilter($key);
-        if($filter !== null){
-            return PermissionsHandler::filterOnContext($filter, $allPermissions);
-        }
-        if(count($allPermissions) > 0){
-            throw new LogicException("Caching system bug: Cached collection has items, 
-            but no context filter is set. Either the context filter is incorrectly saved, 
-            incorrectly retrieved, or the CanvasAPILibrary Caching has a programming error.");
-        }
-        return [];
+        $filter = $this->getCollectionPermissionContext($key);
+        return PermissionsHandler::filterOnContext($filter, $allPermissions);
     }
     
     /**
@@ -123,11 +114,18 @@ abstract class CacheProvider{
     }
 
     /**
+     * Returns the permission type for the permissions of a collection.
+     * @param string $key The collection key.
+     * @return int The type of permission that is relevant for this collection.
+     */
+    abstract public function getCollectionPermissionType(string $key): int;
+
+    /**
      * Returns the context filter for the permissions of a collection.
      * @param string $key The collection key.
-     * @return ?string The context filter for the permissions that was saved with the collection. Null is no filter was ever supplied.
+     * @return ?string The context filter of permission that is relevant for this collection. Null if no filter set.
      */
-    abstract public function getCollectionPermissionFilter(string $key): ?string;
+    abstract public function getCollectionPermissionContext(string $key): ?string;
 
     /**
      * Returns a list of all permissions that this client has.
