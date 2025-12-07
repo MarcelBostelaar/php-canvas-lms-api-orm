@@ -50,9 +50,13 @@ class GroupProviderCached implements GroupProviderInterface{
         if($item->hit){
             return $item->value;
         }
+        //No hit
+        $actualItems = $this->getAllGroupsInGroupCategory($category);
+        $exampleContext = unknown;
+        $permissionType
         $this->cache->ensureCollection(
             $collectionKey,
-            
+
         );
 
     }

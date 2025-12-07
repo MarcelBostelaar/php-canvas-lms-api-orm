@@ -2,6 +2,8 @@
 
 namespace CanvasApiLibrary\Core\Models\IdentityTraits\Atomic;
 
+use Exception;
+
 /**
  * Modular model identity system. Traits provide functionality for properties which function as identities for the models, 
  * and serialization and deserialization functionality to go along with it.
@@ -35,6 +37,38 @@ trait IdentityBoiletplateTrait {
     
     /** @var bool Tracks if identity traits have been initialized */
     protected bool $identityInitialized = false;
+
+    /**
+     * Metadata storage. Is (must be) stripped out before storing item in cache.
+     * @var array Associative array.
+     */
+    private array $metadata = [];
+
+    /**
+     * Sets a metadata value
+     * @param string $key 
+     * @param mixed $value Any value, not null.
+     * @throws Exception Throws if value is set to null.
+     * @return void
+     */
+    protected function setMetadata(string $key, $value){
+        if($value === null){
+            throw new Exception("Cannot pass null as a value to setMetadata");
+        }
+        $this->metadata[$key] = $value;
+    }
+
+    /**
+     * Gets a metadata value
+     * @param string $key
+     * @return mixed The value. Null if value is not set.
+     */
+    protected function getMetadata(string $key) : mixed{
+        if(isset($this->metadata[$key])){
+            return $this->metadata[$key];
+        }
+        return null;
+    }
     
 /**
      * Populates the model using the provided other models, filling in missing data.
