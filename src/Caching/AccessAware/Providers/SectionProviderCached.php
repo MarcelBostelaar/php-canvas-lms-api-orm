@@ -12,6 +12,7 @@ use CanvasApiLibrary\Core\Providers\Interfaces\SectionProviderInterface;
 class SectionProviderCached implements SectionProviderInterface{
 
     use SectionProviderProperties;
+    use PrecallTrait;
     public function __construct(
         private readonly SectionProvider $wrapped,
         private readonly FullCacheProviderInterface $cache,
@@ -25,6 +26,8 @@ class SectionProviderCached implements SectionProviderInterface{
     }
 
     public function getAllSectionsInCourse(\CanvasApiLibrary\Core\Models\Course $course): array{
+        $this->doPreCacheCall();
+
         [$cachedItem, $set] = $this->cache->get(
             $this->getAllSectionsInCourseCR,
             $this->wrapped->getClientID(),
@@ -37,6 +40,8 @@ class SectionProviderCached implements SectionProviderInterface{
     }
 
     public function populateSection(\CanvasApiLibrary\Core\Models\Section $section): \CanvasApiLibrary\Core\Models\Section{
+        $this->doPreCacheCall();
+
         [$cachedItem, $set] = $this->cache->get(
             $this->populateSectionCR,
             $this->wrapped->getClientID(),

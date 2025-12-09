@@ -12,6 +12,7 @@ use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
 class UserProviderCached implements UserProviderInterface{
 
     use UserProviderProperties;
+    use PrecallTrait;
     public function __construct(
         private readonly UserProvider $wrapped,
         private readonly FullCacheProviderInterface $cache,
@@ -25,19 +26,9 @@ class UserProviderCached implements UserProviderInterface{
         return $this->wrapped->HandleEmitted($data, $context);
     }
 
-    public function asAdmin(): UserProviderCached{
-        $cloned = clone $this;
-        $cloned->wrapped = $this->wrapped->asAdmin();
-        return $cloned;
-    }
-
-    public function withinCourse(\CanvasApiLibrary\Core\Models\Course $course): UserProviderCached{
-        $cloned = clone $this;
-        $cloned->wrapped = $this->wrapped->withinCourse($course);
-        return $cloned;
-    }
-
     public function getUsersInGroup(\CanvasApiLibrary\Core\Models\Group $group): array{
+        $this->doPreCacheCall();
+        
         [$cachedItem, $set] = $this->cache->get(
             $this->getUsersInGroupCR,
             $this->wrapped->getClientID(),
@@ -50,6 +41,8 @@ class UserProviderCached implements UserProviderInterface{
     }
 
     public function getUsersInSection(\CanvasApiLibrary\Core\Models\Section $section, ?string $enrollmentRoleFilter = null): array{
+        $this->doPreCacheCall();
+        
         [$cachedItem, $set] = $this->cache->get(
             $this->getUsersInSectionCR,
             $this->wrapped->getClientID(),
@@ -66,6 +59,7 @@ class UserProviderCached implements UserProviderInterface{
     }
 
     public function populateUser(\CanvasApiLibrary\Core\Models\User $user): \CanvasApiLibrary\Core\Models\User{
+        $this->doPreCacheCall();
         [$cachedItem, $set] = $this->cache->get(
             $this->populateUserCR,
             $this->wrapped->getClientID(),

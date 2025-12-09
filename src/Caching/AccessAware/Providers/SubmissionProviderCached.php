@@ -13,6 +13,7 @@ use CanvasApiLibrary\Core\Providers\Interfaces\SubmissionProviderInterface;
 class SubmissionProviderCached implements SubmissionProviderInterface{
 
     use SubmissionProviderProperties;
+    use PrecallTrait;
     public function __construct(
         private readonly SubmissionProvider $wrapped,
         private readonly FullCacheProviderInterface $cache,
@@ -26,6 +27,8 @@ class SubmissionProviderCached implements SubmissionProviderInterface{
     }
 
     public function getSubmissionsInAssignment(\CanvasApiLibrary\Core\Models\Assignment $assignment, ?UserProviderInterface $userProvider = null): array{
+        $this->doPreCacheCall();
+        
         [$cachedItem, $set] = $this->cache->get(
             $this->getSubmissionsInAssignmentCR,
             $this->wrapped->getClientID(),
@@ -38,6 +41,8 @@ class SubmissionProviderCached implements SubmissionProviderInterface{
     }
 
     public function populateSubmission(\CanvasApiLibrary\Core\Models\Submission $submission): \CanvasApiLibrary\Core\Models\Submission{
+        $this->doPreCacheCall();
+        
         [$cachedItem, $set] = $this->cache->get(
             $this->populateSubmissionCR,
             $this->wrapped->getClientID(),

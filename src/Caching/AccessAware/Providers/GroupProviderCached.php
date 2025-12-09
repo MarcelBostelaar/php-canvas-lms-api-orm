@@ -12,6 +12,7 @@ use Exception;
 class GroupProviderCached implements GroupProviderInterface{
 
     use GroupProviderProperties;
+    use PrecallTrait;
     public function __construct(
         private readonly GroupProvider $wrapped,
         private readonly CacheStorage $cache,
@@ -29,11 +30,7 @@ class GroupProviderCached implements GroupProviderInterface{
     }
 
     public function getAllGroupsInGroupCategory(\CanvasApiLibrary\Core\Models\GroupCategory $category): array{
-        //call ensure domain perms
-        //if item has domain user context, call ensure domain user perms
-        //if item has domain course user context, call:
-            //ensure domain course perms
-            //ensure domain course user perms
+        $this->doPreCacheCall();
 
         $collectionKey = "getAllGroupsInGroupCategory" . $category->getUniqueId();
         $item = $this->cache->getCollection(
@@ -84,6 +81,8 @@ class GroupProviderCached implements GroupProviderInterface{
     }
 
     public function populateGroup(\CanvasApiLibrary\Core\Models\Group $group): \CanvasApiLibrary\Core\Models\Group{
+        $this->doPreCacheCall();
+
         return $this->cache->trySingleValue(
             $group->getUniqueId(),
             $this->ttl,
