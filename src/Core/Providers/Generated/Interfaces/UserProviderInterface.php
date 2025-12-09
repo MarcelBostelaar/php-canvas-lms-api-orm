@@ -8,7 +8,7 @@ use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
 use CanvasApiLibrary\Core\Models\Group;
 use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Models\Course;
-use CanvasApiLibrary\Core\Models\User;
+use CanvasApiLibrary\Core\Models\UserStub;
 
 interface UserProviderInterface extends HandleEmittedInterface{
 
@@ -56,9 +56,9 @@ interface UserProviderInterface extends HandleEmittedInterface{
     public function getUsersInCourse(Course $course, ?string $enrollmentRoleFilter) : mixed;
 
     /**
-    * @param User $user
-    * @return User
+    * @param UserStub $user
+    * @return CanvasApiLibrary\Core\Models\User
     */
-    public function populateUser(User $user) : User;
+    public function populateUser(UserStub $user) : CanvasApiLibrary\Core\Models\User;
 
 }

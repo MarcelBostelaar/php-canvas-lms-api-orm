@@ -6,7 +6,7 @@ use CanvasApiLibrary\Core\Models\IdentityTraits\Atomic\OptionalCourseContextTrai
 
 trait DomainBoundIdOptionalCourseContextTrait{
     use DomainBoundIdTrait{
-        initIdentityTraits as protected wrappedInitIdentityTraits;
+        DomainBoundIdTrait::initIdentityTraits as protected wrappedInitIdentityTraits;
     }
     use OptionalCourseContextTrait;
 

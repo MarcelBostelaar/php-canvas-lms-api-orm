@@ -2,6 +2,7 @@
 namespace CanvasApiLibrary\Core\Providers;
 
 use CanvasApiLibrary\Core\Models\Section;
+use CanvasApiLibrary\Core\Models\UserStub;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\UserProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
@@ -31,6 +32,10 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
                 ->keyCopy("name"));
     }
 
+    /**
+     * @param Models\Group $group
+     * @return User[]
+     */
     public function getUsersInGroup(Models\Group $group): array{
         return $this->GetMany( "/groups/{$group->id}/users", $group->getContext());
     }
@@ -90,27 +95,28 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
 
     /**
      * Populates a user from the canvas API.
-     * @param Models\User $user
+     * @param Models\UserStub $user
      * @return Models\User
      */
-    public function populateUser(User $user): User{
+    public function populateUser(UserStub $user): User{
         if($user->optionalCourseContext === null){
             //Must be retrieved from global route. Note that only admins can do this.
-            $this->Get("/users/{$user->id}",
+            /** @var User $result */
+            $result = $this->Get("/users/{$user->id}",
             $user->getContext(), 
-            $this->modelPopulator->withInstance($user),
+            null,
             null,
                 //Wrap the handler for this specific call to throw an explanatory exception with a message on 404 not found instead.
             new ErrorOnNotFoundStatusHandlerWrapper($this->statusHandler, "Api route returned not found. Ensure that your API key has admin rights in your Canvas LMS api environment, or provide this user with a course context to retrieve it from.")
         );
-            return $user;
+            return $result;
         }
         
         //Try to find the user within the course provided as the current context.
-        $this->Get("courses/{$user->optionalCourseContext->id}/users/{$user->id}",
-            $user->getContext(), 
-            $this->modelPopulator->withInstance($user)
+        /** @var User $result */
+        $result = $this->Get("courses/{$user->optionalCourseContext->id}/users/{$user->id}",
+            $user->getContext()
         );
-        return $user;
+        return $result;
     }
 }

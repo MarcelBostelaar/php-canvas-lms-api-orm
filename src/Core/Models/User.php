@@ -1,13 +1,10 @@
 <?php
 
 namespace CanvasApiLibrary\Core\Models;
-use CanvasApiLibrary\Core\Models\IdentityTraits\DomainBoundIdOptionalCourseContextTrait;
-use CanvasApiLibrary\Core\Models\Generated\UserProperties;
-use CanvasApiLibrary\Core\Models\Utility\AbstractCanvasPopulatedModel;
+use CanvasApiLibrary\Core\Models\Generated\UserProperties;;
 
-class User extends AbstractCanvasPopulatedModel{
+class User extends UserStub{
     use UserProperties;
-    use DomainBoundIdOptionalCourseContextTrait;
     protected static array $properties = [
         ["string", "name"]
     ];

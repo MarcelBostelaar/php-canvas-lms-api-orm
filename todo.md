@@ -9,11 +9,11 @@
 
 [] Modify services to take better account of forbidden/unauthorized vs 404 errors, and use it in user service check om niet admin keys te ondervangen. Gebruik in dat specifieke geval de optional course.
 
-[] Maak plural field protected
+[x] Maak plural field protected
 [x] ~~Check of we uberhaupt nog een non-nullable fields veld nodig hebben nu we de identity kern via traits doen~~
-[] Maak voor alle models een "stub" versie met alleen de identity (en optionele context)
-en accepteer die in services ipv de hele. Maak dan volledige versies die die subclassen, en geef die specifiek terug.
-[] Maak dan ook de verschillende niveas aan user objects als aparte models die die andere subclassen.
+[] ~~Maak voor alle models een "stub" versie met alleen de identity (en optionele context) en accepteer die in services ipv de hele. Maak dan volledige versies die die subclassen, en geef die specifiek terug.~~
+[x] Maak voor user een stub versie.
+[x] Maak dan ook de verschillende niveas aan user objects als aparte models die die andere subclassen.
 
 [x] Maak de permission manager ook dependency injected.
 [x] Maak de types van de caching dingen generic.

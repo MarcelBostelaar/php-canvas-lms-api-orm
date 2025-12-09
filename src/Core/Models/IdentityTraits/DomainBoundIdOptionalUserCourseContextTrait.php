@@ -7,7 +7,7 @@ use CanvasApiLibrary\Core\Models\IdentityTraits\Atomic\OptionalUserContextTrait;
 
 trait DomainBoundIdOptionalUserCourseContextTrait{
     use DomainBoundIdTrait{
-        initIdentityTraits as protected wrappedInitIdentityTraits;
+        DomainBoundIdTrait::initIdentityTraits as protected wrappedInitIdentityTraits;
     }
     use OptionalCourseContextTrait;
     use OptionalUserContextTrait;
