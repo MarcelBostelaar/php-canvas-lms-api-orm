@@ -117,25 +117,19 @@ function fileEnd(){
  * @param mixed $chosenTraitName
  * @param array{type: string, name: string} $regularProperties
  * @param array{type: string, name: string} $nullableProperties
- * @param array{type: string, name: string} $minimumProperties
- * @param array{type: string, name: string} $minimumModelProperties
  * @param array{type: string, name: string} $ModelProperties
  * @param array{type: string, name: string} $nullableModelProperties
  * @return string
  */
-function GenerateFullModelTrait($originalModelName, $chosenTraitName, array $regularProperties, array $nullableProperties, array $minimumProperties, array $minimumModelProperties, array $ModelProperties, array $nullableModelProperties){
+function GenerateFullModelTrait($originalModelName, $chosenTraitName, array $regularProperties, array $nullableProperties, array $ModelProperties, array $nullableModelProperties){
     // var_dump($regularProperties);
     ob_start();
-    $usedModels = array_unique(array_map(fn($x) => $x["type"], array_merge($ModelProperties, $nullableModelProperties, $minimumModelProperties)));
+    $usedModels = array_unique(array_map(fn($x) => $x["type"], array_merge($ModelProperties, $nullableModelProperties)));
     array_push($usedModels, $originalModelName);
 
     fileTop($chosenTraitName, $usedModels);
 
     foreach($regularProperties as $p){
-        property($p["type"], $p["name"]);
-        echo "\n";
-    }
-    foreach($minimumProperties as $p){
         property($p["type"], $p["name"]);
         echo "\n";
     }
@@ -146,11 +140,6 @@ function GenerateFullModelTrait($originalModelName, $chosenTraitName, array $reg
     }
 
     foreach($ModelProperties as $p){
-        modelProp($p["type"], $p["name"], false, $originalModelName);
-        echo "\n";
-    }
-
-    foreach($minimumModelProperties as $p){
         modelProp($p["type"], $p["name"], false, $originalModelName);
         echo "\n";
     }

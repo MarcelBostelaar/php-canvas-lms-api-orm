@@ -1,6 +1,7 @@
 <?php
 namespace CanvasApiLibrary\Core\Providers;
 
+use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\UserProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;

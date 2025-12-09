@@ -13,5 +13,5 @@ class Assignment extends AbstractCanvasPopulatedModel{
         [GroupCategory::class, "group_category"]
     ];
 
-    public static array $plurals = ["Assignments"];
+    protected static array $plurals = ["Assignments"];
 }

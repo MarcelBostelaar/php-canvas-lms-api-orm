@@ -34,7 +34,6 @@ use PhpParser\NodeDumper;
  */
 function processModelFile($filePath, $modelname, $traitname){
     $ast = parseFile($filePath);
-    $minimumProperties = (new FieldListFinderVisitor("minimumProperties"))->process($ast)->getList();
     $fields = (new FieldListFinderVisitor("properties"))->process($ast)->getList();
     $fieldsNullable = (new FieldListFinderVisitor("nullableProperties"))->process($ast)->getList();
     $plurals = (new PluralsFinderVisitor())->process($ast)->getPlurals();
@@ -42,7 +41,6 @@ function processModelFile($filePath, $modelname, $traitname){
     return ["ast" => $ast,
             "modelname" => $modelname,
             "traitname" => $traitname,
-            "minimumProperties" => $minimumProperties,
             "fields" => $fields,
             "fieldsNullable" => $fieldsNullable,
             "plurals" => $plurals,
