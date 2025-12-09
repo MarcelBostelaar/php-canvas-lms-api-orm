@@ -7,27 +7,32 @@ namespace CanvasApiLibrary\Core\Providers\Generated\Traits;
 
 use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
-use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Models\Course;
+use CanvasApiLibrary\Core\Models\Section;
 
 trait SectionProviderProperties{
-    abstract public function populateSection(Section $section);
+    
+    
+    
+    abstract public function populateSection(Section$section);
     
     /**
-     * Array variant of populateSection
-     * @param Section[] $sections
-     * @return Section[]
-     */
-    public function populateSections(array $sections): array{
+    * Plural version of populateSection
+    * @param Section[] $sections
+    * @return Section[]
+
+    */
+    public function populateSections(array $sections) : array{
         return array_map(fn($x) => $this->populateSection($x), $sections);
     }
-
+    
+    
     abstract public function getAllSectionsInCourse(Course $course) : array;
     
     /**
      * Summary of getAllSectionsInCourses
      * @param Course[] $courses
-     * @return Lookup<Course, Section>
+     * @return Lookup<Course, Course>
      */
     public function getAllSectionsInCourses(array $courses): Lookup{
         $lookup = new Lookup();

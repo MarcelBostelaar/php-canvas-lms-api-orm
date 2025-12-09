@@ -5,8 +5,8 @@ use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
 
-use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Models\Course;
+use CanvasApiLibrary\Core\Models\Section;
 
 interface SectionProviderInterface extends HandleEmittedInterface{
 
@@ -19,7 +19,7 @@ interface SectionProviderInterface extends HandleEmittedInterface{
 
     /**
     * @param Course[] $courses
-    * @return Lookup<Course, Section>
+    * @return Lookup<Course, Course>
     */
     public function getAllSectionsInCourses(array $courses) : Lookup;
 

@@ -5,8 +5,8 @@ use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
 
-use CanvasApiLibrary\Core\Models\Group;
 use CanvasApiLibrary\Core\Models\GroupCategory;
+use CanvasApiLibrary\Core\Models\Group;
 
 interface GroupProviderInterface extends HandleEmittedInterface{
 
@@ -19,7 +19,7 @@ interface GroupProviderInterface extends HandleEmittedInterface{
 
     /**
     * @param GroupCategory[] $groupCategories
-    * @return Lookup<GroupCategory, Group>
+    * @return Lookup<GroupCategory, GroupCategory>
     */
     public function getAllGroupsInGroupCategories(array $groupCategories) : Lookup;
 

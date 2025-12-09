@@ -5,8 +5,8 @@ use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
 
-use CanvasApiLibrary\Core\Models\Submission;
 use CanvasApiLibrary\Core\Models\Assignment;
+use CanvasApiLibrary\Core\Models\Submission;
 
 interface SubmissionProviderInterface extends HandleEmittedInterface{
 
@@ -19,7 +19,7 @@ interface SubmissionProviderInterface extends HandleEmittedInterface{
 
     /**
     * @param Assignment[] $assignments	 * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
-    * @return Lookup<Assignment, Submission>
+    * @return Lookup<Assignment, Assignment>
     */
     public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider) : Lookup;
 

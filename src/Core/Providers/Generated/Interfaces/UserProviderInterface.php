@@ -5,10 +5,10 @@ use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
 
-use CanvasApiLibrary\Core\Models\User;
 use CanvasApiLibrary\Core\Models\Group;
 use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Models\Course;
+use CanvasApiLibrary\Core\Models\User;
 
 interface UserProviderInterface extends HandleEmittedInterface{
 
@@ -21,19 +21,19 @@ interface UserProviderInterface extends HandleEmittedInterface{
 
     /**
     * @param Group[] $groups
-    * @return Lookup<Group, User>
+    * @return Lookup<Group, Group>
     */
     public function getUsersInGroups(array $groups) : Lookup;
 
     /**
     * @param Section[] $sections	 * @param ?string $enrollmentRoleFilter
-    * @return Lookup<Section, User>
+    * @return Lookup<Section, Section>
     */
     public function getUsersInSections(array $sections, ?string $enrollmentRoleFilter) : Lookup;
 
     /**
     * @param Course[] $courses	 * @param ?string $enrollmentRoleFilter
-    * @return Lookup<Course, User>
+    * @return Lookup<Course, Course>
     */
     public function getUsersInCourses(array $courses, ?string $enrollmentRoleFilter) : Lookup;
 

@@ -10,14 +10,19 @@ use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Models\Assignment;
 
 trait AssignmentProviderProperties{
-    abstract public function populateAssignment(Assignment $assignment);
+    
+    
+    
+    abstract public function populateAssignment(Assignment$assignment);
     
     /**
-     * Array variant of populateAssignment
-     * @param Assignment[] $assignments
-     * @return Assignment[]
-     */
-    public function populateAssignments(array $assignments): array{
+    * Plural version of populateAssignment
+    * @param Assignment[] $assignments
+    * @return Assignment[]
+
+    */
+    public function populateAssignments(array $assignments) : array{
         return array_map(fn($x) => $this->populateAssignment($x), $assignments);
     }
-}
+    
+    }

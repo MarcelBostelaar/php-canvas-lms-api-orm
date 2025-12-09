@@ -7,27 +7,32 @@ namespace CanvasApiLibrary\Core\Providers\Generated\Traits;
 
 use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
-use CanvasApiLibrary\Core\Models\Submission;
 use CanvasApiLibrary\Core\Models\Assignment;
+use CanvasApiLibrary\Core\Models\Submission;
 
 trait SubmissionProviderProperties{
-    abstract public function populateSubmission(Submission $submission);
+    
+    
+    
+    abstract public function populateSubmission(Submission$submission);
     
     /**
-     * Array variant of populateSubmission
-     * @param Submission[] $submissions
-     * @return Submission[]
-     */
-    public function populateSubmissions(array $submissions): array{
+    * Plural version of populateSubmission
+    * @param Submission[] $submissions
+    * @return Submission[]
+
+    */
+    public function populateSubmissions(array $submissions) : array{
         return array_map(fn($x) => $this->populateSubmission($x), $submissions);
     }
-
+    
+    
     abstract public function getSubmissionsInAssignment(Assignment $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider) : array;
     
     /**
      * Summary of getSubmissionsInAssignments
      * @param Assignment[] $assignments
-     * @return Lookup<Assignment, Submission>
+     * @return Lookup<Assignment, Assignment>
      */
     public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider): Lookup{
         $lookup = new Lookup();

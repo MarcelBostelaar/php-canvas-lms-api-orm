@@ -38,8 +38,6 @@ function buildProviders($folder, $models){
             "usedModels" => $usedModels
             ] = generateFullProviderTrait(
             $provider['traitname'],
-            $provider['modelname'],
-            $pluralLookup[$provider['modelname']],
             $provider['methods'],
             $pluralLookup
         );

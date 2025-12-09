@@ -7,27 +7,32 @@ namespace CanvasApiLibrary\Core\Providers\Generated\Traits;
 
 use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
-use CanvasApiLibrary\Core\Models\Group;
 use CanvasApiLibrary\Core\Models\GroupCategory;
+use CanvasApiLibrary\Core\Models\Group;
 
 trait GroupProviderProperties{
-    abstract public function populateGroup(Group $group);
+    
+    
+    
+    abstract public function populateGroup(Group$group);
     
     /**
-     * Array variant of populateGroup
-     * @param Group[] $groups
-     * @return Group[]
-     */
-    public function populateGroups(array $groups): array{
+    * Plural version of populateGroup
+    * @param Group[] $groups
+    * @return Group[]
+
+    */
+    public function populateGroups(array $groups) : array{
         return array_map(fn($x) => $this->populateGroup($x), $groups);
     }
-
+    
+    
     abstract public function getAllGroupsInGroupCategory(GroupCategory $category) : array;
     
     /**
      * Summary of getAllGroupsInGroupCategories
      * @param GroupCategory[] $groupCategories
-     * @return Lookup<GroupCategory, Group>
+     * @return Lookup<GroupCategory, GroupCategory>
      */
     public function getAllGroupsInGroupCategories(array $groupCategories): Lookup{
         $lookup = new Lookup();

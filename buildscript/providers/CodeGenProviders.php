@@ -1,6 +1,7 @@
 <?php
 
 namespace Buildscript\Providers;
+use Exception;
 use function Buildscript\tryExtractModelClassName;
 
 /**
@@ -9,20 +10,9 @@ use function Buildscript\tryExtractModelClassName;
  * @param string $modelname
  * @param string[] $modelPlurals
  * @param string[] $usedModels
- * @return array{
- *     name: string,
- *     parameters: array{
- *          type: string,
- *          name: string,
- *          annotatedtype: string
- *     },
- *     returnType: array{
- *          type: string,
- *          annotatedtype: string
- *     }
- * } The created method
+ * @return void
  */
-function fileTop($traitname, $modelname, $modelPlurals, $usedModels){
+function fileTop($traitname, $usedModels){
 ?>
 /* Automatically generated to provide array mapped versions of methods in a provider, 
 as well as missing alias methods for models with multiple plural names.
@@ -40,35 +30,9 @@ use CanvasApiLibrary\Core\Models\<?=$usedModel?>;
 ?>
 
 trait <?=$traitname?>{
-    abstract public function populate<?=$modelname?>(<?=$modelname?> $<?=lcfirst($modelname)?>);
-<?php
-    //Generate a plural variant for each plural name variant.
-    foreach($modelPlurals as $pluralName){?>
     
-    /**
-     * Array variant of populate<?=$modelname?>
-
-     * @param <?=$modelname?>[] $<?=lcfirst($pluralName)?>
-
-     * @return <?=$modelname?>[]
-     */
-    public function populate<?=$pluralName?>(array $<?=lcfirst($pluralName)?>): array{
-        return array_map(fn($x) => $this->populate<?=$modelname?>($x), $<?=lcfirst($pluralName)?>);
-    }
+    
 <?php
-    }
-    return [
-        "name" => "populate$pluralName",
-        "parameters" => [[
-            "name" => lcfirst($pluralName),
-            "type" => "array",
-            "annotatedtype" => $modelname.'[]'
-        ]],
-        "returnType" => [
-            "type" => "array",
-            "annotatedtype" => $modelname.'[]'
-        ]
-    ];
 }
 
 /**
@@ -87,6 +51,50 @@ function generateAbstractOriginal($name, $params){
 
     abstract public function <?=$name?>(<?=$paramString?>) : array;
 <?php
+}
+
+function generateAbstractPopulator($modelname){
+    ?>
+    
+    abstract public function populate<?=$modelname?>(<?=$modelname . '$' . lcfirst($modelname)?>);
+    <?php
+}
+
+/**
+ * Summary of Buildscript\Providers\generatePopulator
+ * @param mixed $modelname Original name of model
+ * @param mixed $togenerate Plural name of model
+ * @return array{name: string, parameters: array, returnType: array{annotatedtype: string, type: string}}
+ */
+function generatePopulator($modelname, $togenerate){
+    $param = '$' . lcfirst($togenerate);
+    ?>
+
+    /**
+    * Plural version of populate<?=$modelname?>
+
+    * @param <?=$modelname?>[] <?=$param?>
+
+    * @return <?=$modelname?>[]
+
+    */
+    public function populate<?=$togenerate?>(array <?=$param?>) : array{
+        return array_map(fn($x) => $this->populate<?=$modelname?>($x), <?=$param?>);
+    }
+    
+    <?php
+    return [
+        "name" => "populate$togenerate",
+        "parameters" => [[
+            "name" => lcfirst($togenerate),
+            "type" => "array",
+            "annotatedtype" => $modelname.'[]'
+        ]],
+        "returnType" => [
+            "type" => "array",
+            "annotatedtype" => $modelname.'[]'
+        ]
+    ];
 }
 
 /**
@@ -114,6 +122,7 @@ function generateAbstractOriginal($name, $params){
  * }
  */
 function generateAlias($aliasInfo, $original){
+    // var_dump($aliasInfo);
     $newMethodName = $aliasInfo['methodPrefix'] . $aliasInfo['originalModelPlural'] . 'In' . $aliasInfo['originalSubjectSingular'];
     $originalMethodName = $original['methodPrefix'] . $original['originalModelPlural'] . 'In' . $original['originalSubjectSingular'];
     $paramString = implode(', ', array_map(fn($p) => "{$p['type']} \${$p['name']}", $aliasInfo['parameters']));
@@ -124,7 +133,7 @@ function generateAlias($aliasInfo, $original){
      * Alias of <?=$originalMethodName?>
 
      */
-    public function <?=$newMethodName?>(<?=$paramString?>): <?=$aliasInfo['returnType']?>{
+    public function <?=$newMethodName?>(<?=$paramString?>): <?=$aliasInfo['returnType']["type"]?>{
         return $this-><?=$originalMethodName?>(<?=$originalParamString?>);
     }
     <?php
@@ -228,27 +237,30 @@ function fileEnd(){
  *          name: string
  *     }, returnType: string}
  */
-function processMethods($methodsToGenerateFor, $modelPlurals, $modelOriginalName){
-    $methodsToGenerateFor = array_filter($methodsToGenerateFor, fn($x) => $x['name'] != "populate$modelOriginalName");
+function processXinYmethods($methodsToGenerateFor, $pluralLookup){
+    $methodsToGenerateFor = array_filter($methodsToGenerateFor, fn($x) => !str_starts_with($x['name'], "populate"));
     //go through method, extract prefix, original method plural, original subject single
-    $originalMethods = array_map(function($method) use($modelPlurals){
+    $originalMethods = array_map(function($method) use($pluralLookup){
         if(!str_contains($method['name'], 'In')){
             echo "Warning: Could not determine original method for " . $method['name'] . " since it does not contain 'In'\n";
             return null;
         }
         [$left, $subjectSingular] = explode('In', $method['name']);
         //if left end with one of the model plurals, remove it, if none, throw exception
-        foreach($modelPlurals as $modelPlural){
-            if(str_ends_with($left, $modelPlural)){
-                $methodPrefix = substr($left, 0, -strlen($modelPlural));
-                $originalModelPlural = substr($left, strlen($methodPrefix));
-                return [
-                    'methodPrefix' => $methodPrefix,
-                    'originalModelPlural' => $originalModelPlural,
-                    'originalSubjectSingular' => $subjectSingular,
-                    'parameters' => $method['parameters'],
-                    'returnType' => $method['returnType']
-                ];
+        foreach($pluralLookup as $originalmodel => $modelPlurals){
+            foreach($modelPlurals as $plural){
+                if(str_ends_with($left, $plural)){
+                    $methodPrefix = substr($left, 0, -strlen($plural));
+                    $originalModelPlural = substr($left, strlen($methodPrefix));
+                    return [
+                        'methodPrefix' => $methodPrefix,
+                        'originalModelPlural' => $originalModelPlural,
+                        'originalSubjectSingular' => $subjectSingular,
+                        'originalModelSingular' => $originalmodel,
+                        'parameters' => $method['parameters'],
+                        'returnType' => $method['returnType']
+                    ];
+                }
             }
         }
         echo "Warning: Could not determine original method for " . $method['name'] . " with model plurals: " . implode(", ", $modelPlurals);
@@ -259,6 +271,24 @@ function processMethods($methodsToGenerateFor, $modelPlurals, $modelOriginalName
     return array_filter($originalMethods, fn($x) => $x !== null);
 }
 
+function processPopulateMethods($methodsToGenerateFor, $modelPlurals){
+    $methodsToGenerateFor = array_filter($methodsToGenerateFor, fn($x) => str_starts_with($x['name'], "populate"));
+    $originalMethods = array_map(function($method) use($modelPlurals){
+        // var_dump($method["name"]);
+        $modelName = substr($method["name"], strlen("populate"));
+        if(!isset($modelPlurals[$modelName])){
+            echo "Warning: Could not determine model of " . $method['name'] . ", tried to find: '" . $modelName . "' with model plurals: " . serialize($modelPlurals);
+            return null;
+        }
+        return [
+            "modelname" => $modelName,
+            "generatePopulateMethods" => $modelPlurals[$modelName]
+        ];
+        // throw new \Exception("Could not determine original method for " . $method['name'] . " with model plurals: " . implode(", ", $modelPlurals));
+    }, $methodsToGenerateFor);
+    return array_filter($originalMethods, fn($x) => $x !== null);
+}
+
 /**
  * Creates info items for which alias methods need to be made. Such as when only GetCactussesForCity exists, but GetCactiForCity needs to also exist.
  * @param array{methodPrefix: string, originalModelPlural: string, originalSubjectSingular: string, 
@@ -266,36 +296,35 @@ function processMethods($methodsToGenerateFor, $modelPlurals, $modelOriginalName
  *          type: string,
  *          name: string
  *     }, returnType: string} $originalMethods
- * @param string[] $modelPlurals
+ * @param array $pluralLookup
  * @return array{methodPrefix: string, originalModelPlural: string, originalSubjectSingular: string, 
  *      parameters: array{
  *          type: string,
  *          name: string
  *     }, returnType: string, original: mixed}
  */
-function createAliasItems($originalMethods, $modelPlurals){
-    //First create missing alternative plurals in the original methods, so that we have all variants
-    //Create a lookup of the original methods by methodPrefix + originalModelPlural + originalSubjectSingular
-    $originalMethodLookup = [];
-    foreach($originalMethods as $method){
-        $key = $method['methodPrefix'] . '|' . $method['originalModelPlural'] . '|' . $method['originalSubjectSingular'];
-        $originalMethodLookup[$key] = $method;
+function createAliasItems($originalMethods, $pluralLookup){
+    $lookup = [];
+    foreach($originalMethods as $original){
+        $lookup[$original["methodPrefix"] . $original["originalModelPlural"] . $original["originalSubjectSingular"]] = true; 
     }
+    //First create missing alternative plurals in the original methods, so that we have all variants
 
     $aliasMethods = [];
     //Try all variants for the model plurals, add them if they do not exist
     foreach($originalMethods as $method){
-        foreach($modelPlurals as $modelPlural){
-            $key = $method['methodPrefix'] . '|' . $modelPlural . '|' . $method['originalSubjectSingular'];
-            if(!isset($originalMethodLookup[$key])){
+        foreach($pluralLookup[$method["originalModelSingular"]] as $modelPlural){
+            if(!isset($lookup[$original["methodPrefix"] . $modelPlural . $original["originalSubjectSingular"]])){
                 $aliasMethods[] = [
                     'methodPrefix' => $method['methodPrefix'],
                     'originalModelPlural' => $modelPlural,
+                    'originalModelSingular' => $method['originalModelSingular'],
                     'originalSubjectSingular' => $method['originalSubjectSingular'],
                     'parameters' => $method['parameters'],
                     'returnType' => $method['returnType'],
                     'original' => $method
                 ];
+                $lookup[$original["methodPrefix"] . $modelPlural . $original["originalSubjectSingular"]] = true;
             }
         }
     }
@@ -319,11 +348,11 @@ function createAliasItems($originalMethods, $modelPlurals){
  * @param array<string, string> $reversePluralLookup Mapping of plural to singular names.
  * @return array
  */
-function generateFullProviderTrait($traitname, $modelname, $modelPlurals, $methodsToGenerateFor, $pluralLookup){
-    echo "Generating trait: $traitname for provider of model: $modelname\n";
+function generateFullProviderTrait($traitname, $methodsToGenerateFor, $pluralLookup){
+    echo "Generating trait: $traitname\n";
     $allMethodsCreated = [];
     //clean up the parameter types to use model names instead of full class names, also collect used models
-    $usedModelsInParams = [$modelname];
+    $usedModelsInParams = [];//[$modelname];
     foreach($methodsToGenerateFor as &$method){
         foreach($method['parameters'] as &$param){
             $type = $param['type'];
@@ -340,13 +369,11 @@ function generateFullProviderTrait($traitname, $modelname, $modelPlurals, $metho
     $usedModelsInParams = array_unique($usedModelsInParams);
 
     //go through method, extract prefix, original method plural, original subject single
-    $originalMethods = processMethods($methodsToGenerateFor, $modelPlurals, $modelname);
+    $originalMethods = processXinYmethods($methodsToGenerateFor, $pluralLookup);
+    $populatorsToGenerate = processPopulateMethods($methodsToGenerateFor, $pluralLookup);
     
     //Get alias items for missing plural variants of the original methods based on the core models plurals
-    $aliasItems = [];
-    if(count($modelPlurals) >= 2){ //No need to create aliases if main model has only one plural, since no alternatives can exist.
-        $aliasItems = createAliasItems($originalMethods, $modelPlurals);
-    }
+    $aliasItems = createAliasItems($originalMethods, $pluralLookup);
 
     $totalMethodsToGenerateFor = array_merge($originalMethods, $aliasItems);
     $totalMethodsToGenerateFor = array_filter($totalMethodsToGenerateFor, fn($x) => $x !== null);
@@ -354,11 +381,18 @@ function generateFullProviderTrait($traitname, $modelname, $modelPlurals, $metho
     $fullAliasNames = array_map(fn($alias) => $alias['methodPrefix'] . $alias['originalModelPlural'] . 'In' . $alias['originalSubjectSingular'], $aliasItems);
 
     ob_start();
-    $allMethodsCreated[] = fileTop($traitname, $modelname, $modelPlurals, $usedModelsInParams);
+    fileTop($traitname, $usedModelsInParams);
     //Aliases
     foreach($aliasItems as $aliasInfo){
         $original = $aliasInfo['original'];
         $allMethodsCreated[] = generateAlias($aliasInfo, $original);
+    }
+
+    foreach($populatorsToGenerate as $populator){
+        generateAbstractPopulator($populator['modelname']);
+        foreach($populator['generatePopulateMethods'] as $togenerate){
+            $allMethodsCreated[] = generatePopulator($populator["modelname"], $togenerate);
+        }
     }
 
     //multi methods
@@ -375,7 +409,7 @@ function generateFullProviderTrait($traitname, $modelname, $modelPlurals, $metho
                 $methodInfo['methodPrefix'],
                 $subjectSingular,
                 $subjectPlural,
-                $modelname,
+                $methodInfo['originalSubjectSingular'],
                 $methodInfo['originalModelPlural'],
                 $methodInfo['parameters'] //ide error about how the 6th arg is a string should not exist
             );
