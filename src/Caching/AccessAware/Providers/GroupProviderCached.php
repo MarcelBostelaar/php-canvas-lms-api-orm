@@ -3,10 +3,11 @@
 namespace CanvasApiLibrary\Caching\AccessAware\Providers;
 
 use CanvasApiLibrary\Caching\AccessAware\Interfaces\CacheStorage;
-use CanvasApiLibrary\Caching\AccessAware\PermissionsHandler;
+use CanvasApiLibrary\Caching\AccessAware\Interfaces\PermissionsHandlerInterface;
 use CanvasApiLibrary\Core\Providers\GroupProvider;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\GroupProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\GroupProviderInterface;
+use Exception;
 
 class GroupProviderCached implements GroupProviderInterface{
 
@@ -14,7 +15,8 @@ class GroupProviderCached implements GroupProviderInterface{
     public function __construct(
         private readonly GroupProvider $wrapped,
         private readonly CacheStorage $cache,
-        private readonly int $ttl
+        private readonly int $ttl,
+        private readonly PermissionsHandlerInterface $permissionHandler
     ) {
     }
 
@@ -27,21 +29,12 @@ class GroupProviderCached implements GroupProviderInterface{
     }
 
     public function getAllGroupsInGroupCategory(\CanvasApiLibrary\Core\Models\GroupCategory $category): array{
-        //TODO add permission backpropagation. Een groupcategory en een group hebben niet een indicatie waarbij ze horen, maar:
-        // 1. In een group zitten studenten.
-        // 2. Groups zitten in een category
-        // Zodra van een group users worden opgehaald, kan je die user permissions toepassen op de group
-        // Zodra de group een userpermission heeft, kan je die toepaasen op de group category
-        // TODO implementeer permission dependency in de cache provider, 
-        // dat automatisch permissions backpropagate als deze gevonden worden.
-        // Misschien dat backpropagation per soort permission gelimiteerd moet worden?
-        //  Of levert het geen probleem op dat de permission van een student deze route aflegt:
-        // User (user+course+domain) -> Group -> Group category -> assignment -> course
-        // Ik denk dat handmatig de backpropagation relatief definieren genoeg is, want het is niet nodig
-        // om assignment de permissions van een group category te geven, 
-        // want de assignment hoord al bij een course, een van de 3 soorten permission (user/course/domain, course/domain, individual)
-        
-        //Cant ensure permissions for a course because GC is not neccecarily course bound.
+        //call ensure domain perms
+        //if item has domain user context, call ensure domain user perms
+        //if item has domain course user context, call:
+            //ensure domain course perms
+            //ensure domain course user perms
+
         $collectionKey = "getAllGroupsInGroupCategory" . $category->getUniqueId();
         $item = $this->cache->getCollection(
             $collectionKey,
@@ -51,14 +44,43 @@ class GroupProviderCached implements GroupProviderInterface{
             return $item->value;
         }
         //No hit
-        $actualItems = $this->getAllGroupsInGroupCategory($category);
-        $exampleContext = unknown;
-        $permissionType
-        $this->cache->ensureCollection(
-            $collectionKey,
+        $actualItems = $this->wrapped->getAllGroupsInGroupCategory($category);
 
-        );
+        //Allowed contexts are the all user permissions of DomainUser type in this domain
+        $knownFilters = [$this->permissionHandler->contextFilterDomainUser($category->domain)];
+        if($category->optionalCourseContext !== null){
+            //and user permissions of the DomainCourseUser type in this course (in this domain)
+            $knownFilters[] = $this->permissionHandler->contextFilterDomainCourseUser(
+                $category->optionalCourseContext
+            );
+        }
 
+        //Set up collection
+        $this->cache->ensureCollection($collectionKey, $this->ttl, ...$knownFilters);
+        
+        //Set up permission backpropagation from groups.
+        //Propagate back all domainuser perms
+        $this->cache->setBackpropagation($collectionKey, 
+        $this->permissionHandler->domainUserType(),
+        $category->getUniqueId());
+
+        //Propagate back all domainCourseUser perms
+        $this->cache->setBackpropagation($collectionKey, 
+        $this->permissionHandler->domainCourseUserType(),
+        $category->getUniqueId());
+
+        //Add individual items to the cache
+        foreach($actualItems as $item){
+            $this->cache->setCollectionItem(
+                $collectionKey, 
+                $item->getUniqueId(), 
+                $item->withMetaDataStripped(), 
+                $this->ttl,
+                $this->getClientID());
+                //Do not set permissions, as permissions must be backpropagated from the users which come out of the groups.
+        }
+        //No permissions can be assigned to the client from this endpoint.
+        return $actualItems;
     }
 
     public function populateGroup(\CanvasApiLibrary\Core\Models\Group $group): \CanvasApiLibrary\Core\Models\Group{
@@ -66,8 +88,7 @@ class GroupProviderCached implements GroupProviderInterface{
             $group->getUniqueId(),
             $this->ttl,
             $this->getClientID(),
-            PermissionsHandler::individualPermission($group->getUniqueId()),
             fn()=> $this->wrapped->populateGroup($group)
-        );
+        ); //Cannot set up permissions, must be backwards propagated from users in group.
     }
 }
