@@ -3,26 +3,36 @@
 namespace CanvasApiLibrary\Caching\AccessAware\Interfaces;
 
 use CanvasApiLibrary\Caching\AccessAware\CacheResult;
-use CanvasApiLibrary\Caching\AccessAware\PermissionsHandler;
+use CanvasApiLibrary\Caching\AccessAware\PermissionsHandlerInterface;
 use CanvasApiLibrary\Core\Models\Course;
-use CanvasApiLibrary\Core\Models\Domain;
 use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
 
+/**
+ * Caching class used in cached providers.
+ * @template Permission
+ * @template ContextFilter
+ * @template PermissionType
+ */
 class CacheStorage{
-
+    /**
+     * @param CacheProvider<Permission, ContextFilter, PermissionType> $cache
+     * @param UserProviderInterface $userProvider
+     * @param PermissionsHandlerInterface<Permission, ContextFilter, PermissionType> $permissionHandler
+     */
     public function __construct(
         private readonly CacheProvider $cache,
-        private readonly UserProviderInterface $userProvider
+        private readonly UserProviderInterface $userProvider,
+        private readonly PermissionsHandlerInterface $permissionHandler
         ) {
     }
 
     /**
      * Returns a boolean indicating whether or not the client has any know permissions in a given context.
      * @param string $clientID
-     * @param string $contextFilter Filter for the context in which to check for any existing permissions.
+     * @param ContextFilter $contextFilter Filter for the context in which to check for any existing permissions.
      * @return bool
      */
-    protected function hasPermissionsInContext(string $clientID, string $contextFilter): bool{
+    protected function hasPermissionsInContext(string $clientID, mixed $contextFilter): bool{
         return $this->cache->hasPermissionsInContext($clientID, $contextFilter);
     }
 
@@ -31,14 +41,14 @@ class CacheStorage{
      * @param string $key
      * @param mixed $value
      * @param int $ttl Times in seconds to keep cache
-     * @param string $permissionsRequired Permission tokens to access this cache. 
+     * @param ContextFilter $permissionsRequired Permission tokens to access this cache. 
      *      User has to provide this tokens in order to allow for cache hit. If client has any of the permissions, can access item.
      * @param string $clientID The ID by which to identify this user in the system. 
      *      Items added automatically have the associated permissions added to the clients permissions list.
      * @return void
      */
     public function setSingleItem(string $key, mixed $value, int $ttl, 
-    string $permissionRequired, string $clientID){
+    mixed $permissionRequired, string $clientID){
         $this->cache->set($key, $value, $ttl, $permissionRequired);
         $this->cache->addPermission($clientID, $permissionRequired, $ttl);
     }
@@ -61,15 +71,14 @@ class CacheStorage{
      * @param string $itemKey The key that uniquely identifies the individual item.
      * @param mixed $value
      * @param int $ttl Times in seconds to keep cache
-     * @param string $itemPermissionRequired Required permission token to access this individual item. 
+     * @param Permission $itemPermissionRequired Required permission token to access this individual item. 
      *      User has to provide this tokens in order to allow for cache hit. 
      * @param string $clientID The ID by which to identify this user in the system.
      *      Items added automatically have the associated permissions added to the clients permissions list.
-     * @param ?string $doBackPropagationToItemKey Set the 
      * @return void
      */
     public function setCollectionItem(string $collectionKey, string $itemKey, mixed $value, int $ttl, 
-    string $itemPermissionRequired, string $clientID){
+    mixed $itemPermissionRequired, string $clientID){
         $this->cache->set($itemKey, $value, $ttl, $itemPermissionRequired);
         $this->cache->addPermission($clientID, $itemPermissionRequired, $ttl);
         $this->cache->addToCollection($collectionKey, $itemKey, $ttl);
@@ -94,15 +103,22 @@ class CacheStorage{
     /**
      * Creates a new collection (if it does not already exist) endpoint. Must be called before saving items to this collection.
      * @param string $collectionKey Key
-     * @param ?string $collectionItemPersmissionContext Context filter for the items in this collection. Leave empty if unknown.
+     * @param ?ContextFilter $collectionItemPersmissionContext Context filter for the items in this collection. Leave empty if unknown.
      * @param int $ttl Time to keep this collection in cache, in seconds.
      * @return void
      */
-    public function ensureCollection(string $collectionKey, ?string $collectionItemPersmissionContext, int $ttl){
+    public function ensureCollection(string $collectionKey, mixed $collectionItemPersmissionContext, int $ttl){
         $this->cache->ensureCollection($collectionKey, $collectionItemPersmissionContext, $ttl);
     }
 
-    public function setBackpropagation(string $collectionKey, int $permissionType, string $target){
+    /**
+     * Summary of setBackpropagation
+     * @param string $collectionKey
+     * @param PermissionType $permissionType
+     * @param string $target
+     * @return void
+     */
+    public function setBackpropagation(string $collectionKey, mixed $permissionType, string $target){
         $this->cache->setBackpropagation($collectionKey, $permissionType, $target);
     }
     
@@ -135,7 +151,7 @@ class CacheStorage{
             return new CacheResult(null, false);
         }
 
-        $clientPermissions = PermissionsHandler::filterOnContext($filter, $this->cache->getClientPermissions($clientID));
+        $clientPermissions = $this->permissionHandler::filterOnContext($filter, $this->cache->getClientPermissions($clientID));
 
         //if the required permissions of all known items in this collection 
         // is a superset of the required permissions (for this context) that the client has, 
@@ -165,8 +181,8 @@ class CacheStorage{
      */
     public function ensurePermissions(Course $course, string $clientID){
         if(
-            $this->hasPermissionsInContext($clientID, PermissionsHandler::contextFilterDomainCourse($course)) ||
-            $this->hasPermissionsInContext($clientID, PermissionsHandler::contextFilterDomainCourseUser($course))){
+            $this->hasPermissionsInContext($clientID, $this->permissionHandler::contextFilterDomainCourse($course)) ||
+            $this->hasPermissionsInContext($clientID, $this->permissionHandler::contextFilterDomainCourseUser($course))){
             return;
         }
         //call saved, cached, user provider. 
@@ -200,7 +216,16 @@ class CacheStorage{
         $this->setCollection($collectionKey, $itemKeys, $ttl, $clientID);
     }
 
-    public function trySingleValue(string $itemKey, int $ttl, string $clientID, string $permission, callable $wrappedFunc): mixed{
+    /**
+     * Summary of trySingleValue
+     * @param string $itemKey
+     * @param int $ttl
+     * @param string $clientID
+     * @param Permission $permission
+     * @param callable $wrappedFunc
+     * @return mixed
+     */
+    public function trySingleValue(string $itemKey, int $ttl, string $clientID, mixed $permission, callable $wrappedFunc): mixed{
         $found = $this->getSingleItem($itemKey, $clientID);
         if($found->hit){
             return $found->value;
@@ -210,7 +235,17 @@ class CacheStorage{
         return $actualValue;
     }
 
-    public function ensureThenTrySingleValue(string $itemKey, int $ttl, Course $course, string $clientID, string $permission, callable $wrappedFunc): mixed{
+    /**
+     * Summary of ensureThenTrySingleValue
+     * @param string $itemKey
+     * @param int $ttl
+     * @param Course $course
+     * @param string $clientID
+     * @param Permission $permission
+     * @param callable $wrappedFunc
+     * @return mixed
+     */
+    public function ensureThenTrySingleValue(string $itemKey, int $ttl, Course $course, string $clientID, mixed $permission, callable $wrappedFunc): mixed{
         $this->ensurePermissions($course, $clientID);
         $found = $this->getSingleItem($itemKey, $clientID);
         if($found->hit){

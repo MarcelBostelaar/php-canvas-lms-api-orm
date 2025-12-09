@@ -3,43 +3,51 @@
 namespace CanvasApiLibrary\Caching\AccessAware\Interfaces;
 
 use CanvasApiLibrary\Caching\AccessAware\CacheResult;
-use CanvasApiLibrary\Caching\AccessAware\PermissionsHandler;
-use LogicException;
+use CanvasApiLibrary\Caching\AccessAware\PermissionsHandlerInterface;
 
 /**
  * Abstract class that can be subclassed to make a concrete cache provider for the caching system, with a backing system of your choice.
+ * 
+ * @template Permission
+ * @template ContextFilter
+ * @template PermissionType
  */
 abstract class CacheProvider{
+
+    public function __construct(private readonly PermissionsHandlerInterface $permissionHandler) {
+        
+    }
+
     /**
      * Sets the value of an item in the cache
      * Permission bound cache operation.
      * @param string $itemKey Cache key for the item, must uniquely identify this item as an individual resource.
      * @param mixed $value Value to cache
      * @param int $ttl Time to keep in cache in seconds.
-     * @param string $permissionRequired String indicating the permission required to access this item. Items may have multiple permissions, store all of them, only one is required to access it.
+     * @param Permission $permissionRequired String indicating the permission required to access this item. Items may have multiple permissions, store all of them, only one is required to access it.
      * @return void
      */
-    abstract public function set(string $itemKey, mixed $value, int $ttl, string $permissionRequired);
+    abstract public function set(string $itemKey, mixed $value, int $ttl, mixed $permissionRequired);
 
     /**
      * Adds a permission to a client. Clients can have many permissions.
      * Clientbound cache operation.
      * @param string $clientID The id for the client.
-     * @param string $permission The permission to store.
+     * @param Permission $permission The permission to store.
      * @param int $ttl Time to keep in cache in seconds.
      * @return void
      */
-    abstract public function addPermission(string $clientID, string $permission, int $ttl);
+    abstract public function addPermission(string $clientID, mixed $permission, int $ttl);
 
     /**
      * Creates a new empty collection in the cache if it does not exist already. Otherwise does nothing.
      * Unbound cache operation.
      * @param string $key Key by which to identify the collection.
-     * @param ?string $itemPermissionContextFilter The filter for permissions for items in this collection.
+     * @param ?ContextFilter $itemPermissionContextFilter The filter for permissions for items in this collection.
      * @param int $ttl Time to keep in cache in seconds.
      * @return void
      */
-    abstract public function ensureCollection(string $key, ?string $itemPermissionContextFilter, int $ttl);
+    abstract public function ensureCollection(string $key, mixed $itemPermissionContextFilter, int $ttl);
 
     /**
      * Saves a set of item keys for a given client and a given collection key.
@@ -63,6 +71,27 @@ abstract class CacheProvider{
      * @return void
      */
     abstract public function addToCollection(string $collectionKey, string $itemKey, int $ttl);
+
+    /**
+     * Sets an item as a target for permission backpropagation. Multiple permission types may be set, but the target may not be changed.
+     * All permissions that get added to the items in this colleciton, which fall within the PermissionType,
+     * get added to the permission list of the target item.
+     * This way it is possible to propagate back permissions of dependent items back to their origin.
+     * 
+     * Backpropagation should only be enabled on collections where the permission to view the target (source) model 
+     * is dependent on being allowed to view at least one of the child (dependent) models.
+     * 
+     * Example:
+     * A group is a domain bound model. It has users. Users may have a domain-course-user bound permission, or a domain-user permission.
+     * If a client has permissions to view a specific user, whether through a domain-course-user, or domain-user,
+     * they also have access to any group this user belongs to. If backpropagation is set to the domain-cours-user permission for this group,
+     * the group item also has the permissions for all users that fall under it, thus anyone with that user permission can also see the cached group.
+     * @param string $collectionKey The key with which the cached collection is stored in the database
+     * @param PermissionType $permissionType The type of permission to backpropagate.
+     * @param string $target The target which gains the permissions.
+     * @return void
+     */
+    abstract public function setBackpropagation(string $collectionKey, mixed $permissionType, string $target);
 
     /**
      * Tries to retrieve a value by key from the cache. Will do so if the client has any matching permission for any of the permissions of this item.
@@ -92,45 +121,45 @@ abstract class CacheProvider{
     public function getCollectionItemPermissionsRequired(string $key): array{
         $allPermissions = $this->getCollectionItemAllPermissionsRequired($key);
         $filter = $this->getCollectionPermissionContext($key);
-        return PermissionsHandler::filterOnContext($filter, $allPermissions);
+        return $this->permissionHandler::filterOnContext($filter, $allPermissions);
     }
     
     /**
      * Returns an array of absolutely all permissions needed to access the items stored in this collection.
      * @param string $key Cache key of the collection.
-     * @return string[] List of total permissions for all items in this collection.
+     * @return Permission[] List of total permissions for all items in this collection.
      */
     abstract protected function getCollectionItemAllPermissionsRequired(string $key): array;
 
     /**
      * Returns a boolean indicating whether or not the client has any permissions in the given context.
      * @param string $clientID The client ID
-     * @param string $contextFilter The context filter for the permissions in which to check for client permissions.
+     * @param ContextFilter $contextFilter The context filter for the permissions in which to check for client permissions.
      * @return bool True if any permission was found. False is no permission found.
      */
     public function hasPermissionsInContext(string $clientID, string $contextFilter): bool{
         $permissions = $this->getClientPermissions($clientID);
-        return \count(PermissionsHandler::filterOnContext($contextFilter, $permissions)) > 0;
+        return \count($this->permissionHandler::filterOnContext($contextFilter, $permissions)) > 0;
     }
 
     /**
      * Returns the permission type for the permissions of a collection.
      * @param string $key The collection key.
-     * @return int The type of permission that is relevant for this collection.
+     * @return PermissionType The type of permission that is relevant for this collection.
      */
     abstract public function getCollectionPermissionType(string $key): int;
 
     /**
      * Returns the context filter for the permissions of a collection.
      * @param string $key The collection key.
-     * @return ?string The context filter of permission that is relevant for this collection. Null if no filter set.
+     * @return ?ContextFilter The context filter of permission that is relevant for this collection. Null if no filter set.
      */
     abstract public function getCollectionPermissionContext(string $key): ?string;
 
     /**
      * Returns a list of all permissions that this client has.
      * @param string $clientID Id by which to identify this client.
-     * @return string[] List of all known permissions, for all contexts.
+     * @return Permission[] List of all known permissions, for all contexts.
      */
     abstract public function getClientPermissions(string $clientID): array;
 
@@ -139,7 +168,7 @@ abstract class CacheProvider{
      * Gets all the cached items in the given collection that the provided permissions provide access to.
      * Assumes permissions have already been filtered correctly.
      * @param string $key The collection key.
-     * @param string[] $permissions A list of permissions for this request.
+     * @param Permission[] $permissions A list of permissions for this request.
      * @param ?string $clientID The ID of the client for which this request has been made. 
      * The retrieved result is also added as a collectionSet for this client.
      * If null, set is not added to client.
