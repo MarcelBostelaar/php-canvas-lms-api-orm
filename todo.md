@@ -1,8 +1,8 @@
 [x] Add method to strip out metadata
 [] Strip out metadata before caching
 
-[] Remove "asadmin" en "within course" methods, they are bound to models directly
-[] Add course and user metadata to all the (non cached) service (via model populator?)
+[x] Remove "asadmin" en "within course" methods, they are bound to models directly
+[x] Add course and user metadata to all the (non cached) service (via model populator?)
 
 [x] Finish permission backpropagation.
 [] Implement permission backpropagation where needed.

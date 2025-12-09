@@ -84,9 +84,7 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
                 throw new InvalidArgumentException("Cannot pass $enrollmentRoleFilter as the role, must be null for no filtering, or one of following: student, teacher, ta, observer, designer");
         }
         return $this->GetMany( "/courses/{$course->id}/users?per_page=100$postfix", 
-        $course->getContext(),
-        $this->modelPopulator
-        ->staticFrom($course)->to("optionalCourseContext"));
+        $course->getContext()); //optional course context already handled through context system.
     }
 
     /**

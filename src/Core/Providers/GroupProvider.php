@@ -30,22 +30,9 @@ class GroupProvider extends AbstractProvider implements GroupProviderInterface{
      * @return Group[]
      */
     public function getAllGroupsInGroupCategory(Models\GroupCategory $category) : array{
-        $builder = $this->modelPopulator;
-
-        //Pass optional context to group
-        $optionalCourse = $category->optionalCourseContext;
-        $optionalUser = $category->optionalUserContext;
-
-        if($optionalCourse !== null){
-            $builder = $builder->staticFrom($optionalCourse)->to("optionalCourseContext");
-        }
-        if($optionalUser !== null){
-            $builder = $builder->staticFrom($optionalUser)->to("optionalUserContext");
-        }
-
+        //Optional context already handled through getcontext
         return $this->GetMany( "/group_categories/$category->id/groups", 
-        $category->getContext(),
-        $builder);
+        $category->getContext());
     }
 
     public function populateGroup(Group $group): Group{
