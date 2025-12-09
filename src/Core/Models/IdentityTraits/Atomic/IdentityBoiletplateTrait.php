@@ -69,6 +69,16 @@ trait IdentityBoiletplateTrait {
         }
         return null;
     }
+
+    /**
+     * Returns a clone of this model, with the metadata stripped from it. Call this before caching.
+     * @return self
+     */
+    public function withMetaDataStripped(): self{
+        $cloned = clone $this;
+        $cloned->metadata = [];
+        return $cloned;
+    }
     
 /**
      * Populates the model using the provided other models, filling in missing data.

@@ -13,8 +13,6 @@ use CanvasApiLibrary\Core\Services\StatusHandlerInterface;
 
 /**
  * Provider for Canvas API group operations
- * 
- * @method Lookup<Models\GroupCategory, Models\Group> GetAllGroupsInGroupCategories() Virtual method to get all groups in group categories
  */
 class GroupProvider extends AbstractProvider implements GroupProviderInterface{
     use GroupProviderProperties;
@@ -32,7 +30,22 @@ class GroupProvider extends AbstractProvider implements GroupProviderInterface{
      * @return Group[]
      */
     public function getAllGroupsInGroupCategory(Models\GroupCategory $category) : array{
-        return $this->GetMany( "/group_categories/$category->id/groups", $category->getContext());
+        $builder = $this->modelPopulator;
+
+        //Pass optional context to group
+        $optionalCourse = $category->optionalCourseContext;
+        $optionalUser = $category->optionalUserContext;
+
+        if($optionalCourse !== null){
+            $builder = $builder->staticFrom($optionalCourse)->to("optionalCourseContext");
+        }
+        if($optionalUser !== null){
+            $builder = $builder->staticFrom($optionalUser)->to("optionalUserContext");
+        }
+
+        return $this->GetMany( "/group_categories/$category->id/groups", 
+        $category->getContext(),
+        $builder);
     }
 
     public function populateGroup(Group $group): Group{

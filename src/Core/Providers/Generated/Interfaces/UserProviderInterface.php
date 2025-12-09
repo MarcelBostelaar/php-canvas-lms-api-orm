@@ -6,9 +6,9 @@ use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
 
 use CanvasApiLibrary\Core\Models\User;
-use CanvasApiLibrary\Core\Models\Course;
 use CanvasApiLibrary\Core\Models\Group;
 use CanvasApiLibrary\Core\Models\Section;
+use CanvasApiLibrary\Core\Models\Course;
 
 interface UserProviderInterface extends HandleEmittedInterface{
 
@@ -26,30 +26,16 @@ interface UserProviderInterface extends HandleEmittedInterface{
     public function getUsersInGroups(array $groups) : Lookup;
 
     /**
-    * @param Section[] $sections	
- * @param ?string $enrollmentRoleFilter
+    * @param Section[] $sections	 * @param ?string $enrollmentRoleFilter
     * @return Lookup<Section, User>
     */
     public function getUsersInSections(array $sections, ?string $enrollmentRoleFilter) : Lookup;
 
     /**
-    * @param Course[] $courses	
- * @param ?string $enrollmentRoleFilter
+    * @param Course[] $courses	 * @param ?string $enrollmentRoleFilter
     * @return Lookup<Course, User>
     */
     public function getUsersInCourses(array $courses, ?string $enrollmentRoleFilter) : Lookup;
-
-    /**
-    
-    * @return CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface
-    */
-    public function asAdmin() : CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
-
-    /**
-    * @param Course $course
-    * @return CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface
-    */
-    public function withinCourse(Course $course) : CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
 
     /**
     * @param Group $group
@@ -58,15 +44,13 @@ interface UserProviderInterface extends HandleEmittedInterface{
     public function getUsersInGroup(Group $group) : mixed;
 
     /**
-    * @param Section $section	
- * @param ?string $enrollmentRoleFilter
+    * @param Section $section	 * @param ?string $enrollmentRoleFilter
     * @return mixed
     */
     public function getUsersInSection(Section $section, ?string $enrollmentRoleFilter) : mixed;
 
     /**
-    * @param Course $course	
- * @param ?string $enrollmentRoleFilter
+    * @param Course $course	 * @param ?string $enrollmentRoleFilter
     * @return mixed
     */
     public function getUsersInCourse(Course $course, ?string $enrollmentRoleFilter) : mixed;

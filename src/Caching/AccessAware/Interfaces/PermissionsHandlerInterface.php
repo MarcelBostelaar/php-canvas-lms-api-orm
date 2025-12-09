@@ -1,6 +1,6 @@
 <?php
 
-namespace CanvasApiLibrary\Caching\AccessAware;
+namespace CanvasApiLibrary\Caching\AccessAware\Interfaces;
 
 use CanvasApiLibrary\Core\Models\Course;
 use CanvasApiLibrary\Core\Models\User;

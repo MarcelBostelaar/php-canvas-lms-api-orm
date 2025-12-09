@@ -8,9 +8,9 @@ namespace CanvasApiLibrary\Core\Providers\Generated\Traits;
 use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Models\User;
-use CanvasApiLibrary\Core\Models\Course;
 use CanvasApiLibrary\Core\Models\Group;
 use CanvasApiLibrary\Core\Models\Section;
+use CanvasApiLibrary\Core\Models\Course;
 
 trait UserProviderProperties{
     abstract public function populateUser(User $user);

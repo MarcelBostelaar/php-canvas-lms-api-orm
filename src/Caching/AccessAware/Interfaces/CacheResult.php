@@ -1,6 +1,6 @@
 <?php
 
-namespace CanvasApiLibrary\Caching\AccessAware;
+namespace CanvasApiLibrary\Caching\AccessAware\Interfaces;
 
 /**
  * Class that is used to generate, check and filter permissions for this caching system. Internal, static.

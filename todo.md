@@ -1,10 +1,11 @@
-[] Add method to strip out metadata
+[x] Add method to strip out metadata
 [] Strip out metadata before caching
 
 [] Remove "asadmin" en "within course" methods, they are bound to models directly
 [] Add course and user metadata to all the (non cached) service (via model populator?)
 
-[] Finish permission backpropagation.
+[x] Finish permission backpropagation.
+[] Implement permission backpropagation where needed.
 
 [] Modify services to take better account of forbidden/unauthorized vs 404 errors, and use it in user service check om niet admin keys te ondervangen. Gebruik in dat specifieke geval de optional course.
 

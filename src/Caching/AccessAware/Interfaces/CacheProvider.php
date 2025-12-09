@@ -2,9 +2,6 @@
 
 namespace CanvasApiLibrary\Caching\AccessAware\Interfaces;
 
-use CanvasApiLibrary\Caching\AccessAware\CacheResult;
-use CanvasApiLibrary\Caching\AccessAware\PermissionsHandlerInterface;
-
 /**
  * Abstract class that can be subclassed to make a concrete cache provider for the caching system, with a backing system of your choice.
  * 

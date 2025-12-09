@@ -2,8 +2,6 @@
 
 namespace CanvasApiLibrary\Caching\AccessAware\Interfaces;
 
-use CanvasApiLibrary\Caching\AccessAware\CacheResult;
-use CanvasApiLibrary\Caching\AccessAware\PermissionsHandlerInterface;
 use CanvasApiLibrary\Core\Models\Course;
 use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
 
