@@ -34,7 +34,7 @@ trait SubmissionProperties{
                 return null;
             }
             $item = new Section();
-            $item->newFromMinimumDataRepresentation($this->section_identity);
+            $item->newFromMinimumDataRepresentation($this->section_identity, $this->getContext());
             return $item;
         }
         set (?Section $value) {

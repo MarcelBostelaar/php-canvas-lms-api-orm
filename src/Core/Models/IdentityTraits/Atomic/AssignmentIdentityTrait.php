@@ -9,7 +9,7 @@ trait AssignmentIdentityTrait{
     protected mixed $assignment_identity;
     public Assignment $assignment{
         get { 
-            return Assignment::newFromMinimumDataRepresentation($this->assignment_identity);
+            return Assignment::newFromMinimumDataRepresentation($this->assignment_identity, $this->getContext());
         }
         set (Assignment $value) {
             if(!isset($this->assignment_identity)){
@@ -44,7 +44,7 @@ trait AssignmentIdentityTrait{
         $this->mdrGetters[] = fn() => [Assignment::class => $this->assignment->id];
 
         $this->mdrSetters[] = function(&$item, $data) {
-            $item->assignment = Assignment::newFromMinimumDataRepresentation($data);
+            $item->assignment = Assignment::newFromMinimumDataRepresentation($data, $this->getContext());
         };
 
         $this->integrityValidators[] = fn() => isset($this->assignment);

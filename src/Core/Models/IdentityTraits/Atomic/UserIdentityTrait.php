@@ -9,7 +9,7 @@ trait UserIdentityTrait{
     protected mixed $user_identity;
     public User $user{
         get { 
-            return User::newFromMinimumDataRepresentation($this->user_identity);
+            return User::newFromMinimumDataRepresentation($this->user_identity, $this->getContext());
         }
         set (User $value) {
             if(!isset($this->user_identity)){
@@ -44,7 +44,7 @@ trait UserIdentityTrait{
         $this->mdrGetters[] = fn() => [User::class => $this->user->id];
 
         $this->mdrSetters[] = function(&$item, $data) {
-            $item->user = User::newFromMinimumDataRepresentation($data);
+            $item->user = User::newFromMinimumDataRepresentation($data, $this->getContext());
         };
 
         $this->integrityValidators[] = fn() => isset($this->user);

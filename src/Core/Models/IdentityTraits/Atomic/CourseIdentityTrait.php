@@ -9,7 +9,7 @@ trait CourseIdentityTrait{
     protected mixed $course_identity;
     public Course $course{
         get { 
-            return Course::newFromMinimumDataRepresentation($this->course_identity);
+            return Course::newFromMinimumDataRepresentation($this->course_identity, $this->getContext());
         }
         set (Course $value) {
             if(!isset($this->course_identity)){
@@ -44,7 +44,7 @@ trait CourseIdentityTrait{
         $this->mdrGetters[] = fn() => [Course::class => $this->course->id];
 
         $this->mdrSetters[] = function(&$item, $data) {
-            $item->course = Course::newFromMinimumDataRepresentation($data);
+            $item->course = Course::newFromMinimumDataRepresentation($data, $this->getContext());
         };
 
         $this->integrityValidators[] = fn() => isset($this->course);

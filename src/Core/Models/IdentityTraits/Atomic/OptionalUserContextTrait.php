@@ -30,7 +30,7 @@ trait OptionalUserContextTrait{
             if($data === null){
                 return null;
             }
-            return User::newFromMinimumDataRepresentation($data);
+            return User::newFromMinimumDataRepresentation($data, $this->getContext());
         }
         set (User $value) {
             $data = $this->getMetadata("optionalusercontext");
@@ -50,5 +50,17 @@ trait OptionalUserContextTrait{
                 //Same user, pass.
             }
         }
+    }
+
+    protected function initializeOptionalUserContext(): void {
+        $this->contextProcessors[] = function($item) {
+            if($item instanceof User){
+                $this->optionalUserContext = $item;
+                return true;
+            }
+            return false;
+        };
+
+        $this->contextGetters[] = fn() => [$this->optionalUserContext];
     }
 }

@@ -146,11 +146,12 @@ trait IdentityBoiletplateTrait {
      * @param mixed $data Minimum data representation array
      * @return static New instance populated with the provided data
      */
-    public static function newFromMinimumDataRepresentation(mixed $data): static {
+    public static function newFromMinimumDataRepresentation(mixed $data, array $context): static {
         $item = new (static::class)();
         foreach ($item->mdrSetters as $setter) {
             $setter($item, $data);
         }
+        $item->populateWithContext($context);
         return $item;
     }
     

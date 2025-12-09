@@ -57,7 +57,7 @@ function NullableModelGetter($modelname, $propertyIdName){?>
                 return null;
             }
             $item = new <?=$modelname?>();
-            $item->newFromMinimumDataRepresentation($this-><?=$propertyIdName?>);
+            $item->newFromMinimumDataRepresentation($this-><?=$propertyIdName?>, $this->getContext());
             return $item;
         }
 <?php
@@ -70,7 +70,7 @@ function NullableModelGetter($modelname, $propertyIdName){?>
 function ModelGetter($modelname, $propertyIdName){
 ?>
         get { 
-            return <?=$modelname?>::newFromMinimumDataRepresentation($this-><?=$propertyIdName?>);
+            return <?=$modelname?>::newFromMinimumDataRepresentation($this-><?=$propertyIdName?>, $this->getContext());
         }
 <?php
 }

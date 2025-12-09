@@ -12,7 +12,7 @@ trait AssignmentProperties{
     protected mixed $group_category_identity;
     public GroupCategory $group_category{
         get { 
-            return GroupCategory::newFromMinimumDataRepresentation($this->group_category_identity);
+            return GroupCategory::newFromMinimumDataRepresentation($this->group_category_identity, $this->getContext());
         }
         set (GroupCategory $value) {
             if($value->domain != $this->domain){

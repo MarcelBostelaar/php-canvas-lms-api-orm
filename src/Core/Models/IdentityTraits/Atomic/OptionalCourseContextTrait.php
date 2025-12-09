@@ -28,7 +28,7 @@ trait OptionalCourseContextTrait{
             if($data === null){
                 return null;
             }
-            return Course::newFromMinimumDataRepresentation($data);
+            return Course::newFromMinimumDataRepresentation($data, $this->getContext());
         }
         set (Course $value) {
             $data = $this->getMetadata("optionalcoursecontext");
@@ -47,5 +47,17 @@ trait OptionalCourseContextTrait{
                 //Same course, pass.
             }
         }
+    }
+
+    protected function initializeOptionalCourseContext(): void {
+        $this->contextProcessors[] = function($item) {
+            if($item instanceof Course){
+                $this->optionalCourseContext = $item;
+                return true;
+            }
+            return false;
+        };
+
+        $this->contextGetters[] = fn() => [$this->optionalCourseContext];
     }
 }
