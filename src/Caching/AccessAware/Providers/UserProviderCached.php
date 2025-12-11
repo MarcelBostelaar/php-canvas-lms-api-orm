@@ -12,7 +12,7 @@ use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
 class UserProviderCached implements UserProviderInterface{
 
     use UserProviderProperties;
-    use PrecallTrait;
+    use PermissionEnsurerTrait;
     public function __construct(
         private readonly UserProvider $wrapped,
         private readonly FullCacheProviderInterface $cache,

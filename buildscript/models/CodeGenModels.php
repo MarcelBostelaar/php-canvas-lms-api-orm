@@ -14,7 +14,6 @@ namespace CanvasApiLibrary\Core\Models\Generated;
 
 use CanvasApiLibrary\Core\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Core\Exceptions\MixingDomainsException;
-use CanvasApiLibrary\Core\Models\Domain;
 <?php foreach($usedModels as $modelName): ?>
 use CanvasApiLibrary\Core\Models\<?=$modelName?>;
 <?php endforeach ?>

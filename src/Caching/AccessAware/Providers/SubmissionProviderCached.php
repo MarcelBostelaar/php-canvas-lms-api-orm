@@ -13,7 +13,7 @@ use CanvasApiLibrary\Core\Providers\Interfaces\SubmissionProviderInterface;
 class SubmissionProviderCached implements SubmissionProviderInterface{
 
     use SubmissionProviderProperties;
-    use PrecallTrait;
+    use PermissionEnsurerTrait;
     public function __construct(
         private readonly SubmissionProvider $wrapped,
         private readonly FullCacheProviderInterface $cache,

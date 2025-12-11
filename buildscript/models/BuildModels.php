@@ -12,9 +12,9 @@ function buildModels($folder, $targetFolderForTraits){
     }
     $mapped = [];
     foreach ($phpFiles as $file) {
-        if(str_ends_with($file[0], "Domain.php")){
-            continue;//Domain.php is special, it does not have a trait
-        }
+        // if(str_ends_with($file[0], "Domain.php")){
+        //     continue;//Domain.php is special, it does not have a trait
+        // }
         $filePath = $file[0];
         $modelname = substr(basename($filePath), 0, -4);
         $traitname = $modelname . "Properties";

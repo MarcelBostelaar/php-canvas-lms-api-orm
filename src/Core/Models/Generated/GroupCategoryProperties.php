@@ -4,7 +4,6 @@ namespace CanvasApiLibrary\Core\Models\Generated;
 
 use CanvasApiLibrary\Core\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Core\Exceptions\MixingDomainsException;
-use CanvasApiLibrary\Core\Models\Domain;
 use CanvasApiLibrary\Core\Models\GroupCategory;
 
 trait GroupCategoryProperties{

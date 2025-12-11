@@ -12,7 +12,7 @@ use Exception;
 class GroupProviderCached implements GroupProviderInterface{
 
     use GroupProviderProperties;
-    use PrecallTrait;
+    use PermissionEnsurerTrait;
     public function __construct(
         private readonly GroupProvider $wrapped,
         private readonly CacheStorage $cache,

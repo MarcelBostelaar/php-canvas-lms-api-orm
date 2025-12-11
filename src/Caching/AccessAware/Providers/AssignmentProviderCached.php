@@ -10,7 +10,7 @@ use CanvasApiLibrary\Core\Providers\Interfaces\AssignmentProviderInterface;
 class AssignmentProviderCached implements AssignmentProviderInterface{
 
     use AssignmentProviderProperties;
-    use PrecallTrait;
+    use PermissionEnsurerTrait;
 
     public function __construct(
         private readonly AssignmentProviderInterface $wrapped,
@@ -29,7 +29,7 @@ class AssignmentProviderCached implements AssignmentProviderInterface{
     }
 
     public function populateAssignment(\CanvasApiLibrary\Core\Models\Assignment $assignment): \CanvasApiLibrary\Core\Models\Assignment{
-        $this->doPreCacheCall();
+        $this->permissionEnsurer?->all();
         return $this->cache->ensureThenTrySingleValue(
             $assignment->getUniqueId(),
             $this->ttl,

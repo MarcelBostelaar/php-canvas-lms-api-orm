@@ -1,6 +1,7 @@
 <?php
 namespace CanvasApiLibrary\Core\Providers;
 
+use CanvasApiLibrary\Core\Models\Domain;
 use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Models\UserStub;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\UserProviderProperties;
@@ -91,6 +92,12 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
         }
         return $this->GetMany( "/courses/{$course->id}/users?per_page=100$postfix", 
         $course->getContext()); //optional course context already handled through context system.
+    }
+
+    public function getUserSelfInfo(Domain $domain): User{
+        /** @var User $result */
+        $result = $this->Get("/users/self", $domain->getContext());
+        return $result;
     }
 
     /**

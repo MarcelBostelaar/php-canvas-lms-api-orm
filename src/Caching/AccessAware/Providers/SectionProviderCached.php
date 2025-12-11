@@ -12,7 +12,7 @@ use CanvasApiLibrary\Core\Providers\Interfaces\SectionProviderInterface;
 class SectionProviderCached implements SectionProviderInterface{
 
     use SectionProviderProperties;
-    use PrecallTrait;
+    use PermissionEnsurerTrait;
     public function __construct(
         private readonly SectionProvider $wrapped,
         private readonly FullCacheProviderInterface $cache,

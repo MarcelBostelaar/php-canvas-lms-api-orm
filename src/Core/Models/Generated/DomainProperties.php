@@ -4,7 +4,7 @@ namespace CanvasApiLibrary\Core\Models\Generated;
 
 use CanvasApiLibrary\Core\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Core\Exceptions\MixingDomainsException;
-use CanvasApiLibrary\Core\Models\UserStub;
+use CanvasApiLibrary\Core\Models\Domain;
 
-trait UserStubProperties{
+trait DomainProperties{
 }
