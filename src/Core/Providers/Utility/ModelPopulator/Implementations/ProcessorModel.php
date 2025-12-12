@@ -1,12 +1,18 @@
 <?php
 
 namespace CanvasApiLibrary\Core\Providers\Utility\ModelPopulator;
-use CanvasApiLibrary\Core\Models\Domain;
+use CanvasApiLibrary\Core\Models\Utility\ModelInterface;
 
 class ProcessorModel implements ProcessorInterface{
+    /**
+     * @var class-string
+     */
     public function __construct(readonly private string $modelclass){}
 
-    public function process(mixed $data, array $context): array{
+    /**
+     * @param array<int, ModelInterface> $context
+     */
+    public function process(mixed $data, array $context): array {
         if($data === null){
             return [
                 "data" => null,

@@ -2,6 +2,7 @@
 
 namespace CanvasApiLibrary\Core\Providers\Utility\ModelPopulator;
 use CanvasApiLibrary\Core\Models\Utility\AbstractCanvasPopulatedModel;
+use CanvasApiLibrary\Core\Models\Utility\ModelInterface;
 use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
 use LogicException;
 
@@ -14,9 +15,10 @@ class ConsumerEmitter implements ConsumerInterface{
      *
      * @param mixed $data Arbitrary data to be consumed
      * @param AbstractCanvasPopulatedModel $model A model instance to mutate/populate
+     * @param array<int, ModelInterface> $context A list of context items.
      * @return string[] List of error messages encountered during consumption (empty when none)
      */
-    public function consumeData(mixed $data, AbstractCanvasPopulatedModel $model, ...$context): array{
+    public function consumeData(mixed $data, AbstractCanvasPopulatedModel $model, array $context): array {
         if($data === null){
             return ["Cannot pass null data to emittion handler"];
         }

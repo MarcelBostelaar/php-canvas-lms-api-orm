@@ -27,7 +27,7 @@ class ProviderKey implements ProviderInterface{
         ];
     }
 
-    public function getDescription(): string{
+    public function getDescription(): string {
         return "Key: $this->key";
     }
 }

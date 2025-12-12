@@ -12,10 +12,10 @@ class ConsumerModelKey implements ConsumerInterface{
      *
      * @param mixed $data Arbitrary data to be consumed
      * @param AbstractCanvasPopulatedModel $model A model instance to mutate/populate
-     * @param ModelInterface[] $context A list of context items.
+     * @param array<int, ModelInterface> $context A list of context items.
      * @return string[] List of error messages encountered during consumption (empty when none)
      */
-    public function consumeData(mixed $data, AbstractCanvasPopulatedModel $model, array ...$context): array{
+    public function consumeData(mixed $data, AbstractCanvasPopulatedModel $model, array $context): array {
         if($data === null){
             if(!$this->acceptsNull){
                 return [
@@ -27,11 +27,12 @@ class ConsumerModelKey implements ConsumerInterface{
         return [];
     }
 
-    private $acceptsNull = false;
+    private bool $acceptsNull = false;
+    
     /**
      * Whether this consumer accepts null data inputs without error.
      */
-    public function getAcceptsNull(): bool{
+    public function getAcceptsNull(): bool {
         return $this->acceptsNull;
     }
 

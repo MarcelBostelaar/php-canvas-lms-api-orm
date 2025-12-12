@@ -21,7 +21,7 @@ class ProviderStatic implements ProviderInterface{
         ];
     }
 
-    public function getDescription(): string{
+    public function getDescription(): string {
         return "Static data provided: " . serialize($this->data);
     }
 }

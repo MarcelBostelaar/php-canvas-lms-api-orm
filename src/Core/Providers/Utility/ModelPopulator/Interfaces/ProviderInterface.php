@@ -11,6 +11,7 @@ interface ProviderInterface
     /**
      * Retrieves data and any errors encountered while producing it.
      *
+     * @param array<string, mixed> $source
      * @return array{data:mixed, errors:string[]} An associative array where:
      *  - data: The produced arbitrary data
      *  - errors: A list of error messages (empty when none)
