@@ -9,12 +9,29 @@ use DateTime;
 use Exception;
 use LogicException;
 
+/**
+ * @template TModel of AbstractCanvasPopulatedModel
+ */
 class ModelPopulationConfigBuilder{
-    private $instructions;
+    /**
+     * @var array<int, array{0: ?ProviderInterface, 1: ProcessorInterface[], 2: ?ConsumerInterface}>
+     */
+    private array $instructions;
+    
+    /**
+     * @var class-string<TModel>
+     */
     private string $model;
 
+    /**
+     * @var TModel|null
+     */
     private ?AbstractCanvasPopulatedModel $instance = null;
 
+    /**
+     * @param class-string<TModel> $model
+     * @param array<int, array{0: ?ProviderInterface, 1: ProcessorInterface[], 2: ?ConsumerInterface}> $instructions
+     */
     public function __construct(string $model, array $instructions = [[null, [], null]]){
         $this->instructions = $instructions;
         $this->model = $model;
@@ -30,7 +47,10 @@ class ModelPopulationConfigBuilder{
         return new ModelPopulationConfigBuilder($this->model, array_merge($this->instructions, [[null, [], null]]));
     }
 
-    protected function getInstructionsFinished(){
+    /**
+     * @return array<int, array{0: ProviderInterface, 1: ProcessorInterface[], 2: ConsumerInterface}>
+     */
+    protected function getInstructionsFinished(): array{
         $stepped = $this->newInstruction();
         $lastInstruction = end($stepped->instructions);
         if($lastInstruction[0] === null & $lastInstruction[1] === [] & $lastInstruction[2] === null){
@@ -180,11 +200,11 @@ class ModelPopulationConfigBuilder{
 
     /**
      * Builds the item
-     * @param mixed $data Dictionary data
-     * @param ModelInterface[] $context 
-     * @return AbstractCanvasPopulatedModel
+     * @param array<string, mixed> $data Dictionary data
+     * @param ModelInterface ...$context 
+     * @return TModel
      */
-    public function build(array $data, ...$context) : AbstractCanvasPopulatedModel{
+    public function build(array $data, ModelInterface ...$context) : AbstractCanvasPopulatedModel{
         $errors = [];
 
         $toPopulate = $this->instance === null ? new ($this->model)() : $this->instance;
@@ -207,7 +227,12 @@ class ModelPopulationConfigBuilder{
         return $toPopulate;
     }
 
-    public function buildMany($dataArray, ...$context) : array{
+    /**
+     * @param array<int, array<string, mixed>> $dataArray
+     * @param ModelInterface ...$context
+     * @return TModel[]
+     */
+    public function buildMany(array $dataArray, ModelInterface ...$context) : array{
         if($this->instance !== null){
             throw new LogicException("Cannot build many with a pre-set instance.");
         }
@@ -221,14 +246,14 @@ class ModelPopulationConfigBuilder{
     /**
      * Summary of buildOneInstruction
      * @param AbstractCanvasPopulatedModel $toBuild
-     * @param mixed $data
+     * @param array<string, mixed> $data
      * @param ModelInterface[] $context
      * @param ProviderInterface $provider
      * @param ProcessorInterface[] $processors
      * @param ConsumerInterface $consumer
      * @return string[] Errors that have come up
      */
-    private static function buildOneInstruction($toBuild, $data, $context, $provider, $processors, $consumer): array{
+    private static function buildOneInstruction(AbstractCanvasPopulatedModel $toBuild, array $data, array $context, ProviderInterface $provider, array $processors, ConsumerInterface $consumer): array{
         $errors = [];
         ['data' => $item, 'errors' => $error] = $provider->getData($data);
         array_push($errors, ...$error);

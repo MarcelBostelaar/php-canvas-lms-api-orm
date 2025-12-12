@@ -7,21 +7,24 @@
         "psr-4": {
             "CanvasApiLibrary\\Core\\": "./",
             "CanvasApiLibrary\\Core\\Providers\\Interfaces\\": [
-                "Providers/Generated/Interfaces"
+                "Core/Providers/Generated/Interfaces"
             ],
             "CanvasApiLibrary\\Core\\Providers\\": [
-                "Providers/",
-                "Providers/Utility/"
+                "Core/Providers/",
+                "Core/Providers/Utility/"
             ]
         },
         "classmap": [
-            "Providers/Utility/ModelPopulator/"
+            "Core/Providers/Utility/ModelPopulator/"
         ]
     },
     "require": {
-        "php": ">=8.4"
+        "php": ">=8.2"
     },
     "scripts": {
         "serve": "php -S localhost:8000 test.php"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "*"
     }
 }

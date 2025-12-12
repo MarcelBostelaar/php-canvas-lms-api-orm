@@ -31,7 +31,12 @@ abstract class AbstractProvider implements HandleEmittedInterface{
         return hash("sha256", $this->canvasCommunicator->apiKey);
     }
 
-    private static function GetDomainFromContext($context){
+    /**
+     * @param array $context
+     * @throws Exception
+     * @return Domain
+     */
+    private static function GetDomainFromContext(array $context){
         foreach($context as $item){
             if($item instanceof Domain){
                 return $item;
