@@ -8,7 +8,6 @@ use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfig
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Services\CanvasCommunicator;
-use CanvasApiLibrary\Core\Services\StatusHandlerInterface;
 
 
 /**
@@ -18,10 +17,9 @@ class GroupProvider extends AbstractProvider implements GroupProviderInterface{
     use GroupProviderProperties;
 
     public function __construct(
-        StatusHandlerInterface $statusHandler,
         CanvasCommunicator $canvasCommunicator
     ) {
-        parent::__construct($statusHandler, $canvasCommunicator,
+        parent::__construct($canvasCommunicator,
             new ModelPopulationConfigBuilder(Group::class)->keyCopy("name"));
     }
 

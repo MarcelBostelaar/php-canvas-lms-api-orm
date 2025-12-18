@@ -36,6 +36,11 @@ use CanvasApiLibrary\Core\Models\<?=$usedModel?>;
 <?php
 }?>
 
+/**
+ * @template TSuccessResult
+ * @template TUnauthorizedResult
+ * @template TNotFoundResult
+ */
 interface <?=$interfacename?> extends HandleEmittedInterface{
 
     public function getClientID(): string;

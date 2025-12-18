@@ -2,14 +2,17 @@
 namespace CanvasApiLibrary\Core\Providers\Utility;
 use CanvasApiLibrary\Core\Models\Utility\ModelInterface;
 use CanvasApiLibrary\Core\Services\CanvasCommunicator;
-use CanvasApiLibrary\Core\Services\StatusHandlerInterface;
+use CanvasApiLibrary\Core\Services\CanvasReturnStatus;
 use CanvasApiLibrary\Core\Models\Domain;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
+use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 use Exception;
 
 abstract class AbstractProvider implements HandleEmittedInterface{
     public function __construct(
-        public readonly StatusHandlerInterface $statusHandler,
         public readonly CanvasCommunicator $canvasCommunicator,
         protected readonly ModelPopulationConfigBuilder $modelPopulator
         ){}
@@ -45,36 +48,54 @@ abstract class AbstractProvider implements HandleEmittedInterface{
         throw new Exception("Domain not found in context");
     }
 
-    private function GetInternal(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null, ?StatusHandlerInterface $customHandler = null){
-        if($customBuilder === null){
-            $customBuilder = $this->modelPopulator;
-        }
-        if($customHandler === null){
-            $customHandler = $this->statusHandler;
-        }
-        
+    /**
+     * @param array<int, ModelInterface> $context
+     * @return array{0:mixed,1:CanvasReturnStatus,2:ModelPopulationConfigBuilder}
+     */
+    private function GetInternal(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null): array{
+        $builder = $customBuilder ?? $this->modelPopulator;
+
         $domain = self::GetDomainFromContext($context);
         [$data, $status] = $this->canvasCommunicator->Get($route, $domain);
         if($data === null){
-            throw new Exception("Not data found in route");
+            throw new Exception("No data found in route");
         }
-        $data = $customHandler->HandleStatus($data, $status);
-        
-        return [$data, $customBuilder];
+        return [$data, $status, $builder];
     }
 
-    protected function GetMany(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null, ?callable $postProcessor = null, ?StatusHandlerInterface $customHandler = null): array{
-        [$data, $builder] = $this->GetInternal($route, $context, $customBuilder, $customHandler);
+    /**
+     * @param array<int, ModelInterface> $context
+    * @return SuccessResult<ModelInterface[]>|UnauthorizedResult|NotFoundResult|ErrorResult
+    */
+    protected function GetMany(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null, ?callable $postProcessor = null): SuccessResult|UnauthorizedResult|NotFoundResult|ErrorResult{
+        [$data, $status, $builder] = $this->GetInternal($route, $context, $customBuilder);
         if($postProcessor){
             $data = $postProcessor($data);
         }
-        return $builder->buildMany($data, ...$context);
+
+        return match($status){
+            CanvasReturnStatus::SUCCESS => new SuccessResult($builder->buildMany($data, ...$context)),
+            CanvasReturnStatus::UNAUTHORIZED => new UnauthorizedResult(),
+            CanvasReturnStatus::NOT_FOUND => new NotFoundResult(),
+            default => new ErrorResult(),
+        };
     }
-    protected function Get(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null, ?callable $postProcessor = null, ?StatusHandlerInterface $customHandler = null): ModelInterface{
-        [$data, $builder] = $this->GetInternal($route, $context, $customBuilder, $customHandler);
+
+    /**
+     * @param array<int, ModelInterface> $context
+     * @return SuccessResult<ModelInterface>|UnauthorizedResult|NotFoundResult|ErrorResult
+     */
+    protected function Get(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null, ?callable $postProcessor = null): SuccessResult|UnauthorizedResult|NotFoundResult|ErrorResult{
+        [$data, $status, $builder] = $this->GetInternal($route, $context, $customBuilder);
         if($postProcessor){
             $data = array_map($postProcessor, $data);
         }
-        return $builder->build($data, ...$context);
+
+        return match($status){
+            CanvasReturnStatus::SUCCESS => new SuccessResult($builder->build($data, ...$context)),
+            CanvasReturnStatus::UNAUTHORIZED => new UnauthorizedResult(),
+            CanvasReturnStatus::NOT_FOUND => new NotFoundResult(),
+            default => new ErrorResult(),
+        };
     }
 }

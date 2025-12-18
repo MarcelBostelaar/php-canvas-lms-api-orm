@@ -9,7 +9,6 @@ use CanvasApiLibrary\Core\Models\Course;
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Services\CanvasCommunicator;
-use CanvasApiLibrary\Core\Services\StatusHandlerInterface;
 
 
 /**
@@ -21,10 +20,9 @@ class SectionProvider extends AbstractProvider implements SectionProviderInterfa
     use SectionProviderProperties;
 
     public function __construct(
-        StatusHandlerInterface $statusHandler,
         CanvasCommunicator $canvasCommunicator
     ) {
-        parent::__construct($statusHandler, $canvasCommunicator,
+        parent::__construct($canvasCommunicator,
         new ModelPopulationConfigBuilder(Section::class)
                 ->keyCopy("name"));
     }

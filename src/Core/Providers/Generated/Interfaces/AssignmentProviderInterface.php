@@ -7,19 +7,25 @@ use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
 
 use CanvasApiLibrary\Core\Models\Assignment;
 
+/**
+ * @template TSuccessResult
+ * @template TUnauthorizedResult
+ * @template TNotFoundResult
+ * @template TErrorResult
+ */
 interface AssignmentProviderInterface extends HandleEmittedInterface{
 
     public function getClientID(): string;
     /**
     * @param Assignment[] $assignments
-    * @return Assignment[]
+    * @return array<TSuccessResult<Assignment>|TUnauthorizedResult|TNotFoundResult|TErrorResult>
     */
     public function populateAssignments(array $assignments) : array;
 
     /**
     * @param Assignment $assignment
-    * @return Assignment
+    * @return TSuccessResult<Assignment>|TUnauthorizedResult|TNotFoundResult|TErrorResult
     */
-    public function populateAssignment(Assignment $assignment) : Assignment;
+    public function populateAssignment(Assignment $assignment);
 
 }

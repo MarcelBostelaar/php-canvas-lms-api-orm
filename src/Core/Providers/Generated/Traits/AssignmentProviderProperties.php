@@ -13,7 +13,7 @@ trait AssignmentProviderProperties{
     
     
     
-    abstract public function populateAssignment(Assignment$assignment);
+    abstract public function populateAssignment(Assignment $assignment);
     
     /**
     * Plural version of populateAssignment

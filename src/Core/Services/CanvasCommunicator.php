@@ -20,6 +20,9 @@ class CanvasCommunicator{
             if($data["status"] == "not found"){
                 return CanvasReturnStatus::NOT_FOUND;
             }
+            if($data["status"] == "unauthorized"){
+                return CanvasReturnStatus::UNAUTHORIZED;
+            }
         }
         if(isset($data["errors"])){
             return CanvasReturnStatus::ERROR;
