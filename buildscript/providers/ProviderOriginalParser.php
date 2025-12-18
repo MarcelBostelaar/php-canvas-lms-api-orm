@@ -45,6 +45,8 @@ class ExtractProviderMethodsVisitor extends AbstractExtractorVisitor {
             $params[] = new MethodParameter($param->var->name, $paramType, $paramType);
         }
         //get return type
+        //TODO see if i can extract the actual type, also from the docblock if needed, because now it doesnt even handle array return type properly
+        var_dump($node->getReturnType());
         $returnType = $node->getReturnType() instanceof \PhpParser\Node\NullableType ? "?" . $node->getReturnType()->type->toString() : ($node->getReturnType() instanceof \PhpParser\Node\Name ? $node->getReturnType()->toString() : (is_string($node->getReturnType()) ? $node->getReturnType() : "mixed"));
         $this->methods[] = new MethodDefinition(
             $name,

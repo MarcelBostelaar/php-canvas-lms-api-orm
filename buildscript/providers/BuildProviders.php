@@ -46,6 +46,7 @@ function buildProviders($folder, $models): array {
     }
 
     foreach($mapped as $provider){
+        // var_dump($provider);
         $result = generateFullProviderTrait(
             $provider->traitname,
             $provider->methods,

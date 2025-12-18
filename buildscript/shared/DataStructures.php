@@ -2,6 +2,54 @@
 
 namespace Buildscript\DataStructures;
 
+
+abstract class TypeDefinitionBase {
+    public function __construct(
+        public readonly bool $isArrayVariant = false,
+    ) {}
+}
+
+class AtomicTypeDefinition extends TypeDefinitionBase {
+    public function __construct(
+        public readonly string $type,
+        bool $isArrayVariant = false,
+        public readonly bool $isNullable = false
+    ) {
+        parent::__construct($isArrayVariant);
+    }
+}
+
+class GenericTypeDefinition extends TypeDefinitionBase {
+    /**
+     * @param string $type
+     * @param TypeDefinitionBase[] $genericParameters
+     * @param bool $isArrayVariant
+     */
+    public function __construct(
+        public readonly string $type,
+        public readonly array $genericParameters,
+        bool $isArrayVariant = false,
+        public readonly bool $isNullable = false
+    ) {
+        parent::__construct($isArrayVariant);
+    }
+}
+
+class UnionTypeDefinition extends TypeDefinitionBase {
+    /**
+     * @param TypeDefinitionBase[] $types
+     * @param bool $isArrayVariant
+     */
+    public function __construct(
+        public readonly array $types,
+        bool $isArrayVariant = false
+    ) {
+        parent::__construct($isArrayVariant);
+    }
+}
+
+
+
 /**
  * Represents a property definition with its type and name
  */
