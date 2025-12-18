@@ -1,6 +1,8 @@
 <?php
 namespace Buildscript\Models;
 
+use Buildscript\DataStructures\PropertyDefinition;
+
 /**
  * @param string $classname
  * @param string[] $usedModels
@@ -113,38 +115,39 @@ function fileEnd(){
 
 /**
  * Summary of Buildscript\Models\GenerateFullModelTrait
- * @param mixed $chosenTraitName
- * @param array{type: string, name: string} $regularProperties
- * @param array{type: string, name: string} $nullableProperties
- * @param array{type: string, name: string} $ModelProperties
- * @param array{type: string, name: string} $nullableModelProperties
+ * @param string $originalModelName
+ * @param string $chosenTraitName
+ * @param PropertyDefinition[] $regularProperties
+ * @param PropertyDefinition[] $nullableProperties
+ * @param PropertyDefinition[] $ModelProperties
+ * @param PropertyDefinition[] $nullableModelProperties
  * @return string
  */
-function GenerateFullModelTrait($originalModelName, $chosenTraitName, array $regularProperties, array $nullableProperties, array $ModelProperties, array $nullableModelProperties){
+function GenerateFullModelTrait($originalModelName, $chosenTraitName, array $regularProperties, array $nullableProperties, array $ModelProperties, array $nullableModelProperties): string {
     // var_dump($regularProperties);
     ob_start();
-    $usedModels = array_unique(array_map(fn($x) => $x["type"], array_merge($ModelProperties, $nullableModelProperties)));
+    $usedModels = array_unique(array_map(fn($x) => $x->type, array_merge($ModelProperties, $nullableModelProperties)));
     array_push($usedModels, $originalModelName);
 
     fileTop($chosenTraitName, $usedModels);
 
     foreach($regularProperties as $p){
-        property($p["type"], $p["name"]);
+        property($p->type, $p->name);
         echo "\n";
     }
     
     foreach($nullableProperties as $p){
-        nullableProperty($p["type"], $p["name"]);
+        nullableProperty($p->type, $p->name);
         echo "\n";
     }
 
     foreach($ModelProperties as $p){
-        modelProp($p["type"], $p["name"], false, $originalModelName);
+        modelProp($p->type, $p->name, false, $originalModelName);
         echo "\n";
     }
 
     foreach($nullableModelProperties as $p){
-        modelProp($p["type"],  $p["name"], true, $originalModelName);
+        modelProp($p->type, $p->name, true, $originalModelName);
         echo "\n";
     }
 

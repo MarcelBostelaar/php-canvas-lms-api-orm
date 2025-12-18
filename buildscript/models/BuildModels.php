@@ -3,9 +3,14 @@ namespace Buildscript\Models;
 
 use function Buildscript\tryExtractModelClassName;
 use function Buildscript\prettified;
+use Buildscript\DataStructures\PropertyDefinition;
+use Buildscript\DataStructures\ModelParseResult;
 
 include_once __DIR__ . '/ModelOriginalParser.php';
-function buildModels($folder, $targetFolderForTraits){
+/**
+ * @return ModelParseResult[]
+ */
+function buildModels($folder, $targetFolderForTraits): array {
     $phpFiles = [];
     foreach (glob($folder . '/*.php') as $filePath) {
         $phpFiles[] = [$filePath];
@@ -19,49 +24,65 @@ function buildModels($folder, $targetFolderForTraits){
         $modelname = substr(basename($filePath), 0, -4);
         $traitname = $modelname . "Properties";
         $parsedFile = processModelFile($filePath, $modelname, $traitname);
-        [$normalProps, $normalModels] = processAndGetModelClassProps($parsedFile['fields']);
-        [$nullableProps, $nullableModels] = processAndGetModelClassProps($parsedFile['fieldsNullable']);
+        [$normalProps, $normalModels] = processAndGetModelClassProps($parsedFile->fields);
+        [$nullableProps, $nullableModels] = processAndGetModelClassProps($parsedFile->fieldsNullable);
         $normalProps = fixGlobalClassTypes($normalProps);
         $nullableProps = fixGlobalClassTypes($nullableProps);
-        $parsedFile['generatedTrait'] = GenerateFullModelTrait(
+        $generatedTrait = GenerateFullModelTrait(
             $modelname, 
             $traitname, 
             $normalProps, 
             $nullableProps,
             $normalModels, 
             $nullableModels);
+        $parsedFile = $parsedFile->withGeneratedTrait($generatedTrait);
         $mapped[] = $parsedFile;
-        file_put_contents("$targetFolderForTraits/$traitname.php", prettified($parsedFile["generatedTrait"]));
+        file_put_contents("$targetFolderForTraits/$traitname.php", prettified($generatedTrait));
         //write to test folder
-        // $ast = $parsedFile["ast"];
-        // $name = $parsedFile["modelname"];
-        // unset($parsedFile["ast"]);
-        // unset($parsedFile["generatedTrait"]);
-        // file_put_contents(__DIR__ . "/../test/" . $name, json_encode($parsedFile, JSON_PRETTY_PRINT) . (new NodeDumper)->dump($ast));
+        // $ast = $parsedFile->ast;
+        // $name = $parsedFile->modelname;
+        // file_put_contents(__DIR__ . "/../test/" . $name, json_encode($parsedFile->toArray(), JSON_PRETTY_PRINT) . (new NodeDumper)->dump($ast));
     }
     return  $mapped;
 }
 
-function fixGlobalClassTypes($properties){
+/**
+ * @param PropertyDefinition[] $properties
+ * @return PropertyDefinition[]
+ */
+function fixGlobalClassTypes(array $properties): array {
     $props = [];
     foreach($properties as $property){
-        if($property["classType"]){
-            $property['type'] = "\\" . $property['type'];
+        if($property->classType){
+            $property = new PropertyDefinition(
+                "\\" . $property->type,
+                $property->name,
+                false
+            );
+        } else {
+            $property = new PropertyDefinition(
+                $property->type,
+                $property->name,
+                false
+            );
         }
-        unset($property["classType"]);
         $props[] = $property;
     }
     return $props;
 }
 
-function processAndGetModelClassProps($properties){
+/**
+ * @param PropertyDefinition[] $properties
+ * @return array{PropertyDefinition[], PropertyDefinition[]}
+ */
+function processAndGetModelClassProps(array $properties): array {
     $normalProps = [];
     $modelProps = [];
     foreach($properties as $prop){
         // match \models\Something, models\Something, \models\Something.php, models\Something.php, or arrays like \models\Something[]
-        $match = tryExtractModelClassName($prop["type"]);
+        $match = tryExtractModelClassName($prop->type);
         if ($match !== null) {
-            $prop["type"] = $match;
+            $prop = new PropertyDefinition($match, $prop->name, $prop->classType);
             $modelProps[] = $prop;
         }
         else{

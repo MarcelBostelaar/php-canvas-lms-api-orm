@@ -5,6 +5,8 @@ use Exception;
 use function Buildscript\parseFile;
 use Buildscript\AbstractExtractorVisitor;
 use Buildscript\FindTraitUserVisitor;
+use Buildscript\DataStructures\PropertyDefinition;
+use Buildscript\DataStructures\ModelParseResult;
 use PhpParser\Node as n;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Scalar;
@@ -24,28 +26,24 @@ use PhpParser\NodeDumper;
 /**
  * Takes a php file by path (a valid model) and processed it. Gives back ast and required data for further processing/generation.
  * @param mixed $filePath
- * @return array{ast: \PhpParser\Node[], fields: array{type: string, name: string}, fieldsNullable: array{type: string, name: string}, filename: string, plurals: string[]} \
- *   An array with the parsed AST, fields, nullable fields, filename and plurals.\
- *   ast: The parsed Abstract Syntax Tree of the PHP file.\
- *   fields: An array of fields with their fully qualified types, and names.\
- *   fieldsNullable: An array of nullable fields with their fully qualified types, and names.\
- *   filename: The name of the file being processed without the path.\
- *   plurals: An array of plural forms of the name of the model, for automatic method generation in providers. 
+ * @return ModelParseResult
  */
-function processModelFile($filePath, $modelname, $traitname){
+function processModelFile($filePath, $modelname, $traitname): ModelParseResult {
     $ast = parseFile($filePath);
     $fields = (new FieldListFinderVisitor("properties"))->process($ast)->getList();
     $fieldsNullable = (new FieldListFinderVisitor("nullableProperties"))->process($ast)->getList();
     $plurals = (new PluralsFinderVisitor())->process($ast)->getPlurals();
     $traitFound = (new FindTraitUserVisitor($traitname))->process($ast)->wasFound;
-    return ["ast" => $ast,
-            "modelname" => $modelname,
-            "traitname" => $traitname,
-            "fields" => $fields,
-            "fieldsNullable" => $fieldsNullable,
-            "plurals" => $plurals,
-            "hasTrait" => $traitFound
-    ];
+    
+    return new ModelParseResult(
+        $ast,
+        $modelname,
+        $traitname,
+        $fields,
+        $fieldsNullable,
+        $plurals,
+        $traitFound
+    );
 }
 
 
@@ -63,9 +61,9 @@ class FieldListFinderVisitor extends AbstractExtractorVisitor{
     }
 
     /**
-     * @return array
+     * @return PropertyDefinition[]
      */
-    public function getList(){
+    public function getList(): array {
         $unexpectedNodeForm = fn() => new Exception("Found node not as expected");
         if(!isset($this->found)){
             echo "No $this->varname found.\n";
@@ -106,11 +104,7 @@ class FieldListFinderVisitor extends AbstractExtractorVisitor{
                 throw $unexpectedNodeForm(); //Name of prop must be of type string.
             }
             $propertyName = $propnameContainer->value;
-            $foundItems[] = [
-                "type" => $classname,
-                "name" => $propertyName,
-                "classType" => $classType
-            ];
+            $foundItems[] = new PropertyDefinition($classname, $propertyName, $classType);
         }
         return $foundItems;
     }

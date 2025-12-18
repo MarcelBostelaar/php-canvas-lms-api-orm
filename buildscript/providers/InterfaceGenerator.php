@@ -3,22 +3,14 @@
 
 namespace Buildscript\Providers;
 
+use Buildscript\DataStructures\MethodDefinition;
+use Buildscript\DataStructures\MethodParameter;
+
 /**
- * 
  * @param string $interfacename
- * @param array{
- *     name: string,
- *     parameters: array{
- *          type: string,
- *          name: string,
- *          annotatedtype: string
- *     },
- *     returnType: array{
- *          type: string,
- *          annotatedtype: string
- *     }
- * }[] $methods
- * @return void
+ * @param MethodDefinition[] $methods
+ * @param string[] $usedModels
+ * @return string
  */
 function generateInterface(string $interfacename, array $methods, $usedModels):string{
     
@@ -57,47 +49,36 @@ foreach($methods as $method){
 }
 
 /**
- * 
- * @param array{
- *     name: string,
- *     parameters: array{
- *          type: string,
- *          name: string,
- *          annotatedtype: string
- *     },
- *     returnType: array{
- *          type: string,
- *          annotatedtype: string
- *     }
- * } $method
+ * @param MethodDefinition $method
+ * @param string[] $usedModels
  * @return void
  */
-function generateInterfaceMethod(array $method, $usedModels){
+function generateInterfaceMethod(MethodDefinition $method, $usedModels){
     // var_dump($method);
-    $method["parameters"] = array_map(function($x) use($usedModels)  {
-        return [
-        "name" => $x["name"],
-        "type" => filterType($x["type"], $usedModels),
-        "annotatedtype" => filterType($x["annotatedtype"], $usedModels)
-        ];
-    }, $method["parameters"]);
+    $cleanedParams = array_map(function($x) use($usedModels)  {
+        return new MethodParameter(
+            $x->name,
+            filterType($x->type, $usedModels),
+            filterType($x->annotatedType, $usedModels)
+        );
+    }, $method->parameters);
 
-    $method['returnType']['type'] = filterType($method['returnType']["type"], $usedModels);
-    $method['returnType']['annotatedtype'] = filterType($method['returnType']["annotatedtype"], $usedModels);
+    $returnTypeType = filterType($method->returnType->type, $usedModels);
+    $returnTypeAnnotated = filterType($method->returnType->annotatedType, $usedModels);
 
     $paramstring = implode(", ", array_map(fn($x) => 
-    $x["type"] . " $" . 
-    $x["name"], 
-    $method["parameters"]));
-    $docstringParams = implode("\t\r ", array_map(fn($x) => "* @param " . $x["annotatedtype"] . " $" . $x["name"], $method["parameters"]));
+    $x->type . " $" . 
+    $x->name, 
+    $cleanedParams));
+    $docstringParams = implode("\t\r ", array_map(fn($x) => "* @param " . $x->annotatedType . " $" . $x->name, $cleanedParams));
     ?>
     /**
     <?=$docstringParams?>
 
-    * @return <?=$method['returnType']['annotatedtype']?>
+    * @return <?=$returnTypeAnnotated?>
 
     */
-    public function <?=$method["name"]?>(<?=$paramstring?>) : <?=$method['returnType']['type']?>;
+    public function <?=$method->name?>(<?=$paramstring?>) : <?=$returnTypeType?>;
 
 <?php
 }
