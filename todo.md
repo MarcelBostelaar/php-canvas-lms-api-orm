@@ -28,4 +28,4 @@
 [x] Maak de permission manager ook dependency injected.
 [x] Maak de types van de caching dingen generic.
 
-[] Loop alle core providers door en kijk waar je de requests kan verbeteren door b.v. meer results per pagina te vragen.
+[] Look alle core providers door en kijk waar je de requests kan verbeteren door b.v. meer results per pagina te vragen.
