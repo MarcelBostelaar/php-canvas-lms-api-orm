@@ -46,9 +46,9 @@ function varDumpNoAst($data){
 function prettified(string $code): string {
     //temp disable
     return $code;
-    $phpParser = (new ParserFactory())->createForNewestSupportedVersion();
-    $ast = $phpParser->parse($code);
+    // $phpParser = (new ParserFactory())->createForNewestSupportedVersion();
+    // $ast = $phpParser->parse($code);
 
-    $prettyPrinter = new \PhpParser\PrettyPrinter\Standard();
-    return $prettyPrinter->prettyPrintFile($ast);
+    // $prettyPrinter = new \PhpParser\PrettyPrinter\Standard();
+    // return $prettyPrinter->prettyPrintFile($ast);
 }

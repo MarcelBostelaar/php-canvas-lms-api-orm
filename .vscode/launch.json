@@ -8,7 +8,7 @@
             "name": "Build",
             "type": "php",
             "request": "launch",
-            "noDebug": true,
+            "noDebug": false,
             "program": "${workspaceRoot}/buildscript/Build.php",
             "cwd": "${workspaceRoot}/buildscript"
         },

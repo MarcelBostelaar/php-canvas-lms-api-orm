@@ -35,6 +35,10 @@ class SectionProvider extends AbstractProvider implements SectionProviderInterfa
         return $this->GetMany("/courses/$course->id/sections", $course->getContext());
     }
 
+    /**
+     * @param Models\Section $section
+     * @return Models\Section
+     */
     public function populateSection(Section $section): Section{
         $courseID = $section->course->id;
         $this->Get("/courses/$courseID/sections/$section->id", 

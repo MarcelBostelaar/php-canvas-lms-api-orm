@@ -17,7 +17,8 @@
             "models/CodeGenModels.php",
             "providers/BuildProviders.php",
             "providers/CodeGenProviders.php",
-            "providers/InterfaceGenerator.php"
+            "providers/InterfaceGenerator.php",
+            "providers/ProviderOriginalParser.php"
         ]
     }
 }

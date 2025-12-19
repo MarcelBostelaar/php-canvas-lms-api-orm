@@ -3,12 +3,15 @@
 namespace Buildscript\Providers;
 use Buildscript\AbstractExtractorVisitor;
 use Buildscript\AtomicTypeDefinition;
+use Buildscript\GenericTypeDefinition;
+use Buildscript\MethodGenerationType;
 use Buildscript\UnionTypeDefinition;
 use Buildscript\FindTraitUserVisitor;
 use Exception;
 use PhpParser\Node\ComplexType;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
+use PhpParser\Node\NullableType;
 use PhpParser\Node\UnionType;
 use function Buildscript\parseFile;
 use Buildscript\MethodParameter;
@@ -54,6 +57,8 @@ class ExtractProviderMethodsVisitor extends AbstractExtractorVisitor {
             throw new Exception("No docstring found for method " . $node->name->toString());
         }
 
+        $docstringText = $docstring->getText();
+
         //get name
         $name = $node->name->toString();
         //get params
@@ -72,10 +77,38 @@ class ExtractProviderMethodsVisitor extends AbstractExtractorVisitor {
         $stringifiedDocReturn = (string)$docstringReturnType;
         echo "Parsed return type for method $name with code type {$stringifiedReturn} and docstring type {$stringifiedDocReturn}\n";
         
+        //if has 1 param, and return type is union with success over same type, it's a populator
+        if(count($params) === 1 && $docstringReturnType instanceof UnionTypeDefinition){
+            foreach($docstringReturnType->types as $type){
+                if($type instanceof GenericTypeDefinition && $type->type === "SuccessResult"){
+                    if(count($type->genericParameters) === 1){
+                        if($type->genericParameters[0] instanceof AtomicTypeDefinition){
+                            if($type->genericParameters[0] == $params[0]->annotatedType){
+                                //it's a populator
+                                $generationType = MethodGenerationType::PopulateSingle;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //if it contains the word "In", it's a get items for single
+        else if(preg_match('/[a-z]In[A-Z]/', $name) === 1){
+            $generationType = MethodGenerationType::GetItemsForSingle;
+        }
+        if(!isset($generationType)){
+            $generationType = MethodGenerationType::Other;
+        }
+        //otherwise, it's Other
+
+
         $this->methods[] = new MethodDefinition(
             $name,
+            "",//$docstringText,
             $params,
-            new MethodReturnType($codeReturnType, $docstringReturnType)
+            new MethodReturnType($codeReturnType, $docstringReturnType),
+            $generationType
         );
         return null;
     }
@@ -89,6 +122,11 @@ class ExtractProviderMethodsVisitor extends AbstractExtractorVisitor {
         }
         if($type instanceof Identifier){
             return new AtomicTypeDefinition($type->toString());
+        }
+        if($type instanceof NullableType){
+            $subtype = self::parseType($type->type);
+            $subtype->isNullable = true;
+            return $subtype;
         }
         echo "Could not find a valid type for: \n";
         var_dump($type);

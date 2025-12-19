@@ -24,15 +24,19 @@ class GroupProvider extends AbstractProvider implements GroupProviderInterface{
     }
 
     /**
-     * @param Models\GroupCategory $category
+     * @param Models\GroupCategory $groupCategory
      * @return Group[]
      */
-    public function getAllGroupsInGroupCategory(Models\GroupCategory $category) : array{
+    public function getAllGroupsInGroupCategory(Models\GroupCategory $groupCategory) : array{
         //Optional context already handled through getcontext
         return $this->GetMany( "/group_categories/$category->id/groups", 
         $category->getContext());
     }
 
+    /**
+     * @param Models\Group $group
+     * @return Models\Group
+     */
     public function populateGroup(Group $group): Group{
         $this->Get( "/api/v1/groups/$group->id", $group->getContext(),
         $this->modelPopulator->withInstance($group));

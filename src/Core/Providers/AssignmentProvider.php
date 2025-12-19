@@ -29,7 +29,8 @@ class AssignmentProvider extends AbstractProvider implements AssignmentProviderI
     }
 
     /**
-     * @return SuccessResult<Assignment>|UnauthorizedResult|NotFoundResult|ErrorResult
+     * @param Assignment $assignment
+     * @return ErrorResult|NotFoundResult|SuccessResult<Assignment>|UnauthorizedResult
      */
     public function populateAssignment(Assignment $assignment): SuccessResult|UnauthorizedResult|NotFoundResult|ErrorResult{
         return $this->Get(

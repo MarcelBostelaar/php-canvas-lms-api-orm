@@ -3,8 +3,42 @@
 
 namespace Buildscript\Providers;
 
-use Buildscript\DataStructures\MethodDefinition;
-use Buildscript\DataStructures\MethodParameter;
+use Buildscript\AtomicTypeDefinition;
+use Buildscript\GenericTypeDefinition;
+use Buildscript\MethodDefinition;
+use Buildscript\MethodGenerationType;
+use Buildscript\MethodParameter;
+use Buildscript\TypeDefinitionBase;
+
+function replaceStandardUnionWithGeneric(TypeDefinitionBase $type){
+    if($type instanceof AtomicTypeDefinition){
+        $realtype = $type->type;
+        if(str_contains($type->type, "\\")){
+            $parts = explode("\\", $type->type);
+            $realtype = array_pop($parts);
+        }
+        switch($realtype){
+            case "SuccessResult":
+                return new AtomicTypeDefinition("TSuccessResult");
+            case "UnauthorizedResult":
+                return new AtomicTypeDefinition("TUnauthorizedResult");
+            case "NotFoundResult":
+                return new AtomicTypeDefinition("TNotFoundResult");
+            case "ErrorResult":
+                return new AtomicTypeDefinition("TErrorResult");
+            default:
+                return $type;
+        }
+    }
+    if($type instanceof GenericTypeDefinition){
+        if($type->type === "SuccessResult"){
+            $copy = clone $type;
+            $copy->type = "TSuccessResult";
+            return $copy;
+        }
+    }
+    return $type;
+}
 
 /**
  * @param string $interfacename
@@ -13,7 +47,25 @@ use Buildscript\DataStructures\MethodParameter;
  * @return string
  */
 function generateInterface(string $interfacename, array $methods, $usedModels):string{
-    
+    $methods = array_map(function($x){
+        return new MethodDefinition(
+            $x->name,
+            $x->docstring,
+            array_map(function($p){
+                return new MethodParameter(
+                    $p->name,
+                    $p->type->map(fn($t) => replaceStandardUnionWithGeneric($t)),
+                    $p->annotatedType->map(fn($t) => replaceStandardUnionWithGeneric($t))
+                );
+            }, $x->parameters),
+            new \Buildscript\MethodReturnType(
+                $x->returnType->type->map(fn($t) => replaceStandardUnionWithGeneric($t)),
+                $x->returnType->annotatedType->map(fn($t) => replaceStandardUnionWithGeneric($t))
+            ),
+            MethodGenerationType::InterfaceMethod
+        );
+    }, $methods);
+
     ob_start();
     ?>
 namespace CanvasApiLibrary\Core\Providers\Interfaces;
@@ -30,7 +82,7 @@ use CanvasApiLibrary\Core\Models\<?=$usedModel?>;
 
 /**
  * @template TSuccessResult
- * @template TUnauthorizedResult
+ * @template TUnauthorizedResult //TODO change this
  * @template TNotFoundResult
  */
 interface <?=$interfacename?> extends HandleEmittedInterface{
@@ -38,7 +90,7 @@ interface <?=$interfacename?> extends HandleEmittedInterface{
     public function getClientID(): string;
 <?php
 foreach($methods as $method){
-    generateInterfaceMethod($method, $usedModels);
+    generateInterfaceMethod($method);
 }
 ?>
 }
@@ -53,41 +105,14 @@ foreach($methods as $method){
  * @param string[] $usedModels
  * @return void
  */
-function generateInterfaceMethod(MethodDefinition $method, $usedModels){
-    // var_dump($method);
-    $cleanedParams = array_map(function($x) use($usedModels)  {
-        return new MethodParameter(
-            $x->name,
-            filterType($x->type, $usedModels),
-            filterType($x->annotatedType, $usedModels)
-        );
-    }, $method->parameters);
-
-    $returnTypeType = filterType($method->returnType->type, $usedModels);
-    $returnTypeAnnotated = filterType($method->returnType->annotatedType, $usedModels);
-
-    $paramstring = implode(", ", array_map(fn($x) => 
-    $x->type . " $" . 
-    $x->name, 
-    $cleanedParams));
-    $docstringParams = implode("\t\r ", array_map(fn($x) => "* @param " . $x->annotatedType . " $" . $x->name, $cleanedParams));
+function generateInterfaceMethod(MethodDefinition $method){
+    
     ?>
     /**
-    <?=$docstringParams?>
-
-    * @return <?=$returnTypeAnnotated?>
-
+    <?=$method->docstring?>
+    <?=$method->createDocstringParamsAndReturn(1)?>
     */
-    public function <?=$method->name?>(<?=$paramstring?>) : <?=$returnTypeType?>;
+    public function <?=$method->name?>(<?=$method->paramString()?>) : <?=(string)$method->returnType->type?>;
 
 <?php
-}
-
-function filterType($original, $usedModels){
-    $split = explode("\\",$original);
-    $item = array_pop($split);
-    if(in_array($item, $usedModels)){
-        return $item;
-    }
-    return $original;
 }

@@ -1,13 +1,12 @@
 <?php
 namespace Buildscript\Providers;
-include_once __DIR__ . '/ProviderOriginalParser.php';
 use Exception;
 use function Buildscript\Providers\processProviderFile;
 use function Buildscript\varDumpNoAst;
 use function Buildscript\prettified;
 use function Buildscript\Providers\generateInterface;
-use Buildscript\DataStructures\ModelParseResult;
-use Buildscript\DataStructures\ProviderParseResult;
+use Buildscript\ModelParseResult;
+use Buildscript\ProviderParseResult;
 
 /**
  * @param string $folder

@@ -93,6 +93,10 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
         $course->getContext()); //optional course context already handled through context system.
     }
 
+    /**
+     * @param Domain $domain
+     * @return Models\User
+     */
     public function getUserSelfInfo(Domain $domain): User{
         /** @var User $result */
         $result = $this->Get("/users/self", $domain->getContext());

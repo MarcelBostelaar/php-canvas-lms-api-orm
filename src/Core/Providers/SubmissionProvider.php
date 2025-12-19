@@ -53,6 +53,10 @@ class SubmissionProvider extends AbstractProvider implements SubmissionProviderI
         );
     }
 
+    /**
+     * @param Models\Submission $submission
+     * @return Models\Submission
+     */
     public function populateSubmission(Submission $submission): Submission{
         $this->Get("/courses/{$submission->course->id}/assignments/{$submission->assignment->id}/submissions/{$submission->user->id}",
         $submission->getContext(), $this->modelPopulator->withInstance($submission));
