@@ -1,10 +1,10 @@
 <?php
 namespace Buildscript\Models;
 
+use Buildscript\ModelParseResult;
+use Buildscript\PropertyDefinition;
 use function Buildscript\tryExtractModelClassName;
 use function Buildscript\prettified;
-use Buildscript\DataStructures\PropertyDefinition;
-use Buildscript\DataStructures\ModelParseResult;
 
 include_once __DIR__ . '/ModelOriginalParser.php';
 /**

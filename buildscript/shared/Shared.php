@@ -5,8 +5,6 @@ use PhpParser\ParserFactory;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 
-require_once __DIR__ . '/DataStructures.php';
-
 function parseFile($filePath){
     
     // Create parser

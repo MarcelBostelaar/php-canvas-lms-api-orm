@@ -11,6 +11,8 @@
         },
         "files":[
             "shared/Shared.php",
+            "shared/DataStructures.php",
+            "shared/TypeExtractor.php",
             "models/BuildModels.php",
             "models/CodeGenModels.php",
             "providers/BuildProviders.php",

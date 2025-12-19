@@ -1,11 +1,11 @@
 <?php
 
-namespace PhpCanvasLmsApiOrm\Buildscript\Shared;
+namespace Buildscript;
 
-use Buildscript\DataStructures\AtomicTypeDefinition;
-use Buildscript\DataStructures\GenericTypeDefinition;
-use Buildscript\DataStructures\UnionTypeDefinition;
-use Buildscript\DataStructures\TypeDefinitionBase;
+use Buildscript\AtomicTypeDefinition;
+use Buildscript\GenericTypeDefinition;
+use Buildscript\UnionTypeDefinition;
+use Buildscript\TypeDefinitionBase;
 use Closure;
 
 /**
@@ -262,6 +262,10 @@ class CombinedParser extends ParserCombinator
 
     public function then(IParserCombinator $nextParser): IParserCombinator
     {
+        if(count($this->postProcessors) > 0){
+            //If it already has a post-processor, the end result is no longer an array, and it should not be just chained.
+            return parent::then($nextParser);
+        }
         $newParsers = array_merge($this->parsers, [$nextParser]);
         return new CombinedParser($newParsers);
     }
@@ -402,7 +406,7 @@ class StringLiteralParser extends ParserCombinator
     public function asSeperator(IParserCombinator $valueParser){
         return $valueParser
         ->then($this->wrapWhitepace()->then($valueParser)->many(0))
-        ->map(fn($x) => array_merge([$x[0]], $x[1]->map(fn($y) => $y[1])));
+        ->map(fn($x) => array_merge([$x[0]], array_map(fn($y) => $y[1], $x[1])));
     }
 }
 
@@ -451,10 +455,13 @@ function GenericTypeString(){
  * @return IParserCombinator<AtomicTypeDefinition|GenericTypeDefinition>
  */
 function GenericOrAtomic(){
-    return new StringLiteralParser("?")
+    return new StringLiteralParser("?")->optional()
     ->then(
         GenericTypeString()
-        ->or(new AtomicTypeParser())
+        ->or(
+            new AtomicTypeParser()
+            ->map(fn($x) => new AtomicTypeDefinition($x))
+        )
     )
     ->then(new StringLiteralParser("[]")->optional())
     ->map(function($result) {
@@ -490,15 +497,18 @@ function FullTypeString(){
 
 function parseParamType(string $paramname, string $string): TypeDefinitionBase {
     //Split string on @param paramname
-    $parts = explode("@param " . $paramname, $string);
+    $parts = explode("$" . $paramname, $string);
     if (count($parts) < 2) {
-        throw new \Exception("Param $paramname not found in docstring.");
+        throw new \Exception("Param $paramname not found in docstring: $string");
     }
-    $afterParam = trim($parts[1]);
+    $parts = explode("@param", $parts[0]);
+    $lastPart = trim(array_pop($parts));
+    
     //Extract type string
-    $result = FullTypeString()->parse($afterParam, 0);
+    $result = FullTypeString()->parse($lastPart, 0);
     if (!$result->success) {
-        throw new \Exception("Failed to parse type for param $paramname.");
+        var_dump($result);
+        throw new \Exception("Failed to parse type for param $paramname from '$lastPart'");
     }
     return $result->value;
 }

@@ -1,21 +1,27 @@
 <?php
 
-namespace Buildscript\DataStructures;
+namespace Buildscript;
 
 
 abstract class TypeDefinitionBase {
     public function __construct(
-        public readonly bool $isArrayVariant = false,
+        public bool $isArrayVariant = false,
     ) {}
+
+    public abstract function __toString(): string;
 }
 
 class AtomicTypeDefinition extends TypeDefinitionBase {
     public function __construct(
-        public readonly string $type,
+        public string $type,
         bool $isArrayVariant = false,
-        public readonly bool $isNullable = false
+        public bool $isNullable = false
     ) {
         parent::__construct($isArrayVariant);
+    }
+
+    public function __toString(): string {
+        return ($this->isNullable ? '?' : '') . $this->type . ($this->isArrayVariant ? '[]' : '') ;
     }
 }
 
@@ -26,12 +32,17 @@ class GenericTypeDefinition extends TypeDefinitionBase {
      * @param bool $isArrayVariant
      */
     public function __construct(
-        public readonly string $type,
-        public readonly array $genericParameters,
+        public string $type,
+        public array $genericParameters,
         bool $isArrayVariant = false,
-        public readonly bool $isNullable = false
+        public bool $isNullable = false
     ) {
         parent::__construct($isArrayVariant);
+    }
+
+    public function __toString(): string {
+        $generics = implode(", ", array_map(fn($p) => (string)$p, $this->genericParameters));
+        return ($this->isNullable ? '?' : '') . $this->type . "<$generics>" . ($this->isArrayVariant ? '[]' : '') ;
     }
 }
 
@@ -41,10 +52,13 @@ class UnionTypeDefinition extends TypeDefinitionBase {
      * @param bool $isArrayVariant
      */
     public function __construct(
-        public readonly array $types,
-        bool $isArrayVariant = false
+        public array $types
     ) {
-        parent::__construct($isArrayVariant);
+        parent::__construct();
+    }
+
+    public function __toString(): string {
+        return implode("|", array_map(fn($p) => (string)$p, $this->types));
     }
 }
 
@@ -67,8 +81,8 @@ class PropertyDefinition {
 class MethodParameter {
     public function __construct(
         public readonly string $name,
-        public readonly string $type,
-        public readonly string $annotatedType,
+        public readonly TypeDefinitionBase $type,
+        public readonly TypeDefinitionBase $annotatedType,
         public readonly bool $isArrayVariant = false
     ) {}
 }
@@ -78,8 +92,8 @@ class MethodParameter {
  */
 class MethodReturnType {
     public function __construct(
-        public readonly string $type,
-        public readonly string $annotatedType
+        public readonly TypeDefinitionBase $type,
+        public readonly TypeDefinitionBase $annotatedType
     ) {}
 }
 

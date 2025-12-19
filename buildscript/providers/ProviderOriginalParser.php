@@ -2,12 +2,21 @@
 
 namespace Buildscript\Providers;
 use Buildscript\AbstractExtractorVisitor;
+use Buildscript\AtomicTypeDefinition;
+use Buildscript\UnionTypeDefinition;
 use Buildscript\FindTraitUserVisitor;
+use Exception;
+use PhpParser\Node\ComplexType;
+use PhpParser\Node\Identifier;
+use PhpParser\Node\Name;
+use PhpParser\Node\UnionType;
 use function Buildscript\parseFile;
-use Buildscript\DataStructures\MethodParameter;
-use Buildscript\DataStructures\MethodReturnType;
-use Buildscript\DataStructures\MethodDefinition;
-use Buildscript\DataStructures\ProviderParseResult;
+use Buildscript\MethodParameter;
+use Buildscript\MethodReturnType;
+use Buildscript\MethodDefinition;
+use Buildscript\ProviderParseResult;
+use function Buildscript\parseParamType;
+use function Buildscript\parseReturnType;
 
 function processProviderFile($filePath, $providername, $traitname, $modelname): ProviderParseResult {
     $ast = parseFile($filePath);
@@ -36,23 +45,53 @@ class ExtractProviderMethodsVisitor extends AbstractExtractorVisitor {
             return null;
         }
 
+        if($node->name->toString() === "__construct"){
+            return null;
+        }
+
+        $docstring = $node->getDocComment();
+        if(!$docstring){
+            throw new Exception("No docstring found for method " . $node->name->toString());
+        }
+
         //get name
         $name = $node->name->toString();
         //get params
         $params = [];
         foreach($node->params as $param){
-            $paramType = $param->type instanceof \PhpParser\Node\NullableType ? "?" . $param->type->type->toString() : ($param->type instanceof \PhpParser\Node\Name ? $param->type->toString() : (is_string($param->type) ? $param->type : "mixed"));
-            $params[] = new MethodParameter($param->var->name, $paramType, $paramType);
+            $docstringType = parseParamType($param->var->name, $docstring);
+            $codeType = self::parseType($param->type);
+            $stringified = (string)$codeType;
+            $stringifiedDoc =(string)$docstringType;
+            echo "Parsed param {$param->var->name} with code type {$stringified} and docstring type {$stringifiedDoc}\n";
+            $params[] = new MethodParameter($param->var->name, $codeType, $docstringType);
         }
-        //get return type
-        //TODO see if i can extract the actual type, also from the docblock if needed, because now it doesnt even handle array return type properly
-        var_dump($node->getReturnType());
-        $returnType = $node->getReturnType() instanceof \PhpParser\Node\NullableType ? "?" . $node->getReturnType()->type->toString() : ($node->getReturnType() instanceof \PhpParser\Node\Name ? $node->getReturnType()->toString() : (is_string($node->getReturnType()) ? $node->getReturnType() : "mixed"));
+        $docstringReturnType = parseReturnType($docstring);
+        $codeReturnType = self::parseType($node->getReturnType());
+        $stringifiedReturn = (string)$codeReturnType;
+        $stringifiedDocReturn = (string)$docstringReturnType;
+        echo "Parsed return type for method $name with code type {$stringifiedReturn} and docstring type {$stringifiedDocReturn}\n";
+        
         $this->methods[] = new MethodDefinition(
             $name,
             $params,
-            new MethodReturnType($returnType, $returnType)
+            new MethodReturnType($codeReturnType, $docstringReturnType)
         );
         return null;
+    }
+
+    private static function parseType(Identifier|Name|ComplexType $type){
+        if($type instanceof \PhpParser\Node\Name\FullyQualified){
+            return new AtomicTypeDefinition($type->toString());
+        }
+        if($type instanceof UnionType){
+            return new UnionTypeDefinition(array_map(fn($x) => self::parseType($x), $type->types));
+        }
+        if($type instanceof Identifier){
+            return new AtomicTypeDefinition($type->toString());
+        }
+        echo "Could not find a valid type for: \n";
+        var_dump($type);
+        throw new Exception();
     }
 }

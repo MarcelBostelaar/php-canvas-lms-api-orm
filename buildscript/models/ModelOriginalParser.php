@@ -1,12 +1,12 @@
 <?php
 
 namespace Buildscript\Models;
+use Buildscript\ModelParseResult;
+use Buildscript\PropertyDefinition;
 use Exception;
 use function Buildscript\parseFile;
 use Buildscript\AbstractExtractorVisitor;
 use Buildscript\FindTraitUserVisitor;
-use Buildscript\DataStructures\PropertyDefinition;
-use Buildscript\DataStructures\ModelParseResult;
 use PhpParser\Node as n;
 use PhpParser\Node\PropertyItem;
 use PhpParser\Node\Scalar;
