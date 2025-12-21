@@ -361,7 +361,16 @@ class MethodDefinition {
     }
 
     public function paramString(): string {
-        return implode(', ', array_map(fn(MethodParameter $p) => $p->paramString(), $this->parameters));
+        $total = [];
+        foreach($this->parameters as $param){
+            if($param->name === "skipCache"){
+                $total[] = 'bool $skipCache = false';
+            }
+            else{
+                $total[] = $param->paramString();
+            }
+        }
+        return implode(', ', $total);
     }
 }
 

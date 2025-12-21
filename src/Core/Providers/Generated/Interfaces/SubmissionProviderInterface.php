@@ -41,24 +41,27 @@ interface SubmissionProviderInterface extends HandleEmittedInterface{
     public function handleResults(Closure $processor): SubmissionProviderInterface;
     /**
 	 * @param Submission[] $submissions
+	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Submission[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSubmissions(array $submissions) : mixed;
+    public function populateSubmissions(array $submissions, bool $skipCache = false) : mixed;
 
     /**
 	 * @param Assignment $assignment
 	 * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
+	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Submission[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getSubmissionsInAssignment(Assignment $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider) : mixed;
+    public function getSubmissionsInAssignment(Assignment $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false) : mixed;
 
     /**
 	 * @param Submission $submission
+	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Submission>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSubmission(Submission $submission) : mixed;
+    public function populateSubmission(Submission $submission, bool $skipCache = false) : mixed;
 
 }

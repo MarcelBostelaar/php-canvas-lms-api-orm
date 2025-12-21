@@ -70,31 +70,34 @@ class GroupProviderWrapper implements GroupProviderInterface {
 
     /**
 	 * @param Group[] $groups
+	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateGroups(array $groups) : mixed{
-        $value = $this->innerProvider->populateGroups($groups);
+    public function populateGroups(array $groups, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->populateGroups($groups, $skipCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param GroupCategory $groupCategory
+	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllGroupsInGroupCategory(GroupCategory $groupCategory) : mixed{
-        $value = $this->innerProvider->getAllGroupsInGroupCategory($groupCategory);
+    public function getAllGroupsInGroupCategory(GroupCategory $groupCategory, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->getAllGroupsInGroupCategory($groupCategory, $skipCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param Group $group
+	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateGroup(Group $group) : mixed{
-        $value = $this->innerProvider->populateGroup($group);
+    public function populateGroup(Group $group, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->populateGroup($group, $skipCache);
         return ($this->resultProcessor)($value);
     }
 

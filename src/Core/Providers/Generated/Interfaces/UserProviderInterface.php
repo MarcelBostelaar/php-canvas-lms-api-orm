@@ -41,39 +41,44 @@ interface UserProviderInterface extends HandleEmittedInterface{
     public function handleResults(Closure $processor): UserProviderInterface;
     /**
 	 * @param Group $group
+	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInGroup(Group $group) : mixed;
+    public function getUsersInGroup(Group $group, bool $skipCache = false) : mixed;
 
     /**
 	 * @param Section $section
 	 * @param ?string $enrollmentRoleFilter
+	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInSection(Section $section, ?string $enrollmentRoleFilter) : mixed;
+    public function getUsersInSection(Section $section, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed;
 
     /**
 	 * @param Course $course
 	 * @param ?string $enrollmentRoleFilter
+	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInCourse(Course $course, ?string $enrollmentRoleFilter) : mixed;
+    public function getUsersInCourse(Course $course, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed;
 
     /**
 	 * @param Domain $domain
+	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUserSelfInfo(Domain $domain) : mixed;
+    public function getUserSelfInfo(Domain $domain, bool $skipCache = false) : mixed;
 
     /**
 	 * @param UserStub $user
+	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateUser(UserStub $user) : mixed;
+    public function populateUser(UserStub $user, bool $skipCache = false) : mixed;
 
 }

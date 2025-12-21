@@ -40,9 +40,10 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
 
     /**
      * @param Models\Group $group
+     * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<User[]>|UnauthorizedResult
     */
-    public function getUsersInGroup(Models\Group $group): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function getUsersInGroup(Models\Group $group, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->GetMany( "/groups/{$group->id}/users", $group->getContext());
     }
 
@@ -50,9 +51,10 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
      * Gets all users in a section.
      * @param Models\Section $section
      * @param ?string $enrollmentRoleFilter Filter to only retrieve a specific type of user. Allowed values: Student, Teacher, Ta, Observer, Designer
+     * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<User[]>|UnauthorizedResult
      */
-    public function getUsersInSection(Models\Section $section, ?string $enrollmentRoleFilter): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function getUsersInSection(Models\Section $section, ?string $enrollmentRoleFilter, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         $postfix = "";
         switch($enrollmentRoleFilter){
             case null:
@@ -78,9 +80,10 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
      * Gets all users in a course.
      * @param Models\Course $course
      * @param ?string $enrollmentRoleFilter Filter to only retrieve a specific type of user. Allowed values: student, teacher, ta, observer, designer
+     * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<User[]>|UnauthorizedResult
      */
-    public function getUsersInCourse(Models\Course $course, ?string $enrollmentRoleFilter): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function getUsersInCourse(Models\Course $course, ?string $enrollmentRoleFilter, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         $postfix = "";
         switch($enrollmentRoleFilter){
             case null:
@@ -101,18 +104,20 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
 
     /**
      * @param Domain $domain
+     * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<User>|UnauthorizedResult
      */
-    public function getUserSelfInfo(Domain $domain): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function getUserSelfInfo(Domain $domain, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->Get("/users/self", $domain->getContext());
     }
 
     /**
      * Populates a user from the canvas API.
      * @param Models\UserStub $user
+     * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<User>|UnauthorizedResult
      */
-    public function populateUser(UserStub $user): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function populateUser(UserStub $user, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         if($user->optionalCourseContext === null){
             //Must be retrieved from global route. Note that only admins can do this.
             /** @var User $result */

@@ -65,16 +65,18 @@ function generatePopulator(MethodDefinition $method) {
     if($method->generationType !== MethodGenerationType::PopulateMultiple){
         throw new Exception("Method is not of type PopulateMultiple: " . $method->name);
     }
+    $tailParams = array_slice($method->parameters, 1);
+    $tailParamString = implode(', ', array_map(fn($p) => ' $' . $p->name, $tailParams));
     ?>
     /**
      * Summary of <?=$method->name . "\n"?>
      * This is a plural version of <?=$method->pluralVariantOf->name . "\n"?>
 <?=$method->createDocstringParamsAndReturn(1) . "\n"?>
      */
-    public function <?=$method->name?>(array $<?=$method->parameters[0]->name?>): <?= $method->returnType->codeString() ?> {
+    public function <?=$method->name?>(<?=$method->paramString()?>): <?= $method->returnType->codeString() ?> {
         $results = [];
         foreach($<?=$method->parameters[0]->name?> as $item){
-            $result = $this-><?=$method->pluralVariantOf->name?>($item);
+            $result = $this-><?=$method->pluralVariantOf->name?>($item,<?= $tailParamString ?>);
             if(!$result instanceof SuccessResult){
                 return $result;
             }

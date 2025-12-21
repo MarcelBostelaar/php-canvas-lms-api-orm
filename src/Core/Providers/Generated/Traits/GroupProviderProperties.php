@@ -26,17 +26,18 @@ use CanvasApiLibrary\Core\Models\UserStub;
 trait GroupProviderProperties{
     
     
-    abstract public function populateGroup(Group $group) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    abstract public function populateGroup(Group $group, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
      * Summary of populateGroups
      * This is a plural version of populateGroup
 	 * @param Group[] $groups
+	 * @param bool $skipCache
 	 * @return ErrorResult|NotFoundResult|SuccessResult<Group[]>|UnauthorizedResult
      */
-    public function populateGroups(array $groups): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+    public function populateGroups(array $groups, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
         $results = [];
         foreach($groups as $item){
-            $result = $this->populateGroup($item);
+            $result = $this->populateGroup($item, $skipCache);
             if(!$result instanceof SuccessResult){
                 return $result;
             }

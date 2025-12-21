@@ -70,31 +70,34 @@ class SectionProviderWrapper implements SectionProviderInterface {
 
     /**
 	 * @param Section[] $sections
+	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSections(array $sections) : mixed{
-        $value = $this->innerProvider->populateSections($sections);
+    public function populateSections(array $sections, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->populateSections($sections, $skipCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param Course $course
+	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllSectionsInCourse(Course $course) : mixed{
-        $value = $this->innerProvider->getAllSectionsInCourse($course);
+    public function getAllSectionsInCourse(Course $course, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->getAllSectionsInCourse($course, $skipCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param Section $section
+	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSection(Section $section) : mixed{
-        $value = $this->innerProvider->populateSection($section);
+    public function populateSection(Section $section, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->populateSection($section, $skipCache);
         return ($this->resultProcessor)($value);
     }
 

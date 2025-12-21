@@ -26,17 +26,18 @@ use CanvasApiLibrary\Core\Models\UserStub;
 trait SectionProviderProperties{
     
     
-    abstract public function populateSection(Section $section) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    abstract public function populateSection(Section $section, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
      * Summary of populateSections
      * This is a plural version of populateSection
 	 * @param Section[] $sections
+	 * @param bool $skipCache
 	 * @return ErrorResult|NotFoundResult|SuccessResult<Section[]>|UnauthorizedResult
      */
-    public function populateSections(array $sections): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+    public function populateSections(array $sections, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
         $results = [];
         foreach($sections as $item){
-            $result = $this->populateSection($item);
+            $result = $this->populateSection($item, $skipCache);
             if(!$result instanceof SuccessResult){
                 return $result;
             }

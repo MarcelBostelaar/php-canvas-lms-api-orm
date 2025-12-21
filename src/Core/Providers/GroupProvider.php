@@ -33,9 +33,10 @@ class GroupProvider extends AbstractProvider implements GroupProviderInterface{
 
     /**
      * @param GroupCategory $groupCategory
+     * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Group[]>|UnauthorizedResult
      */
-    public function getAllGroupsInGroupCategory(GroupCategory $groupCategory) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function getAllGroupsInGroupCategory(GroupCategory $groupCategory, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         //Optional context already handled through getcontext
         return $this->GetMany( "/group_categories/$groupCategory->id/groups", 
         $groupCategory->getContext());
@@ -43,9 +44,10 @@ class GroupProvider extends AbstractProvider implements GroupProviderInterface{
 
     /**
      * @param Group $group
+     * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Group>|UnauthorizedResult
      */
-    public function populateGroup(Group $group): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function populateGroup(Group $group, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->Get( "/api/v1/groups/$group->id", $group->getContext(),
         $this->modelPopulator->withInstance($group));
     }

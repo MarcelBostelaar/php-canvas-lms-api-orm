@@ -70,32 +70,35 @@ class SubmissionProviderWrapper implements SubmissionProviderInterface {
 
     /**
 	 * @param Submission[] $submissions
+	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSubmissions(array $submissions) : mixed{
-        $value = $this->innerProvider->populateSubmissions($submissions);
+    public function populateSubmissions(array $submissions, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->populateSubmissions($submissions, $skipCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param Assignment $assignment
 	 * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
+	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getSubmissionsInAssignment(Assignment $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider) : mixed{
-        $value = $this->innerProvider->getSubmissionsInAssignment($assignment, $userProvider);
+    public function getSubmissionsInAssignment(Assignment $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->getSubmissionsInAssignment($assignment, $userProvider, $skipCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param Submission $submission
+	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSubmission(Submission $submission) : mixed{
-        $value = $this->innerProvider->populateSubmission($submission);
+    public function populateSubmission(Submission $submission, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->populateSubmission($submission, $skipCache);
         return ($this->resultProcessor)($value);
     }
 

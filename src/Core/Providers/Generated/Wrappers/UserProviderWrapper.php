@@ -70,53 +70,58 @@ class UserProviderWrapper implements UserProviderInterface {
 
     /**
 	 * @param Group $group
+	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInGroup(Group $group) : mixed{
-        $value = $this->innerProvider->getUsersInGroup($group);
+    public function getUsersInGroup(Group $group, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->getUsersInGroup($group, $skipCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param Section $section
 	 * @param ?string $enrollmentRoleFilter
+	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInSection(Section $section, ?string $enrollmentRoleFilter) : mixed{
-        $value = $this->innerProvider->getUsersInSection($section, $enrollmentRoleFilter);
+    public function getUsersInSection(Section $section, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->getUsersInSection($section, $enrollmentRoleFilter, $skipCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param Course $course
 	 * @param ?string $enrollmentRoleFilter
+	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInCourse(Course $course, ?string $enrollmentRoleFilter) : mixed{
-        $value = $this->innerProvider->getUsersInCourse($course, $enrollmentRoleFilter);
+    public function getUsersInCourse(Course $course, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->getUsersInCourse($course, $enrollmentRoleFilter, $skipCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param Domain $domain
+	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUserSelfInfo(Domain $domain) : mixed{
-        $value = $this->innerProvider->getUserSelfInfo($domain);
+    public function getUserSelfInfo(Domain $domain, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->getUserSelfInfo($domain, $skipCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param UserStub $user
+	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateUser(UserStub $user) : mixed{
-        $value = $this->innerProvider->populateUser($user);
+    public function populateUser(UserStub $user, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->populateUser($user, $skipCache);
         return ($this->resultProcessor)($value);
     }
 

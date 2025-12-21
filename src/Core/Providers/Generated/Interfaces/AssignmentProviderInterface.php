@@ -41,16 +41,18 @@ interface AssignmentProviderInterface extends HandleEmittedInterface{
     public function handleResults(Closure $processor): AssignmentProviderInterface;
     /**
 	 * @param Assignment[] $assignments
+	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Assignment[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateAssignments(array $assignments) : mixed;
+    public function populateAssignments(array $assignments, bool $skipCache = false) : mixed;
 
     /**
 	 * @param Assignment $assignment
+	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Assignment>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateAssignment(Assignment $assignment) : mixed;
+    public function populateAssignment(Assignment $assignment, bool $skipCache = false) : mixed;
 
 }

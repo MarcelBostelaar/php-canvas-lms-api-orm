@@ -33,17 +33,19 @@ class SectionProvider extends AbstractProvider implements SectionProviderInterfa
 
     /**
      * @param \CanvasApiLibrary\Core\Models\Course $course
+     * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Section[]>|UnauthorizedResult
      */
-    public function getAllSectionsInCourse(Course $course) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function getAllSectionsInCourse(Course $course, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->GetMany("/courses/$course->id/sections", $course->getContext());
     }
 
     /**
      * @param Models\Section $section
+     * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Section>|UnauthorizedResult
      */
-    public function populateSection(Section $section): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function populateSection(Section $section, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         $courseID = $section->course->id;
         return $this->Get("/courses/$courseID/sections/$section->id", 
         $section->getContext(), 

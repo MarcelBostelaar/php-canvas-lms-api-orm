@@ -41,23 +41,26 @@ interface GroupProviderInterface extends HandleEmittedInterface{
     public function handleResults(Closure $processor): GroupProviderInterface;
     /**
 	 * @param Group[] $groups
+	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Group[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateGroups(array $groups) : mixed;
+    public function populateGroups(array $groups, bool $skipCache = false) : mixed;
 
     /**
 	 * @param GroupCategory $groupCategory
+	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Group[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllGroupsInGroupCategory(GroupCategory $groupCategory) : mixed;
+    public function getAllGroupsInGroupCategory(GroupCategory $groupCategory, bool $skipCache = false) : mixed;
 
     /**
 	 * @param Group $group
+	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Group>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateGroup(Group $group) : mixed;
+    public function populateGroup(Group $group, bool $skipCache = false) : mixed;
 
 }

@@ -26,17 +26,18 @@ use CanvasApiLibrary\Core\Models\UserStub;
 trait SubmissionProviderProperties{
     
     
-    abstract public function populateSubmission(Submission $submission) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    abstract public function populateSubmission(Submission $submission, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
      * Summary of populateSubmissions
      * This is a plural version of populateSubmission
 	 * @param Submission[] $submissions
+	 * @param bool $skipCache
 	 * @return ErrorResult|NotFoundResult|SuccessResult<Submission[]>|UnauthorizedResult
      */
-    public function populateSubmissions(array $submissions): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+    public function populateSubmissions(array $submissions, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
         $results = [];
         foreach($submissions as $item){
-            $result = $this->populateSubmission($item);
+            $result = $this->populateSubmission($item, $skipCache);
             if(!$result instanceof SuccessResult){
                 return $result;
             }

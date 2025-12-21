@@ -36,9 +36,10 @@ class CourseProvider extends AbstractProvider implements CourseProviderInterface
 
     /**
      * @param Domain $domain
+     * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Course[]>|UnauthorizedResult
      */
-    public function getAllCoursesInDomain(Domain $domain): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function getAllCoursesInDomain(Domain $domain, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->GetMany("/courses", $domain->getContext());
     }
 }

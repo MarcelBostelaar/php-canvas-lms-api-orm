@@ -41,9 +41,10 @@ interface CourseProviderInterface extends HandleEmittedInterface{
     public function handleResults(Closure $processor): CourseProviderInterface;
     /**
 	 * @param Domain $domain
+	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Course[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllCoursesInDomain(Domain $domain) : mixed;
+    public function getAllCoursesInDomain(Domain $domain, bool $skipCache = false) : mixed;
 
 }
