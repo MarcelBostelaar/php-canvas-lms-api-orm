@@ -7,38 +7,42 @@ namespace CanvasApiLibrary\Core\Providers\Generated\Traits;
 
 use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
+use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 use CanvasApiLibrary\Core\Models\Assignment;
+use CanvasApiLibrary\Core\Models\Course;
+use CanvasApiLibrary\Core\Models\Domain;
+use CanvasApiLibrary\Core\Models\Group;
+use CanvasApiLibrary\Core\Models\GroupCategory;
+use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Models\Submission;
+use CanvasApiLibrary\Core\Models\SubmissionComment;
+use CanvasApiLibrary\Core\Models\User;
+use CanvasApiLibrary\Core\Models\UserDisplay;
+use CanvasApiLibrary\Core\Models\UserStub;
 
 trait SubmissionProviderProperties{
     
     
-    
-    abstract public function populateSubmission(Submission$submission);
-    
+    abstract public function populateSubmission(Submission $submission) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
-    * Plural version of populateSubmission
-    * @param Submission[] $submissions
-    * @return Submission[]
-
-    */
-    public function populateSubmissions(array $submissions) : array{
-        return array_map(fn($x) => $this->populateSubmission($x), $submissions);
-    }
-    
-    
-    abstract public function getSubmissionsInAssignment(Assignment $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider) : array;
-    
-    /**
-     * Summary of getSubmissionsInAssignments
-     * @param Assignment[] $assignments
-     * @return Lookup<Assignment, Assignment>
+     * Summary of populateSubmissions
+     * This is a plural version of populateSubmission
+	 * @param Submission[] $submissions
+	 * @return ErrorResult|NotFoundResult|SuccessResult<Submission[]>|UnauthorizedResult
      */
-    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider): Lookup{
-        $lookup = new Lookup();
-        foreach($assignments as $assignment){
-            $lookup->add($assignment, $this->getSubmissionsInAssignment($assignment, $userProvider));
+    public function populateSubmissions(array $submissions): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+        $results = [];
+        foreach($submissions as $item){
+            $result = $this->populateSubmission($item);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            $results[] = $result->value;
         }
-        return $lookup;
+        return new SuccessResult($results);
     }
+    
 }

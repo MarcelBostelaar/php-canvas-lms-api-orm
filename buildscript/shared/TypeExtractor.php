@@ -495,7 +495,7 @@ function FullTypeString(){
     });
 }
 
-function parseParamType(string $paramname, string $string): TypeDefinitionBase {
+function parseParamType(string $paramname, string $string, TypeDefinitionBase $fullyQualifiedCodeType): TypeDefinitionBase {
     //Split string on @param paramname
     $parts = explode("$" . $paramname, $string);
     if (count($parts) < 2) {
@@ -510,7 +510,18 @@ function parseParamType(string $paramname, string $string): TypeDefinitionBase {
         var_dump($result);
         throw new \Exception("Failed to parse type for param $paramname from '$lastPart'");
     }
-    return $result->value;
+    $value = $result->value;
+    if($value instanceof AtomicTypeDefinition){
+        $value = $value->mergeEnhance($fullyQualifiedCodeType);
+        //if it is a model, convert to short name
+        if(preg_match('/^CanvasApiLibrary\\\\Core\\\\Models\\\\[a-zA-Z]+$/', $value->type)){
+            //split then return last part
+            $parts = explode("\\", $value->type);
+            $value->type = array_pop($parts);
+        }
+    }
+
+    return $value;
 }
 
 function parseReturnType(string $string): TypeDefinitionBase {

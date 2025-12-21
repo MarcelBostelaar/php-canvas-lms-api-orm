@@ -7,71 +7,24 @@ namespace CanvasApiLibrary\Core\Providers\Generated\Traits;
 
 use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
-use CanvasApiLibrary\Core\Models\Group;
-use CanvasApiLibrary\Core\Models\Section;
+use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
+use CanvasApiLibrary\Core\Models\Assignment;
 use CanvasApiLibrary\Core\Models\Course;
 use CanvasApiLibrary\Core\Models\Domain;
+use CanvasApiLibrary\Core\Models\Group;
+use CanvasApiLibrary\Core\Models\GroupCategory;
+use CanvasApiLibrary\Core\Models\Section;
+use CanvasApiLibrary\Core\Models\Submission;
+use CanvasApiLibrary\Core\Models\SubmissionComment;
+use CanvasApiLibrary\Core\Models\User;
+use CanvasApiLibrary\Core\Models\UserDisplay;
 use CanvasApiLibrary\Core\Models\UserStub;
 
 trait UserProviderProperties{
     
     
-    
-    abstract public function populateUser(User$user);
-    
-    /**
-    * Plural version of populateUser
-    * @param User[] $users
-    * @return User[]
 
-    */
-    public function populateUsers(array $users) : array{
-        return array_map(fn($x) => $this->populateUser($x), $users);
-    }
-    
-    
-    abstract public function getUsersInGroup(Group $group) : array;
-    
-    /**
-     * Summary of getUsersInGroups
-     * @param Group[] $groups
-     * @return Lookup<Group, Group>
-     */
-    public function getUsersInGroups(array $groups): Lookup{
-        $lookup = new Lookup();
-        foreach($groups as $group){
-            $lookup->add($group, $this->getUsersInGroup($group));
-        }
-        return $lookup;
-    }
-
-    abstract public function getUsersInSection(Section $section, ?string $enrollmentRoleFilter) : array;
-    
-    /**
-     * Summary of getUsersInSections
-     * @param Section[] $sections
-     * @return Lookup<Section, Section>
-     */
-    public function getUsersInSections(array $sections, ?string $enrollmentRoleFilter): Lookup{
-        $lookup = new Lookup();
-        foreach($sections as $section){
-            $lookup->add($section, $this->getUsersInSection($section, $enrollmentRoleFilter));
-        }
-        return $lookup;
-    }
-
-    abstract public function getUsersInCourse(Course $course, ?string $enrollmentRoleFilter) : array;
-    
-    /**
-     * Summary of getUsersInCourses
-     * @param Course[] $courses
-     * @return Lookup<Course, Course>
-     */
-    public function getUsersInCourses(array $courses, ?string $enrollmentRoleFilter): Lookup{
-        $lookup = new Lookup();
-        foreach($courses as $course){
-            $lookup->add($course, $this->getUsersInCourse($course, $enrollmentRoleFilter));
-        }
-        return $lookup;
-    }
 }

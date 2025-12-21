@@ -15,7 +15,9 @@ use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 use CanvasApiLibrary\Core\Services\CanvasCommunicator;
 
-
+/**
+ * @implements AssignmentProviderInterface<SuccessResult,ErrorResult,NotFoundResult,UnauthorizedResult>
+ */
 class AssignmentProvider extends AbstractProvider implements AssignmentProviderInterface{
     use AssignmentProviderProperties;
 
@@ -32,7 +34,7 @@ class AssignmentProvider extends AbstractProvider implements AssignmentProviderI
      * @param Assignment $assignment
      * @return ErrorResult|NotFoundResult|SuccessResult<Assignment>|UnauthorizedResult
      */
-    public function populateAssignment(Assignment $assignment): SuccessResult|UnauthorizedResult|NotFoundResult|ErrorResult{
+    public function populateAssignment(Assignment $assignment): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->Get(
             "/courses/{$assignment->course->id}/assignments/$assignment->id",
             $assignment->getContext(),

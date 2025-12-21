@@ -30,6 +30,10 @@ namespace CanvasApiLibrary\Core\Providers\Generated\Traits;
 
 use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
+use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 <?php
     foreach($usedModels as $usedModel){ ?>
 use CanvasApiLibrary\Core\Models\<?=$usedModel?>;
@@ -50,44 +54,34 @@ trait <?=$traitname?>{
  * @param MethodParameter[] $params 
  * @return void
  */
-function generateAbstractOriginal($name, $params){
-    $paramString = implode(', ', array_map(fn($p) => "{$p->type} \${$p->name}", $params));
+function generateAbstractOriginal(MethodDefinition $method){
     ?>
-
-    abstract public function <?=$name?>(<?=$paramString?>) : array;
+    abstract public function <?=$method->name?>(<?=$method->paramString()?>) : <?=$method->returnType->codeString()?>;
 <?php
 }
 
 
 function generatePopulator(MethodDefinition $method) {
-    if($method->pluralVariantOf === null){
-        throw new Exception("Cannot generate populator for plural variant method: " . $method->name);
-    }
     if($method->generationType !== MethodGenerationType::PopulateMultiple){
         throw new Exception("Method is not of type PopulateMultiple: " . $method->name);
     }
-    if(count($method->parameters) !== 1){
-        throw new Exception("Populate multiple method must have exactly one parameter: " . $method->name);
-    }
-
     ?>
     /**
-     * Summary of <?=$method->name?>
-     * This is a plural version of <?=$method->pluralVariantOf->name?>
-     <?=$method->createDocstringParamsAndReturn()?>
+     * Summary of <?=$method->name . "\n"?>
+     * This is a plural version of <?=$method->pluralVariantOf->name . "\n"?>
+<?=$method->createDocstringParamsAndReturn(1) . "\n"?>
      */
-    public function <?=$method->name?>(array $<?=$method->parameters[0]->name?>): <?= $method->returnType->type ?> {
+    public function <?=$method->name?>(array $<?=$method->parameters[0]->name?>): <?= $method->returnType->codeString() ?> {
         $results = [];
         foreach($<?=$method->parameters[0]->name?> as $item){
             $result = $this-><?=$method->pluralVariantOf->name?>($item);
             if(!$result instanceof SuccessResult){
                 return $result;
             }
-            $results[] = $result->data;
+            $results[] = $result->value;
         }
         return new SuccessResult($results);
     }
-    
     <?php
 }
 
@@ -102,31 +96,26 @@ function generateAlias(MethodDefinition $aliasInfo) {
 
     ?>
     /**
-     * Alias of <?=$aliasInfo->aliasOf->name?>
-     <?=$aliasInfo->createDocstringParamsAndReturn()?>
+     * Alias of <?=$aliasInfo->aliasOf->name . "\n"?>
+<?=$aliasInfo->createDocstringParamsAndReturn(1) . "\n"?>
      */
-    public function <?=$aliasInfo->name?>(<?=$aliasInfo->paramString()?>): <?=$aliasInfo->returnType->type?> {
+    public function <?=$aliasInfo->name?>(<?=$aliasInfo->paramString()?>): <?=$aliasInfo->returnType->codeString()?> {
         return $this-><?=$aliasInfo->aliasOf->name?>(<?=implode(', ', array_map(fn($p) => '$' . $p->name, $aliasInfo->parameters))?>);
     }
-
     <?php
 }
 
 
 function generateMultiMethod(MethodDefinition $method) {
-    if($method->pluralVariantOf === null){
-        throw new Exception("Cannot generate multi method for a plural variant method: " . $method->name);
-    }
-    if($method->generationType !== MethodGenerationType::GetItemsForMultiple){
+    if($method->generationType !== MethodGenerationType::GetItemsInMultiple){
         throw new Exception("Method is not of type GetItemsForMultiple: " . $method->name);
     }
 
-    $relevantParam = array_filter($method->parameters, fn(MethodParameter $p) => $p->type->isArrayVariant);
+    $relevantParam = array_filter($method->parameters, fn(MethodParameter $p) => $p->name === $method->metadata['relevantParam']);
 
     if(count($relevantParam) !== 1){
         throw new Exception("Could not determine relevant parameter for multi method: " . $method->name);
     }
-    /** @var MethodParameter $relevantParam */
     $relevantParam = array_values($relevantParam)[0];
 
     ?>
@@ -146,7 +135,7 @@ function generateMultiMethod(MethodDefinition $method) {
 }
 
 function fileEnd(){
-    echo "}\n";
+    echo "\n}\n";
 }
 
 
@@ -157,7 +146,7 @@ function fileEnd(){
  * @param array<string, string[]> $pluralLookup Mapping of singular to plural names.
  * @return ProviderTraitResult
  */
-function generateFullProviderTrait($traitname, $methodsToGenerateFor, $pluralLookup): ProviderTraitResult {
+function generateFullProviderTrait($traitname, $methodsToGenerateFor, $pluralLookup, $usedModels): ProviderTraitResult {
     echo "Generating trait: $traitname\n";
 
     $aliasesOfOriginals = array_map(function(MethodDefinition $method) use ($pluralLookup){
@@ -173,14 +162,14 @@ function generateFullProviderTrait($traitname, $methodsToGenerateFor, $pluralLoo
     $multiVersions = array_merge(...$multiVersions);
 
     /** @var MethodDefinition[] */
-    $allNewMethods = array_unique(array_merge($aliasesOfOriginals, $multiVersions));
+    $allNewMethods = array_unique(array_merge($aliasesOfOriginals, $multiVersions), SORT_REGULAR);
 
 
     ob_start();
-    fileTop($traitname, []);
+    fileTop($traitname, $usedModels);
 
     foreach($methodsToGenerateFor as $method){
-        generateAbstractOriginal($method->name, $method->parameters);
+        generateAbstractOriginal($method);
     }
 
     foreach($allNewMethods as $newMethod){
@@ -188,10 +177,10 @@ function generateFullProviderTrait($traitname, $methodsToGenerateFor, $pluralLoo
             generateAlias($newMethod);
             continue;
         }
-        if($newMethod->generationType === MethodGenerationType::GetItemsForSingle || $newMethod->generationType === MethodGenerationType::PopulateSingle){
+        if($newMethod->generationType === MethodGenerationType::GetItemsInSingle || $newMethod->generationType === MethodGenerationType::PopulateSingle){
             throw new Exception("New non alias or non multiple variant in trait generation not supported: " . $newMethod->name);
         }        
-        if($newMethod->generationType === MethodGenerationType::GetItemsForMultiple){
+        if($newMethod->generationType === MethodGenerationType::GetItemsInMultiple){
             generateMultiMethod($newMethod);
             continue;
         }

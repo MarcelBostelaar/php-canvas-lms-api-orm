@@ -7,29 +7,54 @@ use Closure;
 
 abstract class TypeDefinitionBase {
     public function __construct(
-        public bool $isArrayVariant = false,
     ) {}
 
-    public abstract function __toString(): string;
-
     public abstract function map(Closure $func);
+
+    public abstract function codeString(): string;
+    public abstract function annotatedString(): string;
 }
 
 class AtomicTypeDefinition extends TypeDefinitionBase {
     public function __construct(
         public string $type,
-        bool $isArrayVariant = false,
+        public bool $isArrayVariant = false,
         public bool $isNullable = false
     ) {
-        parent::__construct($isArrayVariant);
+        parent::__construct();
     }
 
-    public function __toString(): string {
+    public function annotatedString(): string {
+
         return ($this->isNullable ? '?' : '') . $this->type . ($this->isArrayVariant ? '[]' : '') ;
+    }
+
+    public function codeString(): string {
+        if($this->isArrayVariant){
+            return 'array';
+        }
+        if($this->type === 'mixed'){
+            return 'mixed';
+        }
+        return ($this->isNullable ? '?' : '') . $this->type;
     }
 
     public function map(Closure $func) {
         return $func($this);
+    }
+
+    public function mergeEnhance(TypeDefinitionBase $other): AtomicTypeDefinition {
+        if(!($other instanceof AtomicTypeDefinition)){
+            throw new \Exception("Cannot merge non-atomic type definition into atomic type definition");
+        }
+        if(!$this->isArrayVariant && $other->isArrayVariant){
+            throw new \Exception("Cannot enhance atomic type definition to array variant if original is not array variant");
+        }
+        if(!$this->isNullable && $other->isNullable){
+            throw new \Exception("Cannot enhance atomic type definition to nullable if original is not nullable");
+        }
+        //Assume other type is more specific
+        return $other;
     }
 }
 
@@ -37,20 +62,26 @@ class GenericTypeDefinition extends TypeDefinitionBase {
     /**
      * @param string $type
      * @param TypeDefinitionBase[] $genericParameters
-     * @param bool $isArrayVariant
      */
     public function __construct(
         public string $type,
         public array $genericParameters,
-        bool $isArrayVariant = false,
-        public bool $isNullable = false
+        public bool $isNullable = false,
+        public bool $isArrayVariant = false
     ) {
-        parent::__construct($isArrayVariant);
+        parent::__construct();
     }
 
-    public function __toString(): string {
-        $generics = implode(", ", array_map(fn($p) => (string)$p, $this->genericParameters));
+    public function annotatedString(): string {
+        $generics = implode(", ", array_map(fn($p) => $p->annotatedString(), $this->genericParameters));
         return ($this->isNullable ? '?' : '') . $this->type . "<$generics>" . ($this->isArrayVariant ? '[]' : '') ;
+    }
+
+    public function codeString(): string {
+        if($this->isArrayVariant){
+            return 'array';
+        }
+        return ($this->isNullable ? '?' : '') . $this->type;
     }
 
     public function map(Closure $func) {
@@ -63,7 +94,6 @@ class GenericTypeDefinition extends TypeDefinitionBase {
 class UnionTypeDefinition extends TypeDefinitionBase {
     /**
      * @param TypeDefinitionBase[] $types
-     * @param bool $isArrayVariant
      */
     public function __construct(
         public array $types
@@ -71,8 +101,12 @@ class UnionTypeDefinition extends TypeDefinitionBase {
         parent::__construct();
     }
 
-    public function __toString(): string {
-        return implode("|", array_map(fn($p) => (string)$p, $this->types));
+    public function annotatedString(): string {
+        return implode("|", array_map(fn($p) => $p->annotatedString(), $this->types));
+    }
+
+    public function codeString(): string {
+        return implode("|", array_map(fn($p) => $p->codeString(), $this->types));
     }
 
     public function map(Closure $func) {
@@ -101,30 +135,19 @@ class PropertyDefinition {
 class MethodParameter {
     public function __construct(
         public string $name,
-        public TypeDefinitionBase $type,
-        public TypeDefinitionBase $annotatedType
+        public TypeDefinitionBase $type
     ) {}
 
     public function paramString(): string {
-        return $this->type->__toString() . ' $' . $this->name;
+        return $this->type->codeString() . ' $' . $this->name;
     }
-}
-
-/**
- * Represents a method return type with type information
- */
-class MethodReturnType {
-    public function __construct(
-        public TypeDefinitionBase $type,
-        public TypeDefinitionBase $annotatedType
-    ) {}
 }
 
 enum MethodGenerationType {
     case PopulateSingle;
     case PopulateMultiple;
-    case GetItemsForSingle;
-    case GetItemsForMultiple;
+    case GetItemsInSingle;
+    case GetItemsInMultiple;
     case InterfaceMethod;
     case Other;
 }
@@ -134,11 +157,23 @@ enum MethodGenerationType {
  */
 class MethodDefinition {
 
+    public array $metadata = [];
+
+    /**
+     * Summary of __construct
+     * @param string $name
+     * @param string $docstring
+     * @param MethodParameter[] $parameters
+     * @param TypeDefinitionBase $returnType
+     * @param MethodGenerationType $generationType
+     * @param mixed $aliasOf
+     * @param mixed $pluralVariantOf
+     */
     public function __construct(
         public string $name,
         public string $docstring,
         public array $parameters,
-        public MethodReturnType $returnType,
+        public TypeDefinitionBase $returnType,
         public MethodGenerationType $generationType,
         public ?MethodDefinition $aliasOf = null,
         public ?MethodDefinition $pluralVariantOf = null
@@ -176,8 +211,7 @@ class MethodDefinition {
                         $newParamName = str_replace($lowerOriginal, $lowerAlias, $param->name);
                         return new MethodParameter(
                             $newParamName,
-                            $param->type,
-                            $param->annotatedType
+                            $param->type
                         );
                     }, $this->parameters);
 
@@ -222,10 +256,9 @@ class MethodDefinition {
 
                 $newName = str_replace($singular, $plural, $this->name);
 
-                $lowerOriginal = lcfirst($singular);
-                $relevantParam = array_filter($this->parameters, fn($p) => $p->name == $lowerOriginal);
+                $relevantParam = array_filter($this->parameters, fn($p) => $p->name == $this->metadata['relevantParam']);
                 if(count($relevantParam) === 0){
-                    echo "Could not find parameter $lowerOriginal in method {$this->name} to create plural variant";
+                    echo "Could not find parameter {$this->metadata['relevantParam']} in method {$this->name} to create plural variant";
                     //Singular noun might be subset of plural noun, skip
                     continue;
                 }
@@ -234,8 +267,7 @@ class MethodDefinition {
                 $pluralParam = clone $relevantParam;
                 $pluralParam->type = clone $relevantParam->type;
                 $pluralParam->type->isArrayVariant = true;
-                $pluralParam->annotatedType = clone $relevantParam->annotatedType;
-                $pluralParam->annotatedType->isArrayVariant = true;
+                $pluralParam->name = lcfirst($plural); //take first plural as param name
 
                 //replace relevant param with array variant
                 $newparams = array_map(function(MethodParameter $param) use ($relevantParam, $pluralParam){
@@ -246,10 +278,23 @@ class MethodDefinition {
                 }, $this->parameters);
 
                 if($this->generationType === MethodGenerationType::PopulateSingle){
-                    //Same in as out, simple map is fine
+                    
+                    $newReturnType = $this->returnType->map(function($typeDef) {
+                        if($typeDef instanceof GenericTypeDefinition){
+                            if($typeDef->type === 'SuccessResult'){
+                                $pluralSubtype = clone $typeDef->genericParameters[0];
+                                $pluralSubtype->isArrayVariant = true;
+                                return new GenericTypeDefinition(
+                                    'SuccessResult',
+                                    [
+                                        $pluralSubtype
+                                    ]
+                                );
+                            }
+                        }
+                        return $typeDef;
+                    });
 
-                    $newReturnType = clone $this->returnType;
-                    $newReturnType->isArrayVariant = true;
                     return new MethodDefinition(
                         $newName,
                         $this->docstring,
@@ -262,9 +307,9 @@ class MethodDefinition {
                 }
                 
                 //GetItemsForSingle
-                if($this->generationType === MethodGenerationType::GetItemsForSingle){
+                if($this->generationType === MethodGenerationType::GetItemsInSingle){
                     //Return type becomes lookup of model
-                    $newAnnotatedReturnType = $this->returnType->annotatedType
+                    $newAnnotatedReturnType = $this->returnType
                         ->map(function($typeDef) use ($relevantParam) {
                         if($typeDef instanceof GenericTypeDefinition){
                             if($typeDef->type === 'SuccessResult'){
@@ -278,7 +323,7 @@ class MethodDefinition {
                                         new GenericTypeDefinition(
                                             'Lookup',
                                             [
-                                                $relevantParam->annotatedType,
+                                                $relevantParam->type,
                                                 $pluralSubtype
                                             ]
                                         )
@@ -292,11 +337,8 @@ class MethodDefinition {
                         $newName,
                         $this->docstring,
                         $newparams,
-                        new MethodReturnType(
-                            $this->returnType->type,
-                            $newAnnotatedReturnType
-                        ),
-                        MethodGenerationType::GetItemsForMultiple,
+                        $newAnnotatedReturnType,
+                        MethodGenerationType::GetItemsInMultiple,
                         null,
                         $this
                     );
@@ -309,9 +351,11 @@ class MethodDefinition {
 
     public function createDocstringParamsAndReturn($tabDepth = 0): string {
         $lines = array_map(function(MethodParameter $param){
-            return " * @param {$param->annotatedType} \${$param->name}";
+            $annotatedType = $param->type->annotatedString();
+            return " * @param {$annotatedType} \${$param->name}";
         }, $this->parameters);
-        $lines[] = " * @return {$this->returnType->annotatedType}";
+        $annotatedType = $this->returnType->annotatedString();
+        $lines[] = " * @return {$annotatedType}";
         $paramLines = array_map(fn($line) => str_repeat("\t", $tabDepth) . $line, $lines);
         return implode("\n", $paramLines);
     }

@@ -15,6 +15,11 @@ use CanvasApiLibrary\Core\Services\ErrorOnNotFoundStatusHandlerWrapper;
 use CanvasApiLibrary\Core\Services\StatusHandlerInterface;
 use InvalidArgumentException;
 
+use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
+
 
 /**
  * Provider for Canvas API User operations. 
@@ -34,9 +39,9 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
 
     /**
      * @param Models\Group $group
-     * @return User[]
-     */
-    public function getUsersInGroup(Models\Group $group): array{
+     * @return ErrorResult|NotFoundResult|SuccessResult<User[]>|UnauthorizedResult
+    */
+    public function getUsersInGroup(Models\Group $group): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->GetMany( "/groups/{$group->id}/users", $group->getContext());
     }
 
@@ -44,9 +49,9 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
      * Gets all users in a section.
      * @param Models\Section $section
      * @param ?string $enrollmentRoleFilter Filter to only retrieve a specific type of user. Allowed values: Student, Teacher, Ta, Observer, Designer
-     * @return User[]
+     * @return ErrorResult|NotFoundResult|SuccessResult<User[]>|UnauthorizedResult
      */
-    public function getUsersInSection(Models\Section $section, ?string $enrollmentRoleFilter): array{
+    public function getUsersInSection(Models\Section $section, ?string $enrollmentRoleFilter): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         $postfix = "";
         switch($enrollmentRoleFilter){
             case null:
@@ -72,9 +77,9 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
      * Gets all users in a course.
      * @param Models\Course $course
      * @param ?string $enrollmentRoleFilter Filter to only retrieve a specific type of user. Allowed values: student, teacher, ta, observer, designer
-     * @return User[]
+     * @return ErrorResult|NotFoundResult|SuccessResult<User[]>|UnauthorizedResult
      */
-    public function getUsersInCourse(Models\Course $course, ?string $enrollmentRoleFilter): array{
+    public function getUsersInCourse(Models\Course $course, ?string $enrollmentRoleFilter): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         $postfix = "";
         switch($enrollmentRoleFilter){
             case null:
@@ -95,38 +100,31 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
 
     /**
      * @param Domain $domain
-     * @return Models\User
+     * @return ErrorResult|NotFoundResult|SuccessResult<User>|UnauthorizedResult
      */
-    public function getUserSelfInfo(Domain $domain): User{
-        /** @var User $result */
-        $result = $this->Get("/users/self", $domain->getContext());
-        return $result;
+    public function getUserSelfInfo(Domain $domain): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+        return $this->Get("/users/self", $domain->getContext());
     }
 
     /**
      * Populates a user from the canvas API.
      * @param Models\UserStub $user
-     * @return Models\User
+     * @return ErrorResult|NotFoundResult|SuccessResult<User>|UnauthorizedResult
      */
-    public function populateUser(UserStub $user): User{
+    public function populateUser(UserStub $user): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         if($user->optionalCourseContext === null){
             //Must be retrieved from global route. Note that only admins can do this.
             /** @var User $result */
-            $result = $this->Get("/users/{$user->id}",
+            return $this->Get("/users/{$user->id}",
             $user->getContext(), 
             null,
-            null,
-                //Wrap the handler for this specific call to throw an explanatory exception with a message on 404 not found instead.
-            new ErrorOnNotFoundStatusHandlerWrapper($this->statusHandler, "Api route returned not found. Ensure that your API key has admin rights in your Canvas LMS api environment, or provide this user with a course context to retrieve it from.")
+            null
         );
-            return $result;
         }
         
         //Try to find the user within the course provided as the current context.
-        /** @var User $result */
-        $result = $this->Get("courses/{$user->optionalCourseContext->id}/users/{$user->id}",
+        return $this->Get("courses/{$user->optionalCourseContext->id}/users/{$user->id}",
             $user->getContext()
         );
-        return $result;
     }
 }

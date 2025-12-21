@@ -7,24 +7,24 @@ namespace CanvasApiLibrary\Core\Providers\Generated\Traits;
 
 use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
+use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
+use CanvasApiLibrary\Core\Models\Assignment;
+use CanvasApiLibrary\Core\Models\Course;
 use CanvasApiLibrary\Core\Models\Domain;
+use CanvasApiLibrary\Core\Models\Group;
+use CanvasApiLibrary\Core\Models\GroupCategory;
+use CanvasApiLibrary\Core\Models\Section;
+use CanvasApiLibrary\Core\Models\Submission;
+use CanvasApiLibrary\Core\Models\SubmissionComment;
+use CanvasApiLibrary\Core\Models\User;
+use CanvasApiLibrary\Core\Models\UserDisplay;
+use CanvasApiLibrary\Core\Models\UserStub;
 
 trait CourseProviderProperties{
     
     
 
-    abstract public function getAllCoursesInDomain(Domain $domain) : array;
-    
-    /**
-     * Summary of getAllCoursesInDomains
-     * @param Domain[] $domains
-     * @return Lookup<Domain, Domain>
-     */
-    public function getAllCoursesInDomains(array $domains): Lookup{
-        $lookup = new Lookup();
-        foreach($domains as $domain){
-            $lookup->add($domain, $this->getAllCoursesInDomain($domain));
-        }
-        return $lookup;
-    }
 }

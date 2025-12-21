@@ -5,6 +5,7 @@ use Buildscript\AbstractExtractorVisitor;
 use Buildscript\AtomicTypeDefinition;
 use Buildscript\GenericTypeDefinition;
 use Buildscript\MethodGenerationType;
+use Buildscript\TypeDefinitionBase;
 use Buildscript\UnionTypeDefinition;
 use Buildscript\FindTraitUserVisitor;
 use Exception;
@@ -21,10 +22,18 @@ use Buildscript\ProviderParseResult;
 use function Buildscript\parseParamType;
 use function Buildscript\parseReturnType;
 
-function processProviderFile($filePath, $providername, $traitname, $modelname): ProviderParseResult {
+/**
+ * @param string $filePath
+ * @param string $providername
+ * @param string $traitname
+ * @param string $modelname
+ * @param array{string: string[]} $pluralLookup
+ * @return ProviderParseResult
+ */
+function processProviderFile(string $filePath, string $providername, string $traitname, string $modelname, array $pluralLookup): ProviderParseResult {
     $ast = parseFile($filePath);
     $traitFound = (new FindTraitUserVisitor($traitname))->process($ast)->wasFound;
-    $methods = (new ExtractProviderMethodsVisitor())->process($ast)->methods;
+    $methods = (new ExtractProviderMethodsVisitor($pluralLookup))->process($ast)->methods;
 
     return new ProviderParseResult(
         $ast,
@@ -39,6 +48,13 @@ function processProviderFile($filePath, $providername, $traitname, $modelname): 
 class ExtractProviderMethodsVisitor extends AbstractExtractorVisitor {
     /** @var MethodDefinition[] */
     public $methods = [];
+
+    /**
+     * Summary of __construct
+     * @param array{string: string[]} $pluralLookup
+     */
+    public function __construct(private array $pluralLookup) {
+    }
 
     public function enterNode(\PhpParser\Node $node) {
         if (!$node instanceof \PhpParser\Node\Stmt\ClassMethod) {
@@ -64,53 +80,149 @@ class ExtractProviderMethodsVisitor extends AbstractExtractorVisitor {
         //get params
         $params = [];
         foreach($node->params as $param){
-            $docstringType = parseParamType($param->var->name, $docstring);
-            $codeType = self::parseType($param->type);
-            $stringified = (string)$codeType;
-            $stringifiedDoc =(string)$docstringType;
-            echo "Parsed param {$param->var->name} with code type {$stringified} and docstring type {$stringifiedDoc}\n";
-            $params[] = new MethodParameter($param->var->name, $codeType, $docstringType);
+            $typeInCode = self::parseType($param->type);
+            $docstringType = parseParamType($param->var->name, $docstring, $typeInCode);
+            $stringifiedDoc = $docstringType->annotatedString();
+            echo "Parsed param {$param->var->name} with type {$stringifiedDoc}\n";
+            $params[] = new MethodParameter($param->var->name, $docstringType);
         }
         $docstringReturnType = parseReturnType($docstring);
-        $codeReturnType = self::parseType($node->getReturnType());
-        $stringifiedReturn = (string)$codeReturnType;
-        $stringifiedDocReturn = (string)$docstringReturnType;
-        echo "Parsed return type for method $name with code type {$stringifiedReturn} and docstring type {$stringifiedDocReturn}\n";
+        $stringifiedDocReturn = $docstringReturnType->annotatedString();
+        echo "Parsed return type for method $name with docstring type {$stringifiedDocReturn}\n";
         
-        //if has 1 param, and return type is union with success over same type, it's a populator
-        if(count($params) === 1 && $docstringReturnType instanceof UnionTypeDefinition){
-            foreach($docstringReturnType->types as $type){
-                if($type instanceof GenericTypeDefinition && $type->type === "SuccessResult"){
-                    if(count($type->genericParameters) === 1){
-                        if($type->genericParameters[0] instanceof AtomicTypeDefinition){
-                            if($type->genericParameters[0] == $params[0]->annotatedType){
-                                //it's a populator
-                                $generationType = MethodGenerationType::PopulateSingle;
-                                break;
-                            }
+        $method = new MethodDefinition(
+            $name,
+            $docstringText,
+            $params,
+            $docstringReturnType,
+            MethodGenerationType::Other
+        );
+        $this->methods[] = $method;
+        //Try to specify generation type
+        if(self::tryCheckIsMethodPopulator($method)){
+            return null;
+        }
+        if($this->tryCheckIsXInYMethod($method)){
+            return null;
+        }
+        //No special type found
+        return null;
+    }
+
+    /**
+     * Checks if this method is a populator, sets its type if it is.
+     * Method is considered a populator if it has a param, and the return is a union type containing SuccessResult of that param type
+     * check if union type of success, unauthorized, notfound, error
+     * @param MethodDefinition $method
+     * @return bool
+     */
+    private static function tryCheckIsMethodPopulator(MethodDefinition $method): bool {
+        $wrappedType = self::extractUnionWrappedType($method->returnType);
+        if($wrappedType === null){
+            return false;
+        }
+        //try find it in params
+        foreach($method->parameters as $param){
+            if($param->type->annotatedString() == $wrappedType->annotatedString()){
+                $method->metadata['relevantParam'] = $param->name;
+                $method->generationType = MethodGenerationType::PopulateSingle;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static function extractUnionWrappedType(TypeDefinitionBase $type): ?TypeDefinitionBase {
+        if(!($type instanceof UnionTypeDefinition)){
+            return null;
+        }
+        $foundType = null;
+        $notFoundResult = false;
+        $unauthorizedResult = false;
+        $errorResult = false;
+        foreach($type->types as $subtype){
+            if($subtype instanceof GenericTypeDefinition && $subtype->type === "SuccessResult"){
+                if(count($subtype->genericParameters) !== 1){
+                    return null;
+                }
+                $foundType = $subtype->genericParameters[0];
+                continue;
+            }
+            else if(!$subtype instanceof AtomicTypeDefinition){
+                return null;
+            }
+            switch($subtype->type){
+                case "UnauthorizedResult":
+                    $unauthorizedResult = true;
+                    break;
+                case "NotFoundResult":
+                    $notFoundResult = true;
+                    break;
+                case "ErrorResult":
+                    $errorResult = true;
+                    break;
+                default:
+                    return null;
+            };
+        }
+        if($foundType !== null && $notFoundResult && $unauthorizedResult && $errorResult){
+            return $foundType;
+        }
+        return null;
+    }
+
+    /**
+     * Checks if item is an XInY method, sets type if so.
+     * @param MethodDefinition $method
+     * @throws Exception
+     * @return bool
+     */
+    private function tryCheckIsXInYMethod(MethodDefinition $method): bool {
+        //split name on "In"
+        $parts = preg_split('/In/', $method->name);
+        if(count($parts) !== 2){
+            //Not an In method
+            return false;
+        }
+        $returnWrappedType = self::extractUnionWrappedType($method->returnType);
+        if($returnWrappedType === null){
+            //return type is wrong.
+            return false;
+        }
+        $head = $parts[0];
+        $tail = $parts[1];
+        $foundMatchingPlural = false;
+        $foundMatchingSingular = false;
+
+        foreach($this->pluralLookup as $singular => $plurals){
+            if($tail === $singular){
+                //try finding param with type matching singular
+                foreach($method->parameters as $param){
+                    if($param->type->annotatedString() === $singular){
+                        if($foundMatchingSingular){
+                            throw new Exception("Method " . $method->name . " matches multiple singular forms for parameter");
                         }
+                        $method->metadata['relevantParam'] = $param->name;
+                        $foundMatchingSingular = true;
+                    }
+                }
+            }
+            foreach($plurals as $plural){
+                if(str_ends_with($head, $plural)){
+                    if($returnWrappedType->annotatedString() === $singular){
+                        if($foundMatchingPlural){
+                            throw new Exception("Method " . $method->name . " matches multiple plural forms for return type");
+                        }
+                        $foundMatchingPlural = true;
                     }
                 }
             }
         }
-        //if it contains the word "In", it's a get items for single
-        else if(preg_match('/[a-z]In[A-Z]/', $name) === 1){
-            $generationType = MethodGenerationType::GetItemsForSingle;
+        if($foundMatchingPlural && $foundMatchingSingular){
+            $method->generationType = MethodGenerationType::GetItemsInSingle;
+            return true;
         }
-        if(!isset($generationType)){
-            $generationType = MethodGenerationType::Other;
-        }
-        //otherwise, it's Other
-
-
-        $this->methods[] = new MethodDefinition(
-            $name,
-            "",//$docstringText,
-            $params,
-            new MethodReturnType($codeReturnType, $docstringReturnType),
-            $generationType
-        );
-        return null;
+        return false;
     }
 
     private static function parseType(Identifier|Name|ComplexType $type){

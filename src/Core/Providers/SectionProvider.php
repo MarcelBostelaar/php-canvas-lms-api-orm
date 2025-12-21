@@ -9,7 +9,10 @@ use CanvasApiLibrary\Core\Models\Course;
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Services\CanvasCommunicator;
-
+use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 
 /**
  * Provider for Canvas API section operations
@@ -29,21 +32,20 @@ class SectionProvider extends AbstractProvider implements SectionProviderInterfa
 
     /**
      * @param \CanvasApiLibrary\Core\Models\Course $course
-     * @return Models\Section[]
+     * @return ErrorResult|NotFoundResult|SuccessResult<Section[]>|UnauthorizedResult
      */
-    public function getAllSectionsInCourse(Course $course) : array{
+    public function getAllSectionsInCourse(Course $course) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->GetMany("/courses/$course->id/sections", $course->getContext());
     }
 
     /**
      * @param Models\Section $section
-     * @return Models\Section
+     * @return ErrorResult|NotFoundResult|SuccessResult<Section>|UnauthorizedResult
      */
-    public function populateSection(Section $section): Section{
+    public function populateSection(Section $section): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         $courseID = $section->course->id;
-        $this->Get("/courses/$courseID/sections/$section->id", 
+        return $this->Get("/courses/$courseID/sections/$section->id", 
         $section->getContext(), 
         $this->modelPopulator->withInstance($section));
-        return $section;
     }
 }

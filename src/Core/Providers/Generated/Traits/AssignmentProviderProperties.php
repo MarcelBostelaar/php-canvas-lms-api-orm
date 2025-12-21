@@ -7,22 +7,42 @@ namespace CanvasApiLibrary\Core\Providers\Generated\Traits;
 
 use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
+use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 use CanvasApiLibrary\Core\Models\Assignment;
+use CanvasApiLibrary\Core\Models\Course;
+use CanvasApiLibrary\Core\Models\Domain;
+use CanvasApiLibrary\Core\Models\Group;
+use CanvasApiLibrary\Core\Models\GroupCategory;
+use CanvasApiLibrary\Core\Models\Section;
+use CanvasApiLibrary\Core\Models\Submission;
+use CanvasApiLibrary\Core\Models\SubmissionComment;
+use CanvasApiLibrary\Core\Models\User;
+use CanvasApiLibrary\Core\Models\UserDisplay;
+use CanvasApiLibrary\Core\Models\UserStub;
 
 trait AssignmentProviderProperties{
     
     
-    
-    abstract public function populateAssignment(Assignment $assignment);
-    
+    abstract public function populateAssignment(Assignment $assignment) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
-    * Plural version of populateAssignment
-    * @param Assignment[] $assignments
-    * @return Assignment[]
-
-    */
-    public function populateAssignments(array $assignments) : array{
-        return array_map(fn($x) => $this->populateAssignment($x), $assignments);
+     * Summary of populateAssignments
+     * This is a plural version of populateAssignment
+	 * @param Assignment[] $assignments
+	 * @return ErrorResult|NotFoundResult|SuccessResult<Assignment[]>|UnauthorizedResult
+     */
+    public function populateAssignments(array $assignments): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+        $results = [];
+        foreach($assignments as $item){
+            $result = $this->populateAssignment($item);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            $results[] = $result->value;
+        }
+        return new SuccessResult($results);
     }
     
-    }
+}

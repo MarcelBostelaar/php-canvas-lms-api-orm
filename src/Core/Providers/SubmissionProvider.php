@@ -15,6 +15,10 @@ use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Core\Services\CanvasCommunicator;
 
+use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 
 
 /**
@@ -38,9 +42,9 @@ class SubmissionProvider extends AbstractProvider implements SubmissionProviderI
     /**
      * @param Models\Assignment $assignment
      * @param ?UserProvider $userProvider If provided, will also fetch the users associated with these submissions and pass them to the emitted in the user provider.
-     * @return Submission[]
+     * @return ErrorResult|NotFoundResult|SuccessResult<Submission[]>|UnauthorizedResult
      */
-    function getSubmissionsInAssignment(Assignment $assignment, ?UserProviderInterface $userProvider = null) : array{
+    function getSubmissionsInAssignment(Assignment $assignment, ?UserProviderInterface $userProvider = null) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         $postfix = "";
         $builder = $this->modelPopulator;
         if($userProvider !== null){
@@ -55,11 +59,10 @@ class SubmissionProvider extends AbstractProvider implements SubmissionProviderI
 
     /**
      * @param Models\Submission $submission
-     * @return Models\Submission
+     * @return ErrorResult|NotFoundResult|SuccessResult<Submission>|UnauthorizedResult
      */
-    public function populateSubmission(Submission $submission): Submission{
-        $this->Get("/courses/{$submission->course->id}/assignments/{$submission->assignment->id}/submissions/{$submission->user->id}",
+    public function populateSubmission(Submission $submission): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+        return $this->Get("/courses/{$submission->course->id}/assignments/{$submission->assignment->id}/submissions/{$submission->user->id}",
         $submission->getContext(), $this->modelPopulator->withInstance($submission));
-        return $submission;
     }
 }
