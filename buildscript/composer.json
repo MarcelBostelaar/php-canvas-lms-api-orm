@@ -16,6 +16,7 @@
             "models/BuildModels.php",
             "models/CodeGenModels.php",
             "providers/BuildProviders.php",
+            "providers/WrapperGenerator.php",
             "providers/CodeGenProviders.php",
             "providers/InterfaceGenerator.php",
             "providers/ProviderOriginalParser.php"

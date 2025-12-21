@@ -56,9 +56,13 @@ function buildProviders($folder, $models): array {
             $pluralLookup,
             $modelNames
         );
+        $interfaceName = $provider->providername . "ProviderInterface";
+        $wrapperName = $provider->providername . "ProviderWrapper";
         file_put_contents("$folder/Generated/Traits/" . $provider->traitname . '.php', prettified("<?php\n" . $result->trait));
-        $generatedInterface = generateInterface($provider->providername . "ProviderInterface", array_merge($result->createdMethods, $provider->methods), $modelNames);
+        $generatedInterface = generateInterface($provider->providername . "ProviderInterface", array_merge($result->createdMethods, $provider->methods), $wrapperName, $modelNames);
         file_put_contents("$folder/Generated/Interfaces/" . $provider->providername . "ProviderInterface" . '.php', prettified("<?php\n" . $generatedInterface));
+        $generatedWrapper = generateWrapper($provider->providername . "ProviderWrapper", $interfaceName, array_merge($result->createdMethods, $provider->methods), $modelNames);
+        file_put_contents("$folder/Generated/Wrappers/" . $provider->providername . "ProviderWrapper" . '.php', prettified("<?php\n" . $generatedWrapper));
         // echo "Provider: " . $provider->providername . "<br>";
         // echo "Original methods: \n";
         // var_dump($provider->methods);

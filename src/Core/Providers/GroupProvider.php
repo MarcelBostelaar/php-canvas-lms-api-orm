@@ -5,6 +5,7 @@ use CanvasApiLibrary\Core\Models\Group;
 use CanvasApiLibrary\Core\Models\GroupCategory;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\GroupProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\GroupProviderInterface;
+use CanvasApiLibrary\Core\Providers\Traits\GroupWrapperTrait;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
@@ -16,10 +17,12 @@ use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 
 
 /**
- * Provider for Canvas API group operations
+ * @implements GroupProviderInterface<SuccessResult,ErrorResult,NotFoundResult,UnauthorizedResult>
+ * @extends parent<Group>
  */
 class GroupProvider extends AbstractProvider implements GroupProviderInterface{
     use GroupProviderProperties;
+    use GroupWrapperTrait;
 
     public function __construct(
         CanvasCommunicator $canvasCommunicator

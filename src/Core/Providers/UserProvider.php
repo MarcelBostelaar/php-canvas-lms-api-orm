@@ -6,6 +6,7 @@ use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Models\UserStub;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\UserProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
+use CanvasApiLibrary\Core\Providers\Traits\UserWrapperTrait;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Core\Models as Models;
 use CanvasApiLibrary\Core\Models\User;
@@ -22,12 +23,12 @@ use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 
 
 /**
- * Provider for Canvas API User operations. 
- * Can be run in admin mode, enabling global operations for users, provided your API key has rights to do so.
- * Otherwise must be provided with the course that will be used as the context of the user operations, such as reading personal data.
+ * @implements UserProviderInterface<SuccessResult,ErrorResult,NotFoundResult,UnauthorizedResult>
+ * @extends parent<User>
  */
 class UserProvider extends AbstractProvider implements UserProviderInterface{
     use UserProviderProperties;
+    use UserWrapperTrait;
 
     public function __construct(
         CanvasCommunicator $canvasCommunicator

@@ -5,6 +5,7 @@ namespace CanvasApiLibrary\Core\Providers\Interfaces;
 use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
+use Closure;
 
 use CanvasApiLibrary\Core\Models\Assignment;
 use CanvasApiLibrary\Core\Models\Course;
@@ -27,15 +28,28 @@ use CanvasApiLibrary\Core\Models\UserStub;
 interface AssignmentProviderInterface extends HandleEmittedInterface{
 
     public function getClientID(): string;
+
+    /**
+     * Summary of handleResults
+     * @template newSuccessT
+     * @template newUnauthorizedT
+     * @template newNotFoundT
+     * @template newErrorT
+     * @param Closure(TSuccessResult|TErrorResult|TNotFoundResult|TUnauthorizedResult) : (newSuccessT|newErrorT|newNotFoundT|newUnauthorizedT) $processor
+     * @return AssignmentProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
+     */
+    public function handleResults(Closure $processor): AssignmentProviderInterface;
     /**
 	 * @param Assignment[] $assignments
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Assignment[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function populateAssignments(array $assignments) : mixed;
 
     /**
 	 * @param Assignment $assignment
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Assignment>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function populateAssignment(Assignment $assignment) : mixed;
 

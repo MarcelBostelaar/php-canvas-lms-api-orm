@@ -11,7 +11,15 @@ use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 use Exception;
 
+/**
+ * @template ModelT
+ */
 abstract class AbstractProvider implements HandleEmittedInterface{
+    /**
+     * Summary of __construct
+     * @param CanvasCommunicator $canvasCommunicator
+     * @param ModelPopulationConfigBuilder<ModelT> $modelPopulator
+     */
     public function __construct(
         public readonly CanvasCommunicator $canvasCommunicator,
         protected readonly ModelPopulationConfigBuilder $modelPopulator
@@ -50,7 +58,7 @@ abstract class AbstractProvider implements HandleEmittedInterface{
 
     /**
      * @param array<int, ModelInterface> $context
-     * @return array{0:mixed,1:CanvasReturnStatus,2:ModelPopulationConfigBuilder}
+     * @return array{0:mixed,1:CanvasReturnStatus,2:ModelPopulationConfigBuilder<ModelT>}
      */
     private function GetInternal(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null): array{
         $builder = $customBuilder ?? $this->modelPopulator;
@@ -65,7 +73,7 @@ abstract class AbstractProvider implements HandleEmittedInterface{
 
     /**
      * @param array<int, ModelInterface> $context
-    * @return SuccessResult<ModelInterface[]>|UnauthorizedResult|NotFoundResult|ErrorResult
+    * @return SuccessResult<ModelT[]>|UnauthorizedResult|NotFoundResult|ErrorResult
     */
     protected function GetMany(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null, ?callable $postProcessor = null): SuccessResult|UnauthorizedResult|NotFoundResult|ErrorResult{
         [$data, $status, $builder] = $this->GetInternal($route, $context, $customBuilder);
@@ -83,7 +91,7 @@ abstract class AbstractProvider implements HandleEmittedInterface{
 
     /**
      * @param array<int, ModelInterface> $context
-     * @return SuccessResult<ModelInterface>|UnauthorizedResult|NotFoundResult|ErrorResult
+     * @return SuccessResult<ModelT>|UnauthorizedResult|NotFoundResult|ErrorResult
      */
     protected function Get(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null, ?callable $postProcessor = null): SuccessResult|UnauthorizedResult|NotFoundResult|ErrorResult{
         [$data, $status, $builder] = $this->GetInternal($route, $context, $customBuilder);

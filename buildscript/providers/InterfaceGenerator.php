@@ -91,7 +91,7 @@ function replaceGenericsWithMixed(TypeDefinitionBase $type){
  * @param string[] $usedModels
  * @return string
  */
-function generateInterface(string $interfacename, array $methods, $usedModels):string{
+function generateInterface(string $interfacename, array $methods, string $wrappername, $usedModels):string{
     $methods = array_map(function($x){
         return new MethodDefinition(
             $x->name,
@@ -115,6 +115,7 @@ namespace CanvasApiLibrary\Core\Providers\Interfaces;
 use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
+use Closure;
 
 <?php
     foreach($usedModels as $usedModel){ ?>
@@ -131,6 +132,17 @@ use CanvasApiLibrary\Core\Models\<?=$usedModel?>;
 interface <?=$interfacename?> extends HandleEmittedInterface{
 
     public function getClientID(): string;
+
+    /**
+     * Summary of handleResults
+     * @template newSuccessT
+     * @template newUnauthorizedT
+     * @template newNotFoundT
+     * @template newErrorT
+     * @param Closure(TSuccessResult|TErrorResult|TNotFoundResult|TUnauthorizedResult) : (newSuccessT|newErrorT|newNotFoundT|newUnauthorizedT) $processor
+     * @return <?=$interfacename?><newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
+     */
+    public function handleResults(Closure $processor): <?=$interfacename?>;
 <?php
 foreach($methods as $method){
     generateInterfaceMethod($method);
@@ -154,6 +166,7 @@ function generateInterfaceMethod(MethodDefinition $method){
     /**
 <?=$method->createDocstringParamsAndReturn(1)?>
 
+     * @phpstan-ignore return.unresolvableType
     */
     public function <?=$method->name?>(<?=$method->paramString()?>) : <?=$method->returnType
     ->map(fn($x) => replaceGenericsWithMixed($x))->codeString()?>;

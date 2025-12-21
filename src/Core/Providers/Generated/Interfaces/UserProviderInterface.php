@@ -5,6 +5,7 @@ namespace CanvasApiLibrary\Core\Providers\Interfaces;
 use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
+use Closure;
 
 use CanvasApiLibrary\Core\Models\Assignment;
 use CanvasApiLibrary\Core\Models\Course;
@@ -27,9 +28,21 @@ use CanvasApiLibrary\Core\Models\UserStub;
 interface UserProviderInterface extends HandleEmittedInterface{
 
     public function getClientID(): string;
+
+    /**
+     * Summary of handleResults
+     * @template newSuccessT
+     * @template newUnauthorizedT
+     * @template newNotFoundT
+     * @template newErrorT
+     * @param Closure(TSuccessResult|TErrorResult|TNotFoundResult|TUnauthorizedResult) : (newSuccessT|newErrorT|newNotFoundT|newUnauthorizedT) $processor
+     * @return UserProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
+     */
+    public function handleResults(Closure $processor): UserProviderInterface;
     /**
 	 * @param Group $group
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function getUsersInGroup(Group $group) : mixed;
 
@@ -37,6 +50,7 @@ interface UserProviderInterface extends HandleEmittedInterface{
 	 * @param Section $section
 	 * @param ?string $enrollmentRoleFilter
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function getUsersInSection(Section $section, ?string $enrollmentRoleFilter) : mixed;
 
@@ -44,18 +58,21 @@ interface UserProviderInterface extends HandleEmittedInterface{
 	 * @param Course $course
 	 * @param ?string $enrollmentRoleFilter
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function getUsersInCourse(Course $course, ?string $enrollmentRoleFilter) : mixed;
 
     /**
 	 * @param Domain $domain
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function getUserSelfInfo(Domain $domain) : mixed;
 
     /**
 	 * @param UserStub $user
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function populateUser(UserStub $user) : mixed;
 

@@ -7,6 +7,7 @@ use CanvasApiLibrary\Core\Models\Course;
 use CanvasApiLibrary\Core\Models\GroupCategory;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\AssignmentProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\AssignmentProviderInterface;
+use CanvasApiLibrary\Core\Providers\Traits\AssignmentWrapperTrait;
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
@@ -17,9 +18,11 @@ use CanvasApiLibrary\Core\Services\CanvasCommunicator;
 
 /**
  * @implements AssignmentProviderInterface<SuccessResult,ErrorResult,NotFoundResult,UnauthorizedResult>
+ * @extends parent<Assignment>
  */
 class AssignmentProvider extends AbstractProvider implements AssignmentProviderInterface{
     use AssignmentProviderProperties;
+    use AssignmentWrapperTrait;
 
     public function __construct(
         CanvasCommunicator $canvasCommunicator

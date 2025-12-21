@@ -7,7 +7,8 @@
         "psr-4": {
             "CanvasApiLibrary\\Core\\": "./",
             "CanvasApiLibrary\\Core\\Providers\\Interfaces\\": [
-                "Core/Providers/Generated/Interfaces"
+                "Core/Providers/Generated/Interfaces",
+                "Core/Providers/Generated/Wrappers"
             ],
             "CanvasApiLibrary\\Core\\Providers\\": [
                 "Core/Providers/",

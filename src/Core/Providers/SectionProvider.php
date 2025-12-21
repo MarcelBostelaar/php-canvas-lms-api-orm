@@ -4,6 +4,7 @@ use CanvasApiLibrary\Core\Models as Models;
 use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\SectionProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\SectionProviderInterface;
+use CanvasApiLibrary\Core\Providers\Traits\SectionWrapperTrait;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Core\Models\Course;
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
@@ -15,12 +16,12 @@ use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 
 /**
- * Provider for Canvas API section operations
- * 
- * @method Lookup<Models\Course, Models\Section> getAllSectionsInCourses() Virtual method to get all sections in a course
+ * @implements SectionProviderInterface<SuccessResult,ErrorResult,NotFoundResult,UnauthorizedResult>
+ * @extends parent<Section>
  */
 class SectionProvider extends AbstractProvider implements SectionProviderInterface{
     use SectionProviderProperties;
+    use SectionWrapperTrait;
 
     public function __construct(
         CanvasCommunicator $canvasCommunicator

@@ -5,6 +5,7 @@ namespace CanvasApiLibrary\Caching\AccessAware\Providers;
 use CanvasApiLibrary\Core\Caching\CacheRules\UndefinedCacherule;
 use CanvasApiLibrary\Core\Caching\Utility\FullCacheProviderInterface;
 use CanvasApiLibrary\Core\Caching\Utility\CacheRule;
+use CanvasApiLibrary\Core\Providers\Traits\UserWrapperTrait;
 use CanvasApiLibrary\Core\Providers\UserProvider;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\UserProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
@@ -13,6 +14,7 @@ class UserProviderCached implements UserProviderInterface{
 
     use UserProviderProperties;
     use PermissionEnsurerTrait;
+    use UserWrapperTrait;
     public function __construct(
         private readonly UserProvider $wrapped,
         private readonly FullCacheProviderInterface $cache,

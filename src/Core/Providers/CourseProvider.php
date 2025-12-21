@@ -10,6 +10,7 @@ use CanvasApiLibrary\Core\Providers\Generated\Traits\AssignmentProviderPropertie
 use CanvasApiLibrary\Core\Providers\Generated\Traits\CourseProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\AssignmentProviderInterface;
 use CanvasApiLibrary\Core\Providers\Interfaces\CourseProviderInterface;
+use CanvasApiLibrary\Core\Providers\Traits\CourseWrapperTrait;
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Core\Services\CanvasCommunicator;
@@ -18,9 +19,13 @@ use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 
-
+/**
+ * @implements CourseProviderInterface<SuccessResult,ErrorResult,NotFoundResult,UnauthorizedResult>
+ * @extends parent<Course>
+ */
 class CourseProvider extends AbstractProvider implements CourseProviderInterface{
     use CourseProviderProperties;
+    use CourseWrapperTrait;
 
     public function __construct(
         CanvasCommunicator $canvasCommunicator

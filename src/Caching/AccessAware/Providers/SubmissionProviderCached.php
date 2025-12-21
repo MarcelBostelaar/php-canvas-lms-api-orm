@@ -9,11 +9,13 @@ use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
 use CanvasApiLibrary\Core\Providers\SubmissionProvider;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\SubmissionProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\SubmissionProviderInterface;
+use CanvasApiLibrary\Core\Providers\Traits\SubmissionWrapperTrait;
 
 class SubmissionProviderCached implements SubmissionProviderInterface{
 
     use SubmissionProviderProperties;
     use PermissionEnsurerTrait;
+    use SubmissionWrapperTrait;
     public function __construct(
         private readonly SubmissionProvider $wrapped,
         private readonly FullCacheProviderInterface $cache,

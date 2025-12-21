@@ -5,6 +5,7 @@ namespace CanvasApiLibrary\Core\Providers\Interfaces;
 use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
+use Closure;
 
 use CanvasApiLibrary\Core\Models\Assignment;
 use CanvasApiLibrary\Core\Models\Course;
@@ -27,21 +28,35 @@ use CanvasApiLibrary\Core\Models\UserStub;
 interface SectionProviderInterface extends HandleEmittedInterface{
 
     public function getClientID(): string;
+
+    /**
+     * Summary of handleResults
+     * @template newSuccessT
+     * @template newUnauthorizedT
+     * @template newNotFoundT
+     * @template newErrorT
+     * @param Closure(TSuccessResult|TErrorResult|TNotFoundResult|TUnauthorizedResult) : (newSuccessT|newErrorT|newNotFoundT|newUnauthorizedT) $processor
+     * @return SectionProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
+     */
+    public function handleResults(Closure $processor): SectionProviderInterface;
     /**
 	 * @param Section[] $sections
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Section[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function populateSections(array $sections) : mixed;
 
     /**
 	 * @param Course $course
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Section[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function getAllSectionsInCourse(Course $course) : mixed;
 
     /**
 	 * @param Section $section
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Section>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function populateSection(Section $section) : mixed;
 

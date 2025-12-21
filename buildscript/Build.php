@@ -14,10 +14,12 @@ function build(){
     $modelTraitFolder = $srcFolder . "/Models/Generated";
     $providerTraitFolder = $srcFolder . "/Providers/Generated/Traits";
     $providerInterfaceFolder = $srcFolder . "/Providers/Generated/Interfaces";
+    $providerWrapperFolder = $srcFolder . "/Providers/Generated/Wrappers";
     clearFolder(__DIR__ . "/test");
     clearFolder($modelTraitFolder);
     clearFolder($providerTraitFolder);
     clearFolder($providerInterfaceFolder);
+    clearFolder($providerWrapperFolder);
     $models = buildModels($srcFolder . "/Models", $modelTraitFolder);
     $providers = buildProviders($srcFolder . "/Providers", $models); //provide category for testing
 }

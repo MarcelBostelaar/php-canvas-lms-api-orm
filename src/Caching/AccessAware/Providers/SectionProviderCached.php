@@ -8,11 +8,13 @@ use CanvasApiLibrary\Core\Caching\Utility\CacheRule;
 use CanvasApiLibrary\Core\Providers\SectionProvider;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\SectionProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\SectionProviderInterface;
+use CanvasApiLibrary\Core\Providers\Traits\SectionWrapperTrait;
 
 class SectionProviderCached implements SectionProviderInterface{
 
     use SectionProviderProperties;
     use PermissionEnsurerTrait;
+    use SectionWrapperTrait;
     public function __construct(
         private readonly SectionProvider $wrapped,
         private readonly FullCacheProviderInterface $cache,

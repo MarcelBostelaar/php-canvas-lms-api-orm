@@ -5,6 +5,7 @@ namespace CanvasApiLibrary\Core\Providers\Interfaces;
 use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
+use Closure;
 
 use CanvasApiLibrary\Core\Models\Assignment;
 use CanvasApiLibrary\Core\Models\Course;
@@ -27,21 +28,35 @@ use CanvasApiLibrary\Core\Models\UserStub;
 interface GroupProviderInterface extends HandleEmittedInterface{
 
     public function getClientID(): string;
+
+    /**
+     * Summary of handleResults
+     * @template newSuccessT
+     * @template newUnauthorizedT
+     * @template newNotFoundT
+     * @template newErrorT
+     * @param Closure(TSuccessResult|TErrorResult|TNotFoundResult|TUnauthorizedResult) : (newSuccessT|newErrorT|newNotFoundT|newUnauthorizedT) $processor
+     * @return GroupProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
+     */
+    public function handleResults(Closure $processor): GroupProviderInterface;
     /**
 	 * @param Group[] $groups
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Group[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function populateGroups(array $groups) : mixed;
 
     /**
 	 * @param GroupCategory $groupCategory
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Group[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function getAllGroupsInGroupCategory(GroupCategory $groupCategory) : mixed;
 
     /**
 	 * @param Group $group
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Group>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function populateGroup(Group $group) : mixed;
 

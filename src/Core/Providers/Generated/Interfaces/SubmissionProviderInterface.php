@@ -5,6 +5,7 @@ namespace CanvasApiLibrary\Core\Providers\Interfaces;
 use CanvasApiLibrary;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
+use Closure;
 
 use CanvasApiLibrary\Core\Models\Assignment;
 use CanvasApiLibrary\Core\Models\Course;
@@ -27,9 +28,21 @@ use CanvasApiLibrary\Core\Models\UserStub;
 interface SubmissionProviderInterface extends HandleEmittedInterface{
 
     public function getClientID(): string;
+
+    /**
+     * Summary of handleResults
+     * @template newSuccessT
+     * @template newUnauthorizedT
+     * @template newNotFoundT
+     * @template newErrorT
+     * @param Closure(TSuccessResult|TErrorResult|TNotFoundResult|TUnauthorizedResult) : (newSuccessT|newErrorT|newNotFoundT|newUnauthorizedT) $processor
+     * @return SubmissionProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
+     */
+    public function handleResults(Closure $processor): SubmissionProviderInterface;
     /**
 	 * @param Submission[] $submissions
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Submission[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function populateSubmissions(array $submissions) : mixed;
 
@@ -37,12 +50,14 @@ interface SubmissionProviderInterface extends HandleEmittedInterface{
 	 * @param Assignment $assignment
 	 * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Submission[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function getSubmissionsInAssignment(Assignment $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider) : mixed;
 
     /**
 	 * @param Submission $submission
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Submission>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
     */
     public function populateSubmission(Submission $submission) : mixed;
 

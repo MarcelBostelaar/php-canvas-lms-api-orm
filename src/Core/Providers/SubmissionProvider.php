@@ -9,6 +9,7 @@ use CanvasApiLibrary\Core\Models\User;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\SubmissionProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\SubmissionProviderInterface;
 use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
+use CanvasApiLibrary\Core\Providers\Traits\SubmissionWrapperTrait;
 use CanvasApiLibrary\Core\Providers\UserProvider;
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
@@ -22,12 +23,13 @@ use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 
 
 /**
- * Provider for Canvas API group operations
- * 
- * @method Lookup<Models\Assignment, Models\Submission> getSubmissionsForAssignments() Virtual method to get all groups in group categories
+ * @implements SubmissionProviderInterface<SuccessResult,ErrorResult,NotFoundResult,UnauthorizedResult>
+ * @extends parent<Submission>
  */
 class SubmissionProvider extends AbstractProvider implements SubmissionProviderInterface{
     use SubmissionProviderProperties;
+    use SubmissionWrapperTrait;
+    
     public function __construct(
         CanvasCommunicator $canvasCommunicator
     ) {

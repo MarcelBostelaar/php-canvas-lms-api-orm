@@ -132,7 +132,7 @@ class ExtractProviderMethodsVisitor extends AbstractExtractorVisitor {
         return false;
     }
 
-    private static function extractUnionWrappedType(TypeDefinitionBase $type): ?TypeDefinitionBase {
+    public static function extractUnionWrappedType(TypeDefinitionBase $type): ?TypeDefinitionBase {
         if(!($type instanceof UnionTypeDefinition)){
             return null;
         }

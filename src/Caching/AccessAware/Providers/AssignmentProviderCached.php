@@ -6,11 +6,13 @@ use CanvasApiLibrary\Caching\AccessAware\Interfaces\CacheStorage;
 use CanvasApiLibrary\Caching\AccessAware\Interfaces\PermissionsHandlerInterface;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\AssignmentProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\AssignmentProviderInterface;
+use CanvasApiLibrary\Core\Providers\Traits\AssignmentWrapperTrait;
 
 class AssignmentProviderCached implements AssignmentProviderInterface{
 
     use AssignmentProviderProperties;
     use PermissionEnsurerTrait;
+    use AssignmentWrapperTrait;
 
     public function __construct(
         private readonly AssignmentProviderInterface $wrapped,

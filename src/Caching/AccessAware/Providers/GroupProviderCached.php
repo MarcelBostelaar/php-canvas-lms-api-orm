@@ -7,12 +7,14 @@ use CanvasApiLibrary\Caching\AccessAware\Interfaces\PermissionsHandlerInterface;
 use CanvasApiLibrary\Core\Providers\GroupProvider;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\GroupProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\GroupProviderInterface;
+use CanvasApiLibrary\Core\Providers\Traits\GroupWrapperTrait;
 use Exception;
 
 class GroupProviderCached implements GroupProviderInterface{
 
     use GroupProviderProperties;
     use PermissionEnsurerTrait;
+    use GroupWrapperTrait;
     public function __construct(
         private readonly GroupProvider $wrapped,
         private readonly CacheStorage $cache,
