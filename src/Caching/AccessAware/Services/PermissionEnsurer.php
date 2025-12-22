@@ -3,53 +3,114 @@
 namespace CanvasApiLibrary\Caching\AccessAware\Services;
 
 use CanvasApiLibrary\Caching\AccessAware\Interfaces\CacheProviderInterface;
+use CanvasApiLibrary\Caching\AccessAware\Providers\CourseProviderCached;
+use CanvasApiLibrary\Caching\AccessAware\Providers\UserProviderCached;
 use CanvasApiLibrary\Core\Models\Course;
+use CanvasApiLibrary\Core\Models\CourseStub;
 use CanvasApiLibrary\Core\Models\Domain;
-use CanvasApiLibrary\Core\Providers\Interfaces\CourseProviderInterface;
-use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
+use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
+use Closure;
+use function _PHPStan_5adafcbb8\React\Promise\all;
 
 /**
  * Gets permissions
  */
 class PermissionEnsurer{
+    /**
+     * Summary of __construct
+     * @param CourseProviderCached $courseProvider
+     * @param UserProviderCached $userProvider
+     * @param CacheProviderInterface $cache
+     * @param Closure(NotFoundResult) $handleNotFound
+     * @param Closure(ErrorResult) $handleOtherError
+     */
     public function __construct(
-        private readonly CourseProviderInterface $courseProvider,
-        private readonly UserProviderInterface $userProvider,
-        private readonly CacheProviderInterface $cache) {
+        private readonly CourseProviderCached $courseProvider,
+        private readonly UserProviderCached $userProvider,
+        private readonly CacheProviderInterface $cache,
+        private readonly Closure $handleNotFound,
+        private readonly Closure $handleOtherError) {
     }
 
-    public function domain(Domain $domain, string $clientID): bool{
-        if($this->cache->getUnprotected("DomainPermissions" . $clientID)){
+    public function domain(Domain $domain, string $clientID, bool $refresh): bool{
+        $key = "DomainPermissions" . $clientID;
+        if($this->cache->getUnprotected($key)->hit && !$refresh){
             return true;
         }
-        $this->courseProvider->getAllCoursesInDomain($domain);
-        //get self info of user
+        $result = $this->courseProvider->getAllCoursesInDomain($domain);
+        $allowed = false;
+        if($result instanceof SuccessResult){
+            $allowed = true;
+        }
+        if($result instanceof UnauthorizedResult){
+            $allowed = false;
+        }
+        if($result instanceof NotFoundResult){
+            return ($this->handleNotFound)($result);
+        }
+        if($result instanceof ErrorResult){
+            return ($this->handleOtherError)($result);
+        }
+        $this->cache->setUnprotected($key, $allowed, $this->courseProvider->ttl);
+        return $allowed;
     }
 
-    public function course(Course $course, string $clientID): bool{
-        if(!$this->domain($course->domain, $clientID)){
+    public function usersInCourse(CourseStub $course, string $clientID, bool $refresh): bool{
+        $key = "CourseUserPermissions" . $course->getUniqueId() . $clientID;
+        if($this->cache->getUnprotected($key)->hit && !$refresh){
+            return true;
+        }
+        if(!$this->domain($course->domain, $clientID, $refresh)){
             return false;
         }
-        //get basic info of course
+        $result = $this->userProvider->getUsersInCourse($course);
+        $allowed = false;
+        if($result instanceof SuccessResult){
+            $allowed = true;
+        }
+        if($result instanceof UnauthorizedResult){
+            $allowed = false;
+        }
+        if($result instanceof NotFoundResult){
+            //assume information masking, not allowed to know course exists
+            $allowed = false;
+        }
+        if($result instanceof ErrorResult){
+            return ($this->handleOtherError)($result);
+        }
+        $this->cache->setUnprotected($key, $allowed, $this->userProvider->ttl);
+        return $allowed;
     }
 
-    public function usersInCourse(Course $course, string $clientID): bool{
-        if(!$this->course($course, $clientID)){
+    public function usersInDomain(Domain $domain, string $clientID, bool $refresh): bool{
+        $key = "DomainUserPermissions" . $domain->getUniqueId() . $clientID;
+        if($this->cache->getUnprotected($key)->hit && !$refresh){
+            return true;
+        }
+        if(!$this->domain($domain, $clientID, $refresh)){
             return false;
         }
-        //get all users in course
-    }
-
-    public function usersInDomain(Domain $domain, string $clientID): bool{
-        if(!$this->domain($domain, $clientID)){
-            return false;
+        $result = $this->userProvider->getUsersInDomain($domain, $refresh);
+        $allowed = false;
+        if($result instanceof SuccessResult){
+            $allowed = true;
         }
-        //get all globally accesible users
+        if($result instanceof UnauthorizedResult){
+            $allowed = false;
+        }
+        if($result instanceof ErrorResult){
+            return ($this->handleOtherError)($result);
+        }
+        $this->cache->setUnprotected($key, $allowed, $this->userProvider->ttl);
+        return $allowed;
     }
 
-    public function allUsers(Course $course, string $clientID){
-        $canAccessInCourse = $this->usersInCourse($course, $clientID);
-        $this->usersInDomain($course->domain, $clientID);
+    public function allUsers(CourseStub $course, string $clientID, bool $refresh): bool{
+        $canAccessInCourse = $this->usersInCourse($course, $clientID, $refresh);
+        $this->usersInDomain($course->domain, $clientID, $refresh);
         return $canAccessInCourse;
     }
 }

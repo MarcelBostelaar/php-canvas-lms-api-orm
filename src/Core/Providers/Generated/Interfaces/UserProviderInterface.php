@@ -75,6 +75,14 @@ interface UserProviderInterface extends HandleEmittedInterface{
     /**
 	 * @param Domain $domain
 	 * @param bool $skipCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getUsersInDomain(Domain $domain, bool $skipCache = false) : mixed;
+
+    /**
+	 * @param Domain $domain
+	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */

@@ -20,6 +20,7 @@ use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
+use PHPStan\BetterReflection\Reflection\Adapter\Exception\NotImplemented;
 
 
 /**
@@ -100,6 +101,15 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
         }
         return $this->GetMany( "/courses/{$course->id}/users?per_page=100$postfix", 
         $course->getContext()); //optional course context already handled through context system.
+    }
+
+    /**
+     * @param Domain $domain
+     * @param bool $skipCache
+     * @return ErrorResult|NotFoundResult|SuccessResult<User[]>|UnauthorizedResult
+     */
+    public function getUsersInDomain(Domain $domain, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+        throw new NotImplemented();
     }
 
     /**

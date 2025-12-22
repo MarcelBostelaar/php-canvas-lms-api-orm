@@ -14,6 +14,7 @@ use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
+use CanvasApiLibrary\Caching\AccessAware\Providers\Traits\PermissionEnsurerTrait;
 
 
 /**

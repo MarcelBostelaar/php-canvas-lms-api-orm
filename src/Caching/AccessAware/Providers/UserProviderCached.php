@@ -13,6 +13,7 @@ use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
+use CanvasApiLibrary\Caching\AccessAware\Providers\Traits\PermissionEnsurerTrait;
 
 
 /**
@@ -25,10 +26,9 @@ class UserProviderCached implements UserProviderInterface{
     use UserWrapperTrait;
     public function __construct(
         private readonly UserProvider $wrapped,
-        private readonly FullCacheProviderInterface $cache,
-        private readonly CacheRule $getUsersInGroupCR = new UndefinedCacherule(),
-        private readonly CacheRule $getUsersInSectionCR = new UndefinedCacherule(),
-        private readonly CacheRule $populateUserCR = new UndefinedCacherule()
+        private readonly CacheStorage $cache,
+        public readonly int $ttl,
+        private readonly PermissionsHandlerInterface $permissionHandler
     ) {
     }
 

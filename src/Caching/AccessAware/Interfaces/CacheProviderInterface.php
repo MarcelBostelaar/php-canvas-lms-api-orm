@@ -31,6 +31,22 @@ interface CacheProviderInterface{
      */
     public function get(string $clientID, string $key) : CacheResult;
 
+    /**
+     * Gets an unprotected value by key.
+     * @param string $key
+     * @return CacheResult
+     */
+    public function getUnprotected(string $key) : CacheResult;
+
+    /**
+     * Sets a value in the cache without permissions.
+     * @param string $key
+     * @param mixed $value
+     * @param int $ttl
+     * @return void
+     */
+    public function setUnprotected(string $key, mixed $value, int $ttl) : void;
+
 
     /**
      * Saves a set of item keys for a given client and a given collection key.

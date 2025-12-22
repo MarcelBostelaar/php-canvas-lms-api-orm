@@ -15,8 +15,8 @@
 [x] Cache versies hebben de standaard versie nodig
          Zo kan de end-user een eigen handler geven die bv alle errors gewoon in een throw omzetten en het gebruik makkelijker maken.
 
-[] re-implement getclientid om zo de user the identificeren ipv de api key te gebruiken (want die verloopt na een uur).
-    doe dit door de endpoint van de user zelf op te vragen en zn domain+id(?) op te slaan als clientID.
+[x] ~~re-implement getclientid om zo de user the identificeren ipv de api key te gebruiken (want die verloopt na een uur). doe dit door de endpoint van de user zelf op te vragen en zn domain+id(?) op te slaan als clientID.~~ Niet nodig, permissions ophalen is niet expensive. Gehashe api key is prima.
+
 [] Geef ensureX callables mee aan de cached providers. Of late bind ze (minder DPI proof). Of maak gewoon een losse functionaliteit/class die alles ensured voor een bepaalde ding en laat dit bij de gebruiker van de cache. doe late binding met een callable voor caching.
 
 [x] Maak plural field protected
