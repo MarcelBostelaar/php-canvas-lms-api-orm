@@ -3,6 +3,7 @@
 namespace CanvasApiLibrary\Core\Providers;
 
 use CanvasApiLibrary\Core\Models\Assignment;
+use CanvasApiLibrary\Core\Models\AssignmentStub;
 use CanvasApiLibrary\Core\Models\Course;
 use CanvasApiLibrary\Core\Models\GroupCategory;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\AssignmentProviderProperties;
@@ -34,15 +35,14 @@ class AssignmentProvider extends AbstractProvider implements AssignmentProviderI
     }
 
     /**
-     * @param Assignment $assignment
+     * @param AssignmentStub $assignment
      * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Assignment>|UnauthorizedResult
      */
-    public function populateAssignment(Assignment $assignment, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function populateAssignment(AssignmentStub $assignment, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->Get(
             "/courses/{$assignment->course->id}/assignments/$assignment->id",
-            $assignment->getContext(),
-            $this->modelPopulator->withInstance($assignment)
+            $assignment->getContext()
         );
     }
 }

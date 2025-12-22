@@ -8,13 +8,20 @@ use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
 use Closure;
 
 use CanvasApiLibrary\Core\Models\Assignment;
+use CanvasApiLibrary\Core\Models\AssignmentStub;
 use CanvasApiLibrary\Core\Models\Course;
+use CanvasApiLibrary\Core\Models\CourseStub;
 use CanvasApiLibrary\Core\Models\Domain;
 use CanvasApiLibrary\Core\Models\Group;
 use CanvasApiLibrary\Core\Models\GroupCategory;
+use CanvasApiLibrary\Core\Models\GroupCategoryStub;
+use CanvasApiLibrary\Core\Models\GroupStub;
 use CanvasApiLibrary\Core\Models\Section;
+use CanvasApiLibrary\Core\Models\SectionStub;
 use CanvasApiLibrary\Core\Models\Submission;
 use CanvasApiLibrary\Core\Models\SubmissionComment;
+use CanvasApiLibrary\Core\Models\SubmissionCommentStub;
+use CanvasApiLibrary\Core\Models\SubmissionStub;
 use CanvasApiLibrary\Core\Models\User;
 use CanvasApiLibrary\Core\Models\UserDisplay;
 use CanvasApiLibrary\Core\Models\UserStub;
@@ -40,30 +47,30 @@ interface UserProviderInterface extends HandleEmittedInterface{
      */
     public function handleResults(Closure $processor): UserProviderInterface;
     /**
-	 * @param Group $group
+	 * @param GroupStub $group
 	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInGroup(Group $group, bool $skipCache = false) : mixed;
+    public function getUsersInGroup(GroupStub $group, bool $skipCache = false) : mixed;
 
     /**
-	 * @param Section $section
+	 * @param SectionStub $section
 	 * @param ?string $enrollmentRoleFilter
 	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInSection(Section $section, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed;
+    public function getUsersInSection(SectionStub $section, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed;
 
     /**
-	 * @param Course $course
+	 * @param CourseStub $course
 	 * @param ?string $enrollmentRoleFilter
 	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInCourse(Course $course, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed;
+    public function getUsersInCourse(CourseStub $course, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed;
 
     /**
 	 * @param Domain $domain

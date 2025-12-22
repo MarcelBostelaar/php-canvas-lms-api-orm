@@ -3,8 +3,10 @@
 namespace CanvasApiLibrary\Core\Providers;
 use CanvasApiLibrary\Core\Models as Models;
 use CanvasApiLibrary\Core\Models\Assignment;
+use CanvasApiLibrary\Core\Models\AssignmentStub;
 use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Models\Submission;
+use CanvasApiLibrary\Core\Models\SubmissionStub;
 use CanvasApiLibrary\Core\Models\User;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\SubmissionProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\SubmissionProviderInterface;
@@ -42,12 +44,12 @@ class SubmissionProvider extends AbstractProvider implements SubmissionProviderI
     }
 
     /**
-     * @param Models\Assignment $assignment
+     * @param Models\AssignmentStub $assignment
      * @param ?UserProvider $userProvider If provided, will also fetch the users associated with these submissions and pass them to the emitted in the user provider.
      * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Submission[]>|UnauthorizedResult
      */
-    function getSubmissionsInAssignment(Assignment $assignment, ?UserProviderInterface $userProvider = null, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    function getSubmissionsInAssignment(AssignmentStub $assignment, ?UserProviderInterface $userProvider = null, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         $postfix = "";
         $builder = $this->modelPopulator;
         if($userProvider !== null){
@@ -61,12 +63,12 @@ class SubmissionProvider extends AbstractProvider implements SubmissionProviderI
     }
 
     /**
-     * @param Models\Submission $submission
+     * @param Models\SubmissionStub $submission
      * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Submission>|UnauthorizedResult
      */
-    public function populateSubmission(Submission $submission, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function populateSubmission(SubmissionStub $submission, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->Get("/courses/{$submission->course->id}/assignments/{$submission->assignment->id}/submissions/{$submission->user->id}",
-        $submission->getContext(), $this->modelPopulator->withInstance($submission));
+        $submission->getContext());
     }
 }

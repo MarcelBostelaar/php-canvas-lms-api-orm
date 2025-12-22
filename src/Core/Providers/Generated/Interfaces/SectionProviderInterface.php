@@ -8,13 +8,20 @@ use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
 use Closure;
 
 use CanvasApiLibrary\Core\Models\Assignment;
+use CanvasApiLibrary\Core\Models\AssignmentStub;
 use CanvasApiLibrary\Core\Models\Course;
+use CanvasApiLibrary\Core\Models\CourseStub;
 use CanvasApiLibrary\Core\Models\Domain;
 use CanvasApiLibrary\Core\Models\Group;
 use CanvasApiLibrary\Core\Models\GroupCategory;
+use CanvasApiLibrary\Core\Models\GroupCategoryStub;
+use CanvasApiLibrary\Core\Models\GroupStub;
 use CanvasApiLibrary\Core\Models\Section;
+use CanvasApiLibrary\Core\Models\SectionStub;
 use CanvasApiLibrary\Core\Models\Submission;
 use CanvasApiLibrary\Core\Models\SubmissionComment;
+use CanvasApiLibrary\Core\Models\SubmissionCommentStub;
+use CanvasApiLibrary\Core\Models\SubmissionStub;
 use CanvasApiLibrary\Core\Models\User;
 use CanvasApiLibrary\Core\Models\UserDisplay;
 use CanvasApiLibrary\Core\Models\UserStub;
@@ -40,27 +47,19 @@ interface SectionProviderInterface extends HandleEmittedInterface{
      */
     public function handleResults(Closure $processor): SectionProviderInterface;
     /**
-	 * @param Section[] $sections
+	 * @param CourseStub $course
 	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Section[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSections(array $sections, bool $skipCache = false) : mixed;
+    public function getAllSectionsInCourse(CourseStub $course, bool $skipCache = false) : mixed;
 
     /**
-	 * @param Course $course
-	 * @param bool $skipCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Section[]>|TUnauthorizedResult
-     * @phpstan-ignore return.unresolvableType
-    */
-    public function getAllSectionsInCourse(Course $course, bool $skipCache = false) : mixed;
-
-    /**
-	 * @param Section $section
+	 * @param SectionStub $section
 	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Section>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSection(Section $section, bool $skipCache = false) : mixed;
+    public function populateSection(SectionStub $section, bool $skipCache = false) : mixed;
 
 }

@@ -156,17 +156,6 @@ class ModelPopulationConfigBuilder{
         return $this->addProcessor(new ProcessorClosure($closure));
     }
 
-    /**
-     * Sets a specific instance to run the builder with. Method does not mutate original builder (entire builder is immutable/behaviourally pure).
-     * @param \CanvasApiLibrary\Core\Models\Utility\AbstractCanvasPopulatedModel $instance
-     * @return ModelPopulationConfigBuilder
-     */
-    public function withInstance(AbstractCanvasPopulatedModel $instance): ModelPopulationConfigBuilder{
-        $new = clone $this;
-        $new->instance = $instance;
-        return $new;
-    }
-
     //Usability combinations
 
     /**

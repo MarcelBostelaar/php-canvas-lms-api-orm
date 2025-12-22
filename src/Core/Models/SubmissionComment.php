@@ -1,13 +1,10 @@
 <?php
 
 namespace CanvasApiLibrary\Core\Models;
-use CanvasApiLibrary\Core\Models\IdentityTraits\UserAssignmentBoundIdTrait;
-use CanvasApiLibrary\Core\Models\Utility\AbstractCanvasPopulatedModel;
 use CanvasApiLibrary\Core\Models\Generated\SubmissionCommentProperties;
 
-class SubmissionComment extends AbstractCanvasPopulatedModel{
+class SubmissionComment extends SubmissionCommentStub{
     use SubmissionCommentProperties;
-    use UserAssignmentBoundIdTrait;
     protected static array $properties = [
         ["string", "feedback_giver"],
         ["string", "comment"],

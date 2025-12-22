@@ -12,13 +12,20 @@ use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 use CanvasApiLibrary\Core\Models\Assignment;
+use CanvasApiLibrary\Core\Models\AssignmentStub;
 use CanvasApiLibrary\Core\Models\Course;
+use CanvasApiLibrary\Core\Models\CourseStub;
 use CanvasApiLibrary\Core\Models\Domain;
 use CanvasApiLibrary\Core\Models\Group;
 use CanvasApiLibrary\Core\Models\GroupCategory;
+use CanvasApiLibrary\Core\Models\GroupCategoryStub;
+use CanvasApiLibrary\Core\Models\GroupStub;
 use CanvasApiLibrary\Core\Models\Section;
+use CanvasApiLibrary\Core\Models\SectionStub;
 use CanvasApiLibrary\Core\Models\Submission;
 use CanvasApiLibrary\Core\Models\SubmissionComment;
+use CanvasApiLibrary\Core\Models\SubmissionCommentStub;
+use CanvasApiLibrary\Core\Models\SubmissionStub;
 use CanvasApiLibrary\Core\Models\User;
 use CanvasApiLibrary\Core\Models\UserDisplay;
 use CanvasApiLibrary\Core\Models\UserStub;
@@ -26,24 +33,5 @@ use CanvasApiLibrary\Core\Models\UserStub;
 trait GroupProviderProperties{
     
     
-    abstract public function populateGroup(Group $group, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
-    /**
-     * Summary of populateGroups
-     * This is a plural version of populateGroup
-	 * @param Group[] $groups
-	 * @param bool $skipCache
-	 * @return ErrorResult|NotFoundResult|SuccessResult<Group[]>|UnauthorizedResult
-     */
-    public function populateGroups(array $groups, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
-        $results = [];
-        foreach($groups as $item){
-            $result = $this->populateGroup($item, $skipCache);
-            if(!$result instanceof SuccessResult){
-                return $result;
-            }
-            $results[] = $result->value;
-        }
-        return new SuccessResult($results);
-    }
-    
+
 }

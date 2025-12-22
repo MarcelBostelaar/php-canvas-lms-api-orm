@@ -2,7 +2,8 @@
 namespace CanvasApiLibrary\Core\Providers;
 use CanvasApiLibrary\Core\Models as Models;
 use CanvasApiLibrary\Core\Models\Group;
-use CanvasApiLibrary\Core\Models\GroupCategory;
+use CanvasApiLibrary\Core\Models\GroupCategoryStub;
+use CanvasApiLibrary\Core\Models\GroupStub;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\GroupProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\GroupProviderInterface;
 use CanvasApiLibrary\Core\Providers\Traits\GroupWrapperTrait;
@@ -32,23 +33,22 @@ class GroupProvider extends AbstractProvider implements GroupProviderInterface{
     }
 
     /**
-     * @param GroupCategory $groupCategory
+     * @param GroupCategoryStub $groupCategory
      * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Group[]>|UnauthorizedResult
      */
-    public function getAllGroupsInGroupCategory(GroupCategory $groupCategory, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         //Optional context already handled through getcontext
         return $this->GetMany( "/group_categories/$groupCategory->id/groups", 
         $groupCategory->getContext());
     }
 
     /**
-     * @param Group $group
+     * @param GroupStub $group
      * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Group>|UnauthorizedResult
      */
-    public function populateGroup(Group $group, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
-        return $this->Get( "/api/v1/groups/$group->id", $group->getContext(),
-        $this->modelPopulator->withInstance($group));
+    public function populateGroup(GroupStub $group, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+        return $this->Get( "/api/v1/groups/$group->id", $group->getContext());
     }
 }

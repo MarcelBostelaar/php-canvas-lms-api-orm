@@ -21,7 +21,7 @@
 
 [x] Maak plural field protected
 [x] ~~Check of we uberhaupt nog een non-nullable fields veld nodig hebben nu we de identity kern via traits doen~~
-[] Maak voor alle models een "stub" versie met alleen de identity (en optionele context) en accepteer die in services ipv de hele. Maak dan volledige versies die die subclassen, en geef die specifiek terug.
+[x] Maak voor alle models een "stub" versie met alleen de identity (en optionele context) en accepteer die in services ipv de hele. Maak dan volledige versies die die subclassen, en geef die specifiek terug.
 [x] Maak voor user een stub versie.
 [x] Maak dan ook de verschillende niveas aan user objects als aparte models die die andere subclassen.
 

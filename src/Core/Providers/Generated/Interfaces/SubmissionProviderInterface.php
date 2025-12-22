@@ -8,13 +8,20 @@ use CanvasApiLibrary\Core\Providers\Utility\HandleEmittedInterface;
 use Closure;
 
 use CanvasApiLibrary\Core\Models\Assignment;
+use CanvasApiLibrary\Core\Models\AssignmentStub;
 use CanvasApiLibrary\Core\Models\Course;
+use CanvasApiLibrary\Core\Models\CourseStub;
 use CanvasApiLibrary\Core\Models\Domain;
 use CanvasApiLibrary\Core\Models\Group;
 use CanvasApiLibrary\Core\Models\GroupCategory;
+use CanvasApiLibrary\Core\Models\GroupCategoryStub;
+use CanvasApiLibrary\Core\Models\GroupStub;
 use CanvasApiLibrary\Core\Models\Section;
+use CanvasApiLibrary\Core\Models\SectionStub;
 use CanvasApiLibrary\Core\Models\Submission;
 use CanvasApiLibrary\Core\Models\SubmissionComment;
+use CanvasApiLibrary\Core\Models\SubmissionCommentStub;
+use CanvasApiLibrary\Core\Models\SubmissionStub;
 use CanvasApiLibrary\Core\Models\User;
 use CanvasApiLibrary\Core\Models\UserDisplay;
 use CanvasApiLibrary\Core\Models\UserStub;
@@ -40,28 +47,20 @@ interface SubmissionProviderInterface extends HandleEmittedInterface{
      */
     public function handleResults(Closure $processor): SubmissionProviderInterface;
     /**
-	 * @param Submission[] $submissions
-	 * @param bool $skipCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Submission[]>|TUnauthorizedResult
-     * @phpstan-ignore return.unresolvableType
-    */
-    public function populateSubmissions(array $submissions, bool $skipCache = false) : mixed;
-
-    /**
-	 * @param Assignment $assignment
+	 * @param AssignmentStub $assignment
 	 * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
 	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Submission[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getSubmissionsInAssignment(Assignment $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false) : mixed;
+    public function getSubmissionsInAssignment(AssignmentStub $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false) : mixed;
 
     /**
-	 * @param Submission $submission
+	 * @param SubmissionStub $submission
 	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Submission>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSubmission(Submission $submission, bool $skipCache = false) : mixed;
+    public function populateSubmission(SubmissionStub $submission, bool $skipCache = false) : mixed;
 
 }

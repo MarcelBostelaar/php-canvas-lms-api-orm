@@ -1,7 +1,9 @@
 <?php
 namespace CanvasApiLibrary\Core\Providers;
 use CanvasApiLibrary\Core\Models as Models;
+use CanvasApiLibrary\Core\Models\CourseStub;
 use CanvasApiLibrary\Core\Models\Section;
+use CanvasApiLibrary\Core\Models\SectionStub;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\SectionProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\SectionProviderInterface;
 use CanvasApiLibrary\Core\Providers\Traits\SectionWrapperTrait;
@@ -32,23 +34,23 @@ class SectionProvider extends AbstractProvider implements SectionProviderInterfa
     }
 
     /**
-     * @param \CanvasApiLibrary\Core\Models\Course $course
+     * @param \CanvasApiLibrary\Core\Models\CourseStub $course
      * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Section[]>|UnauthorizedResult
      */
-    public function getAllSectionsInCourse(Course $course, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function getAllSectionsInCourse(CourseStub $course, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->GetMany("/courses/$course->id/sections", $course->getContext());
     }
 
     /**
-     * @param Models\Section $section
+     * @param Models\SectionStub $section
      * @param bool $skipCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Section>|UnauthorizedResult
      */
-    public function populateSection(Section $section, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function populateSection(SectionStub $section, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         $courseID = $section->course->id;
         return $this->Get("/courses/$courseID/sections/$section->id", 
-        $section->getContext(), 
-        $this->modelPopulator->withInstance($section));
+        $section->getContext()
+        );
     }
 }
