@@ -8,13 +8,22 @@ use CanvasApiLibrary\Core\Providers\GroupProvider;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\GroupProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\GroupProviderInterface;
 use CanvasApiLibrary\Core\Providers\Traits\GroupWrapperTrait;
+use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 use Exception;
 
+/**
+ * @implements GroupProviderInterface<SuccessResult,ErrorResult,NotFoundResult,UnauthorizedResult>
+ */
 class GroupProviderCached implements GroupProviderInterface{
 
     use GroupProviderProperties;
     use PermissionEnsurerTrait;
     use GroupWrapperTrait;
+    
+    
     public function __construct(
         private readonly GroupProvider $wrapped,
         private readonly CacheStorage $cache,

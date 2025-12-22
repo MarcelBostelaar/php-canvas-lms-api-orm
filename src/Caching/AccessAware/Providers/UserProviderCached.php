@@ -9,7 +9,15 @@ use CanvasApiLibrary\Core\Providers\Traits\UserWrapperTrait;
 use CanvasApiLibrary\Core\Providers\UserProvider;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\UserProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
+use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 
+
+/**
+ * @implements UserProviderInterface<SuccessResult,ErrorResult,NotFoundResult,UnauthorizedResult>
+ */
 class UserProviderCached implements UserProviderInterface{
 
     use UserProviderProperties;

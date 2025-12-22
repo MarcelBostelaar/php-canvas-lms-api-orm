@@ -9,7 +9,15 @@ use CanvasApiLibrary\Core\Providers\SectionProvider;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\SectionProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\SectionProviderInterface;
 use CanvasApiLibrary\Core\Providers\Traits\SectionWrapperTrait;
+use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 
+
+/**
+ * @implements SectionProviderInterface<SuccessResult,ErrorResult,NotFoundResult,UnauthorizedResult>
+ */
 class SectionProviderCached implements SectionProviderInterface{
 
     use SectionProviderProperties;

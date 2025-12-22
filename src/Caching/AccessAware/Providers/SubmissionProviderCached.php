@@ -10,7 +10,15 @@ use CanvasApiLibrary\Core\Providers\SubmissionProvider;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\SubmissionProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\SubmissionProviderInterface;
 use CanvasApiLibrary\Core\Providers\Traits\SubmissionWrapperTrait;
+use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\SuccessResult;
+use CanvasApiLibrary\Core\Providers\Utility\Results\UnauthorizedResult;
 
+
+/**
+ * @implements SubmissionProviderInterface<SuccessResult,ErrorResult,NotFoundResult,UnauthorizedResult>
+ */
 class SubmissionProviderCached implements SubmissionProviderInterface{
 
     use SubmissionProviderProperties;
