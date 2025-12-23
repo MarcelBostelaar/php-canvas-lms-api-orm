@@ -20,14 +20,14 @@ trait NumberIdentityTrait{
     }
 
     protected function initializeNumberIdentity(): void {
-        $this->mdrGetters[] = fn() => [static::class => $this->id];
+        $this->mdrGetters[] = fn() => [static::class => $this->id]; //TODO check if this still works with inheritance
 
         $this->mdrSetters[] = function(&$item, $data) {
-            $item->id = $data[static::class];
+            $item->id = $data[static::class]; //same here, should be stub class?
         };
 
         $this->integrityValidators[] = fn() => isset($this->id);
 
-        $this->uniqueIdParts[] = fn() => static::class . "-" . $this->id;
+        $this->uniqueIdParts[] = fn() => static::class . "-" . $this->id; //TODO check if this works, should correctly show actual model class.
     }
 }

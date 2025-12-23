@@ -40,7 +40,7 @@ class PermissionEnsurer{
         if($this->cache->getUnprotected($key)->hit && !$refresh){
             return true;
         }
-        $result = $this->courseProvider->getAllCoursesInDomain($domain);
+        $result = $this->courseProvider->getAllCoursesInDomain($domain, true);
         $allowed = false;
         if($result instanceof SuccessResult){
             $allowed = true;
@@ -66,7 +66,7 @@ class PermissionEnsurer{
         if(!$this->domain($course->domain, $clientID, $refresh)){
             return false;
         }
-        $result = $this->userProvider->getUsersInCourse($course);
+        $result = $this->userProvider->getUsersInCourse($course, null, true);
         $allowed = false;
         if($result instanceof SuccessResult){
             $allowed = true;
@@ -93,7 +93,7 @@ class PermissionEnsurer{
         if(!$this->domain($domain, $clientID, $refresh)){
             return false;
         }
-        $result = $this->userProvider->getUsersInDomain($domain, $refresh);
+        $result = $this->userProvider->getUsersInDomain($domain, true);
         $allowed = false;
         if($result instanceof SuccessResult){
             $allowed = true;

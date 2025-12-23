@@ -14,7 +14,7 @@ interface CacheProviderInterface{
      * Sets the value of an item in the cache
      * Permission bound cache operation.
      * @param string $itemKey Cache key for the item, must uniquely identify this item as an individual resource.
-     * @param mixed $value Value to cache
+     * @param mixed $value Value to cache. Must be the actual value, not a Result-type wrapper / value
      * @param int $ttl Time to keep in cache in seconds.
      * @param string $clientID Id of the current cache client.
      * @param Permission[] $permissionsRequired String indicating the permission required to access this item. Items may have multiple permissions, store all of them, only one is required to access it.

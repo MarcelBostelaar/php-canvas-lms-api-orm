@@ -3,8 +3,8 @@
 namespace CanvasApiLibrary\Caching\AccessAware\Providers;
 
 use CanvasApiLibrary\Caching\AccessAware\Interfaces\CacheProviderInterface;
-use CanvasApiLibrary\Caching\AccessAware\Interfaces\CacheStorage;
 use CanvasApiLibrary\Caching\AccessAware\Interfaces\PermissionsHandlerInterface;
+use CanvasApiLibrary\Caching\AccessAware\Providers\Traits\CacheHelperTrait;
 use CanvasApiLibrary\Caching\AccessAware\Providers\Traits\PermissionEnsurerTrait;
 use CanvasApiLibrary\Core\Models\AssignmentStub;
 use CanvasApiLibrary\Core\Providers\AssignmentProvider;
@@ -24,6 +24,7 @@ class AssignmentProviderCached implements AssignmentProviderInterface{
     use AssignmentProviderProperties;
     use PermissionEnsurerTrait;
     use AssignmentWrapperTrait;
+    use CacheHelperTrait;
 
     
     public function __construct(
@@ -42,15 +43,16 @@ class AssignmentProviderCached implements AssignmentProviderInterface{
         return $this->wrapped->getClientID();
     }
 
-    public function populateAssignment(AssignmentStub $assignment, bool $skipCache = false): \CanvasApiLibrary\Core\Models\Assignment{
-        $this->permissionEnsurer->usersInCourse($assignment->course, $this->getClientID(), $skipCache);
-        return $this->ensureThenTrySingleValue( //TODO merge users in course above into this, and make this utility func
+    /**
+     * @param AssignmentStub $assignment
+     * @param bool $skipCache
+     * @return ErrorResult|NotFoundResult|SuccessResult<\CanvasApiLibrary\Core\Models\Assignment>|UnauthorizedResult
+     */
+    public function populateAssignment(AssignmentStub $assignment, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+        return $this->courseSingleValue(
             $assignment->getUniqueId(),
-            $this->ttl,
+            fn() => $this->wrapped->populateAssignment($assignment, $skipCache),
             $assignment->course,
-            $this->getClientID(),
-            $this->permissionHandler::contextFilterDomainCourse($assignment->course),
-            fn()=> $this->wrapped->populateAssignment($assignment)
-        );
+            $skipCache);
     }
 }

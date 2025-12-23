@@ -1,5 +1,7 @@
 [x] Add method to strip out metadata
 [] Strip out metadata before caching
+[] Fix get unique id to keep account of model inheritance
+[] Fix from min data rep and to min data rep
 
 [x] Remove "asadmin" en "within course" methods, they are bound to models directly
 [x] Add course and user metadata to all the (non cached) service (via model populator?)

@@ -2,9 +2,9 @@
 
 namespace CanvasApiLibrary\Caching\AccessAware\Interfaces;
 
-use CanvasApiLibrary\Core\Models\Course;
+use CanvasApiLibrary\Core\Models\CourseStub;
 use CanvasApiLibrary\Core\Models\Domain;
-use CanvasApiLibrary\Core\Models\User;
+use CanvasApiLibrary\Core\Models\UserStub;
 
 /**
  * Class that is used to generate, check and filter permissions for this caching system. Internal, static.
@@ -34,17 +34,21 @@ interface PermissionsHandlerInterface{
 
     public static function contextFrom(PermissionType $permission): ContextFilter;
 
-    public static function contextFilterDomainCourseUser(Course $course): ContextFilter;
+    public static function contextFilterDomainCourseUser(CourseStub $course): ContextFilter;
 
-    public static function contextFilterDomainCourse(Course $course): ContextFilter;
+    public static function contextFilterDomainCourse(CourseStub $course): ContextFilter;
 
     public static function contextFilterDomainUser(Domain $domain): ContextFilter;
 
-    public static function domainCoursePermission(Course $course): Permission;
+    public static function contextFilterDomain(Domain $domain): ContextFilter;
 
-    public static function domainUserPermission(User $course): Permission;
+    public static function domainPermission(Domain $domain): Permission;
+    
+    public static function domainCoursePermission(CourseStub $course): Permission;
 
-    public static function domainCourseUserPermission(Course $course, User $user): Permission;
+    public static function domainUserPermission(UserStub $course): Permission;
+
+    public static function domainCourseUserPermission(CourseStub $course, UserStub $user): Permission;
 
     public static function typeFromPermission(string $permission) : PermissionType;
 

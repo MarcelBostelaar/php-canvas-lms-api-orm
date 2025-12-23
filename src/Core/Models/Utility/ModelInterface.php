@@ -25,4 +25,6 @@ interface ModelInterface{
      * @return bool
      */
     public function validateIdentityIntegrity() : bool;
+
+    public function withMetadataStripped(): ModelInterface;
 }
