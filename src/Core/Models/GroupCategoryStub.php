@@ -14,4 +14,7 @@ abstract class GroupCategoryStub extends AbstractCanvasPopulatedModel{
     ];
 
     public static array $plurals = ["GroupCategoryStubs"];
+    protected function getClassName(): string{
+        return $this::class;
+    }
 }

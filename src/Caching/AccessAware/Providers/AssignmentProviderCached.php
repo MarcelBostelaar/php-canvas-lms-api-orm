@@ -6,6 +6,7 @@ use CanvasApiLibrary\Caching\AccessAware\Interfaces\CacheProviderInterface;
 use CanvasApiLibrary\Caching\AccessAware\Interfaces\PermissionsHandlerInterface;
 use CanvasApiLibrary\Caching\AccessAware\Providers\Traits\CacheHelperTrait;
 use CanvasApiLibrary\Caching\AccessAware\Providers\Traits\PermissionEnsurerTrait;
+use CanvasApiLibrary\Core\Models\Assignment;
 use CanvasApiLibrary\Core\Models\AssignmentStub;
 use CanvasApiLibrary\Core\Providers\AssignmentProvider;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\AssignmentProviderProperties;
@@ -50,7 +51,7 @@ class AssignmentProviderCached implements AssignmentProviderInterface{
      */
     public function populateAssignment(AssignmentStub $assignment, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->courseSingleValue(
-            $assignment->getUniqueId(),
+            Assignment::fromStub($assignment)->getResourceKey(),
             fn() => $this->wrapped->populateAssignment($assignment, $skipCache),
             $assignment->course,
             $skipCache);

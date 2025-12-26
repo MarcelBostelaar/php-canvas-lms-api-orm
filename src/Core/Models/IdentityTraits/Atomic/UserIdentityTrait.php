@@ -3,15 +3,15 @@
 namespace CanvasApiLibrary\Core\Models\IdentityTraits\Atomic;
 use CanvasApiLibrary\Core\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Core\Exceptions\ChangingIdException;
-use CanvasApiLibrary\Core\Models\User;
+use CanvasApiLibrary\Core\Models\UserStub;
 
 trait UserIdentityTrait{
     protected mixed $user_identity;
-    public User $user{
+    public UserStub $user{
         get { 
-            return User::newFromMinimumDataRepresentation($this->user_identity, $this->getContext());
+            return UserStub::newFromMinimumDataRepresentation($this->user_identity, $this->getContext());
         }
-        set (User $value) {
+        set (UserStub $value) {
             if(!isset($this->user_identity)){
                 if($this->domain != $value->domain){
                     $selfDomain = $this->domain->domain;
@@ -32,7 +32,7 @@ trait UserIdentityTrait{
 
     protected function initializeUserIdentity(): void {
         $this->contextProcessors[] = function($item) {
-            if($item instanceof User){
+            if($item instanceof UserStub){
                 $this->user = $item;
                 return true;
             }
@@ -41,14 +41,14 @@ trait UserIdentityTrait{
 
         $this->contextGetters[] = fn() => [$this->user];
 
-        $this->mdrGetters[] = fn() => [User::class => $this->user->id];
+        $this->mdrGetters[] = fn() => [UserStub::class => $this->user->id];
 
         $this->mdrSetters[] = function(&$item, $data) {
-            $item->user = User::newFromMinimumDataRepresentation($data, $this->getContext());
+            $item->user = UserStub::newFromMinimumDataRepresentation($data, $this->getContext());
         };
 
         $this->integrityValidators[] = fn() => isset($this->user);
 
-        $this->uniqueIdParts[] = fn() => "User:" . $this->user->id;
+        $this->resourceKeyParts[] = fn() => "UserStub:" . $this->user->id;
     }
 }

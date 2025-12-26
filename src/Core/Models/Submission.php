@@ -20,4 +20,7 @@ final class Submission extends SubmissionStub{
     ];
     
     public static array $plurals = ["Submissions"];
+    protected function getClassName(): string{
+        return $this::class;
+    }
 }

@@ -39,6 +39,6 @@ trait DomainIdentityTrait{
 
         $this->integrityValidators[] = fn() => isset($this->domain);
 
-        $this->uniqueIdParts[] = fn() => $this->domain->domain;
+        $this->resourceKeyParts[] = fn() => $this->domain->domain;
     }
 }

@@ -12,4 +12,7 @@ class SubmissionComment extends SubmissionCommentStub{
     ];
 
     public static array $plurals = ["SubmissionComments"];
+    protected function getClassName(): string{
+        return $this::class;
+    }
 }

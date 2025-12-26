@@ -33,7 +33,7 @@ trait IdentityBoiletplateTrait {
     protected array $integrityValidators = [];
     
     /** @var callable[] Functions that return unique ID parts */
-    protected array $uniqueIdParts = [];
+    protected array $resourceKeyParts = [];
     
     /** @var bool Tracks if identity traits have been initialized */
     protected bool $identityInitialized = false;
@@ -177,10 +177,10 @@ trait IdentityBoiletplateTrait {
      * 
      * @return string Unique identifier string
      */
-    public function getUniqueId(): string {
+    public function getResourceKey(): string {
         $this->ensureIdentityInitialized();
         $parts = [];
-        foreach ($this->uniqueIdParts as $partGetter) {
+        foreach ($this->resourceKeyParts as $partGetter) {
             $parts[] = $partGetter();
         }
         return implode('-', $parts);
@@ -194,5 +194,17 @@ trait IdentityBoiletplateTrait {
             $this->identityInitialized = true;
             $this->initIdentityTraits();
         }
+    }
+
+    /**
+     * Creates an instance from a stub or supertype model.
+     * 
+     * @phpstan-param static $supertype
+     * @return static
+     */
+    public static function fromStub(mixed $supertype): static{
+        $mdr = $supertype->getMinimumDataRepresentation();
+        $context = $supertype->getContext();
+        return static::newFromMinimumDataRepresentation($mdr, $context);
     }
 }

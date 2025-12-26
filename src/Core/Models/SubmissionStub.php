@@ -14,4 +14,7 @@ abstract class SubmissionStub extends AbstractCanvasPopulatedModel{
     ];
 
     public static array $plurals = ["SubmissionStubs"];
+    protected function getClassName(): string{
+        return $this::class;
+    }
 }

@@ -19,15 +19,17 @@ trait NumberIdentityTrait{
         }
     }
 
+    abstract protected function getClassName(): string;
+
     protected function initializeNumberIdentity(): void {
-        $this->mdrGetters[] = fn() => [static::class => $this->id]; //TODO check if this still works with inheritance
+        $this->mdrGetters[] = fn() => ["identity" => $this->id];
 
         $this->mdrSetters[] = function(&$item, $data) {
-            $item->id = $data[static::class]; //same here, should be stub class?
+            $item->id = $data["identity"]; 
         };
 
         $this->integrityValidators[] = fn() => isset($this->id);
 
-        $this->uniqueIdParts[] = fn() => static::class . "-" . $this->id; //TODO check if this works, should correctly show actual model class.
+        $this->resourceKeyParts[] = fn() => $this->getClassName() . "-" . $this->id;
     }
 }

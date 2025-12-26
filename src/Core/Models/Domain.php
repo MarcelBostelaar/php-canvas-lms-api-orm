@@ -7,7 +7,7 @@ use CanvasApiLibrary\Core\Models\Utility\ModelInterface;
 final class Domain implements ModelInterface{
     public function __construct(public readonly string $domain){}
 
-    public function getUniqueId(): string {
+    public function getResourceKey(): string {
         return $this->domain;
     }
 
@@ -21,6 +21,10 @@ final class Domain implements ModelInterface{
 
     public function getContext(): array{
         return [$this];
+    }
+
+    public function withMetadataStripped(): ModelInterface{
+        return $this;//no metadata
     }
 
     public static array $plurals = ["Domains"];

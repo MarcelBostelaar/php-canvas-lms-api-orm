@@ -14,4 +14,7 @@ abstract class CourseStub extends AbstractCanvasPopulatedModel{
     ];
 
     public static array $plurals = ["CourseStubs"];
+    protected function getClassName(): string{
+        return $this::class;
+    }
 }

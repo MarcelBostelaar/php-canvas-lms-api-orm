@@ -107,7 +107,7 @@ trait CacheHelperTrait{
         //save child model results individually first
         $childKeys = [];
         foreach($result as $child){
-            $childKey = $child->getUniqueId();
+            $childKey = $child->getResourceKey();
             $childKeys[] = $childKey;
             $childPermission = $childPermissionFactory($child);
             $this->cache->set(

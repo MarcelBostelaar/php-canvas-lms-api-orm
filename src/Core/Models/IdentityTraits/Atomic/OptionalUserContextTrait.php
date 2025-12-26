@@ -5,6 +5,7 @@ namespace CanvasApiLibrary\Core\Models\IdentityTraits\Atomic;
 use CanvasApiLibrary\Core\Exceptions\ChangingIdException;
 use CanvasApiLibrary\Core\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Core\Models\User;
+use CanvasApiLibrary\Core\Models\UserStub;
 use GithubProjectViewer\Util\Caching\SetMetadata;
 
 
@@ -24,15 +25,15 @@ trait OptionalUserContextTrait{
      * in which case the code will throw an exception.
      * Is set automatically if the item has been retrieved from a service using a user directly.
      */
-    public ?User $optionalUserContext{
+    public ?UserStub $optionalUserContext{
         get { 
             $data = $this->getMetadata("optionalusercontext");
             if($data === null){
                 return null;
             }
-            return User::newFromMinimumDataRepresentation($data, $this->getContext());
+            return UserStub::newFromMinimumDataRepresentation($data, $this->getContext());
         }
-        set (User $value) {
+        set (UserStub $value) {
             $data = $this->getMetadata("optionalusercontext");
             if($data === null){
                 if($this->domain != $value->domain){
@@ -54,7 +55,7 @@ trait OptionalUserContextTrait{
 
     protected function initializeOptionalUserContext(): void {
         $this->contextProcessors[] = function($item) {
-            if($item instanceof User){
+            if($item instanceof UserStub){
                 $this->optionalUserContext = $item;
                 return true;
             }

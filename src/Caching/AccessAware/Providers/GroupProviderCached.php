@@ -44,7 +44,7 @@ class GroupProviderCached implements GroupProviderInterface{
     public function getAllGroupsInGroupCategory(\CanvasApiLibrary\Core\Models\GroupCategory $category): array{
         $this->doPreCacheCall();
 
-        $collectionKey = "getAllGroupsInGroupCategory" . $category->getUniqueId();
+        $collectionKey = "getAllGroupsInGroupCategory" . $category->getResourceKey();
         $item = $this->cache->getCollection(
             $collectionKey,
             $this->getClientID()
@@ -71,18 +71,18 @@ class GroupProviderCached implements GroupProviderInterface{
         //Propagate back all domainuser perms
         $this->cache->setBackpropagation($collectionKey, 
         $this->permissionHandler->domainUserType(),
-        $category->getUniqueId());
+        $category->getResourceKey());
 
         //Propagate back all domainCourseUser perms
         $this->cache->setBackpropagation($collectionKey, 
         $this->permissionHandler->domainCourseUserType(),
-        $category->getUniqueId());
+        $category->getResourceKey());
 
         //Add individual items to the cache
         foreach($actualItems as $item){
             $this->cache->setCollectionItem(
                 $collectionKey, 
-                $item->getUniqueId(), 
+                $item->getResourceKey(), 
                 $item->withMetaDataStripped(), 
                 $this->ttl,
                 $this->getClientID());
@@ -96,7 +96,7 @@ class GroupProviderCached implements GroupProviderInterface{
         $this->doPreCacheCall();
 
         return $this->cache->trySingleValue(
-            $group->getUniqueId(),
+            $group->getResourceKey(),
             $this->ttl,
             $this->getClientID(),
             fn()=> $this->wrapped->populateGroup($group)

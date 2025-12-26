@@ -11,4 +11,7 @@ final class Section extends SectionStub{
 
     
     public static array $plurals = ["Sections"];
+    protected function getClassName(): string{
+        return $this::class;
+    }
 }

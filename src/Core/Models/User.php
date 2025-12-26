@@ -10,4 +10,7 @@ class User extends UserStub{
     ];
     
     public static array $plurals = ["Users"];
+    protected function getClassName(): string{
+        return $this::class;
+    }
 }

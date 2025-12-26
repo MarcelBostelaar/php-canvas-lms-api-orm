@@ -5,6 +5,7 @@ namespace CanvasApiLibrary\Core\Models\IdentityTraits\Atomic;
 use CanvasApiLibrary\Core\Exceptions\ChangingIdException;
 use CanvasApiLibrary\Core\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Core\Models\Course;
+use CanvasApiLibrary\Core\Models\CourseStub;
 
 /**
  * Add this to models that can optionally be retrieved through a course, among other options,
@@ -22,15 +23,15 @@ trait OptionalCourseContextTrait{
      * in which case the code will throw an exception.
      * Is set automatically if the item has been retrieved from a service using another item bound to a course context directly.
      */
-    public ?Course $optionalCourseContext{
+    public ?CourseStub $optionalCourseContext{
         get { 
             $data = $this->getMetadata("optionalcoursecontext");
             if($data === null){
                 return null;
             }
-            return Course::newFromMinimumDataRepresentation($data, $this->getContext());
+            return CourseStub::newFromMinimumDataRepresentation($data, $this->getContext());
         }
-        set (Course $value) {
+        set (CourseStub $value) {
             $data = $this->getMetadata("optionalcoursecontext");
             if(!isset($this->course_identity)){
                 if($this->domain != $value->domain){
@@ -51,7 +52,7 @@ trait OptionalCourseContextTrait{
 
     protected function initializeOptionalCourseContext(): void {
         $this->contextProcessors[] = function($item) {
-            if($item instanceof Course){
+            if($item instanceof CourseStub){
                 $this->optionalCourseContext = $item;
                 return true;
             }

@@ -59,7 +59,7 @@ class PermissionEnsurer{
     }
 
     public function usersInCourse(CourseStub $course, string $clientID, bool $refresh): bool{
-        $key = "CourseUserPermissions" . $course->getUniqueId() . $clientID;
+        $key = "CourseUserPermissions" . $course->getResourceKey() . $clientID;
         if($this->cache->getUnprotected($key)->hit && !$refresh){
             return true;
         }
@@ -86,7 +86,7 @@ class PermissionEnsurer{
     }
 
     public function usersInDomain(Domain $domain, string $clientID, bool $refresh): bool{
-        $key = "DomainUserPermissions" . $domain->getUniqueId() . $clientID;
+        $key = "DomainUserPermissions" . $domain->getResourceKey() . $clientID;
         if($this->cache->getUnprotected($key)->hit && !$refresh){
             return true;
         }

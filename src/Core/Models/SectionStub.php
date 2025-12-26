@@ -14,4 +14,7 @@ abstract class SectionStub extends AbstractCanvasPopulatedModel{
     ];
 
     public static array $plurals = ["SectionStubs"];
+    protected function getClassName(): string{
+        return $this::class;
+    }
 }

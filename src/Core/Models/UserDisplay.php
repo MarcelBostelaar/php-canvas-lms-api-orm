@@ -13,4 +13,7 @@ abstract class UserDisplay extends UserStub{
     ];
     
     public static array $plurals = ["UserDisplays"];
+    protected function getClassName(): string{
+        return $this::class;
+    }
 }

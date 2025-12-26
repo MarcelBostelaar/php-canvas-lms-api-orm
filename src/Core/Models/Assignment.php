@@ -11,4 +11,8 @@ class Assignment extends AssignmentStub{
     ];
 
     protected static array $plurals = ["Assignments"];
+
+    protected function getClassName(): string{
+        return $this::class;
+    }
 }
