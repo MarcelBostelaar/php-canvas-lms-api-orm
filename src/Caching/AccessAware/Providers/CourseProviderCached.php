@@ -30,7 +30,7 @@ class CourseProviderCached implements CourseProviderInterface{
     public function __construct(
         private readonly CourseProvider $wrapped,
         private readonly CacheProviderInterface $cache,
-        private readonly int $ttl,
+        public readonly int $ttl,
         private readonly PermissionsHandlerInterface $permissionHandler
     ) {
     }

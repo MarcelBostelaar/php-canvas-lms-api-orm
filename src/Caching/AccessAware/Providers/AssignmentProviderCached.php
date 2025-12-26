@@ -31,7 +31,7 @@ class AssignmentProviderCached implements AssignmentProviderInterface{
     public function __construct(
         private readonly AssignmentProvider $wrapped,
         private readonly CacheProviderInterface $cache,
-        private readonly int $ttl,
+        public readonly int $ttl,
         private readonly PermissionsHandlerInterface $permissionHandler
     ) {
     }

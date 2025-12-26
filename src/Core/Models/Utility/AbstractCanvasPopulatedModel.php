@@ -22,4 +22,6 @@ abstract class AbstractCanvasPopulatedModel implements ModelInterface{
      * @var array{0: class-string, 1: string}
      */
     protected static array $nullableProperties = [];
+
+    public abstract function withMetadataStripped(): ModelInterface;
 }

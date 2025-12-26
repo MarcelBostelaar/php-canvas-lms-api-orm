@@ -33,7 +33,7 @@ class SubmissionProviderCached implements SubmissionProviderInterface{
     public function __construct(
         private readonly SubmissionProvider $wrapped,
         private readonly CacheProviderInterface $cache,
-        private readonly int $ttl,
+        public readonly int $ttl,
         private readonly PermissionsHandlerInterface $permissionHandler
     ) {
     }
@@ -56,7 +56,7 @@ class SubmissionProviderCached implements SubmissionProviderInterface{
     public function getSubmissionsInAssignment(AssignmentStub $assignment, ?UserProviderInterface $userProvider, bool $skipCache = false) : mixed{
         return $this->userInCourseScopedCollectionValue(
             "getSubmissionsInAssignment" . AssignmentStub::fromStub($assignment)->getResourceKey(),
-            fn() => $this->getSubmissionsInAssignment($assignment, $userProvider, $skipCache),
+            fn() => $this->wrapped->getSubmissionsInAssignment($assignment, $userProvider, $skipCache),
             fn(Submission $x) => [$this->permissionHandler::domainCourseUserPermission($x->course, $x->user)],
             $skipCache,
             $assignment->course
@@ -72,7 +72,7 @@ class SubmissionProviderCached implements SubmissionProviderInterface{
     public function populateSubmission(SubmissionStub $submission, bool $skipCache = false) : mixed{
         return $this->userInCourseSingleValue(
             Submission::fromStub($submission)->getResourceKey(),
-            fn() => $this->populateSubmission($submission, $skipCache),
+            fn() => $this->wrapped->populateSubmission($submission, $skipCache),
             $submission->user,
             $submission->course,
             $skipCache

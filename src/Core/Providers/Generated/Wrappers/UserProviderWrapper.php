@@ -122,17 +122,6 @@ class UserProviderWrapper implements UserProviderInterface {
     }
 
     /**
-	 * @param Domain $domain
-	 * @param bool $skipCache
-	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
-     * @phpstan-ignore return.unresolvableType
-    */
-    public function getUserSelfInfo(Domain $domain, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->getUserSelfInfo($domain, $skipCache);
-        return ($this->resultProcessor)($value);
-    }
-
-    /**
 	 * @param UserStub $user
 	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2

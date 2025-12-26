@@ -113,15 +113,6 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
     }
 
     /**
-     * @param Domain $domain
-     * @param bool $skipCache Does nothing for this uncached base provider.
-     * @return ErrorResult|NotFoundResult|SuccessResult<User>|UnauthorizedResult
-     */
-    public function getUserSelfInfo(Domain $domain, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
-        return $this->Get("/users/self", $domain->getContext());
-    }
-
-    /**
      * Populates a user from the canvas API.
      * @param Models\UserStub $user
      * @param bool $skipCache Does nothing for this uncached base provider.

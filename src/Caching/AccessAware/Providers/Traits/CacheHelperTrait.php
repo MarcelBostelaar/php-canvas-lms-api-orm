@@ -74,6 +74,12 @@ trait CacheHelperTrait{
         return $this->_internalTrySingleValue($key, $valueFactory, $skipCache, $requiredPermission);
     }
 
+    private function domainUserSingleValue(string $key, Closure $valueFactory, UserStub $user, bool $skipCache){
+        $this->permissionEnsurer->usersInDomain($user->domain, $this->getClientID(), $skipCache);
+        $requiredPermission = $this->permissionHandler::domainUserPermission($user);
+        return $this->_internalTrySingleValue($key, $valueFactory, $skipCache, $requiredPermission);
+    }
+
     /**
      * Try single value. Does not do any permission ensuring, do this before calling manually.
      * @param string $key
@@ -205,7 +211,6 @@ trait CacheHelperTrait{
         $this->permissionEnsurer->usersInDomain($domain, $this->getClientID(), $skipCache);
         $permissionFilter = $this->permissionHandler::contextFilterDomainUser($domain);
 
-        //Permission for all child items are also domain scoped, so we can just give all of them the same domain permission.
         $permissionFactory = fn($x) => [$this->permissionHandler::domainUserPermission($x)];
         
         return $this->_internalTryCollectionValue($key, $valueFactory, $permissionFactory, $skipCache, $permissionFilter);

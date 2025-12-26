@@ -34,7 +34,7 @@ class GroupProviderCached implements GroupProviderInterface{
     public function __construct(
         private readonly GroupProvider $wrapped,
         private readonly CacheProviderInterface $cache,
-        private readonly int $ttl,
+        public readonly int $ttl,
         private readonly PermissionsHandlerInterface $permissionHandler
     ) {
     }
@@ -56,18 +56,7 @@ class GroupProviderCached implements GroupProviderInterface{
     public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false): mixed{
         $originKey = GroupCategoryStub::fromStub($groupCategory)->getResourceKey();
         $alternativeKey = GroupCategory::fromStub($groupCategory)->getResourceKey();
-        //Setup permissions union
-        $this->cache->setPermissionUnion($originKey, $alternativeKey);
-        $gcKey = "getAllGroupsInGroupCategory" . $originKey;
-        //setup backpropagation, 
-        // groups and group categories live in both the global (domain) namespace bound to user(s), 
-        // and the course specific namespace, bound to user(s). So we configure both.
-
-        // Being allowed to access a group category depends on being allowed to access a group. 
-        // Can you access 1 group? You may access the category it belongs to.
-        $this->cache->setBackpropagation($gcKey, $this->permissionHandler::domainUserType(), $originKey);
-        $this->cache->setBackpropagation($gcKey, $this->permissionHandler::domainCourseUserType(), $originKey);
-
+        $collectionKey = "getAllGroupsInGroupCategory" . $originKey;
         //Manually do permission ensurance.
         if(isset($groupCategory->optionalCourseContext)){
             $this->permissionEnsurer->allUsers($groupCategory->optionalCourseContext, $this->getClientID(), $skipCache);
@@ -78,12 +67,25 @@ class GroupProviderCached implements GroupProviderInterface{
 
         //Groups themselves do not have knowable permissions from just their data.
         //Their permissions are propagatad back from the users in them.
-        return $this->unknownPermissionCollectionValue(
-            $gcKey, 
-            fn() => $this->getAllGroupsInGroupCategory($groupCategory),
+        $val = $this->unknownPermissionCollectionValue(
+            $collectionKey, 
+            fn() => $this->wrapped->getAllGroupsInGroupCategory($groupCategory),
             $skipCache
         );
         
+        //Setup permissions union
+        $this->cache->setPermissionUnion($originKey, $alternativeKey);
+        //setup backpropagation, 
+        // groups and group categories live in both the global (domain) namespace bound to user(s), 
+        // and the course specific namespace, bound to user(s). So we configure both.
+
+        // Being allowed to access a group category depends on being allowed to access a group. 
+        // Can you access 1 group? You may access the category it belongs to.
+        $this->cache->setBackpropagation($collectionKey, $this->permissionHandler::domainUserType(), $originKey);
+        $this->cache->setBackpropagation($collectionKey, $this->permissionHandler::domainCourseUserType(), $originKey);
+
+        return $val;
+
     }
 
     /**
@@ -102,7 +104,7 @@ class GroupProviderCached implements GroupProviderInterface{
 
         return $this->unknownPermissionSingleValue(
             Group::fromStub($group)->getResourceKey(),
-            fn() => $this->populateGroup($group, $skipCache),
+            fn() => $this->wrapped->populateGroup($group, $skipCache),
             $skipCache
         );
     }

@@ -32,7 +32,7 @@ class SectionProviderCached implements SectionProviderInterface{
     public function __construct(
         private readonly SectionProvider $wrapped,
         private readonly CacheProviderInterface $cache,
-        private readonly int $ttl,
+        public readonly int $ttl,
         private readonly PermissionsHandlerInterface $permissionHandler
     ) {
     }
@@ -53,7 +53,7 @@ class SectionProviderCached implements SectionProviderInterface{
     public function getAllSectionsInCourse(CourseStub $course, bool $skipCache = false): mixed{
         return $this->courseScopedCollectionValue(
             "getAllSectionsInCourse" . CourseStub::fromStub($course)->getResourceKey(),
-            fn() => $this->getAllSectionsInCourse($course),
+            fn() => $this->wrapped->getAllSectionsInCourse($course),
             $skipCache,
             $course
         );
@@ -67,7 +67,7 @@ class SectionProviderCached implements SectionProviderInterface{
     public function populateSection(SectionStub $section, bool $skipCache = false): mixed{
         return $this->courseSingleValue(
             Section::fromStub($section)->getResourceKey(),
-            fn() => $this->populateSection($section, $skipCache),
+            fn() => $this->wrapped->populateSection($section, $skipCache),
             $section->course,
             $skipCache
         );
