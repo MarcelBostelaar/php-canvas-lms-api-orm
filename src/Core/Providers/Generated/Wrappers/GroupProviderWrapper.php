@@ -76,6 +76,28 @@ class GroupProviderWrapper implements GroupProviderInterface {
     }
 
     /**
+	 * @param GroupCategoryStub[] $groupCategories
+	 * @param bool $skipCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getAllGroupsInGroupCategories(array $groupCategories, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->getAllGroupsInGroupCategories($groupCategories, $skipCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
+	 * @param GroupStub[] $groups
+	 * @param bool $skipCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function populateGroups(array $groups, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->populateGroups($groups, $skipCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
 	 * @param GroupCategoryStub $groupCategory
 	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2

@@ -28,12 +28,13 @@ use function Buildscript\parseReturnType;
  * @param string $traitname
  * @param string $modelname
  * @param array{string: string[]} $pluralLookup
+ * @param array{string: string|null} $parentLookup
  * @return ProviderParseResult
  */
-function processProviderFile(string $filePath, string $providername, string $traitname, string $modelname, array $pluralLookup): ProviderParseResult {
+function processProviderFile(string $filePath, string $providername, string $traitname, string $modelname, array $pluralLookup, array $parentLookup): ProviderParseResult {
     $ast = parseFile($filePath);
     $traitFound = (new FindTraitUserVisitor($traitname))->process($ast)->wasFound;
-    $methods = (new ExtractProviderMethodsVisitor($pluralLookup))->process($ast)->methods;
+    $methods = (new ExtractProviderMethodsVisitor($pluralLookup, $parentLookup))->process($ast)->methods;
 
     return new ProviderParseResult(
         $ast,
@@ -52,8 +53,9 @@ class ExtractProviderMethodsVisitor extends AbstractExtractorVisitor {
     /**
      * Summary of __construct
      * @param array{string: string[]} $pluralLookup
+     * @param array{string: string|null} $parentLookup
      */
-    public function __construct(private array $pluralLookup) {
+    public function __construct(private array $pluralLookup, private array $parentLookup){
     }
 
     public function enterNode(\PhpParser\Node $node) {
@@ -99,7 +101,7 @@ class ExtractProviderMethodsVisitor extends AbstractExtractorVisitor {
         );
         $this->methods[] = $method;
         //Try to specify generation type
-        if(self::tryCheckIsMethodPopulator($method)){
+        if($this->tryCheckIsMethodPopulator($method)){
             return null;
         }
         if($this->tryCheckIsXInYMethod($method)){
@@ -116,18 +118,39 @@ class ExtractProviderMethodsVisitor extends AbstractExtractorVisitor {
      * @param MethodDefinition $method
      * @return bool
      */
-    private static function tryCheckIsMethodPopulator(MethodDefinition $method): bool {
+    private function tryCheckIsMethodPopulator(MethodDefinition $method): bool {
         $wrappedType = self::extractUnionWrappedType($method->returnType);
         if($wrappedType === null){
             return false;
         }
+        if(!($wrappedType instanceof AtomicTypeDefinition)){
+            return false;
+        }
         //try find it in params
         foreach($method->parameters as $param){
-            if($param->type->annotatedString() == $wrappedType->annotatedString()){
-                $method->metadata['relevantParam'] = $param->name;
-                $method->generationType = MethodGenerationType::PopulateSingle;
-                return true;
+            if(!$param->type instanceof AtomicTypeDefinition){
+                continue;
             }
+            $tempWrappedType = $wrappedType;
+
+            $continue = true;
+            while($continue){
+                if($param->type->annotatedString() == $tempWrappedType->annotatedString()){
+                    $method->metadata['relevantParam'] = $param->name;
+                    $method->generationType = MethodGenerationType::PopulateSingle;
+                    return true;
+                }
+                else{
+                    if(isset($this->parentLookup[$tempWrappedType->type]) && $this->parentLookup[$tempWrappedType->type] !== null){
+                        $tempWrappedType = clone $tempWrappedType;
+                        $tempWrappedType->type = $this->parentLookup[$tempWrappedType->type];
+                    }
+                    else{
+                        $continue = false;
+                    }
+                }
+            }
+            
         }
         return false;
     }
@@ -189,6 +212,10 @@ class ExtractProviderMethodsVisitor extends AbstractExtractorVisitor {
             //return type is wrong.
             return false;
         }
+        if(!($returnWrappedType instanceof AtomicTypeDefinition)){
+            //return type is wrong.
+            return false;
+        }
         $head = $parts[0];
         $tail = $parts[1];
         $foundMatchingPlural = false;
@@ -198,18 +225,31 @@ class ExtractProviderMethodsVisitor extends AbstractExtractorVisitor {
             if($tail === $singular){
                 //try finding param with type matching singular
                 foreach($method->parameters as $param){
-                    if($param->type->annotatedString() === $singular){
-                        if($foundMatchingSingular){
-                            throw new Exception("Method " . $method->name . " matches multiple singular forms for parameter");
+                    $singularTemp = $singular;
+                    $continue = true;
+                    while($continue){
+                        if($param->type->annotatedString() === $singularTemp){
+                            if($foundMatchingSingular){
+                                throw new Exception("Method " . $method->name . " matches multiple singular forms for parameter");
+                            }
+                            $method->metadata['relevantParam'] = $param->name;
+                            $foundMatchingSingular = true;
+                            $continue = false;
                         }
-                        $method->metadata['relevantParam'] = $param->name;
-                        $foundMatchingSingular = true;
+                        else{
+                            if(isset($this->parentLookup[$singularTemp])){
+                                $singularTemp = $this->parentLookup[$singularTemp];
+                            }
+                            else{
+                                $continue = false;
+                            }
+                        }
                     }
                 }
             }
             foreach($plurals as $plural){
                 if(str_ends_with($head, $plural)){
-                    if($returnWrappedType->annotatedString() === $singular){
+                    if($returnWrappedType->type === $singular){
                         if($foundMatchingPlural){
                             throw new Exception("Method " . $method->name . " matches multiple plural forms for return type");
                         }

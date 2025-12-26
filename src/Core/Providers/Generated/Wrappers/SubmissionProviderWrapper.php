@@ -76,6 +76,29 @@ class SubmissionProviderWrapper implements SubmissionProviderInterface {
     }
 
     /**
+	 * @param AssignmentStub[] $assignments
+	 * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
+	 * @param bool $skipCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->getSubmissionsInAssignments($assignments, $userProvider, $skipCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
+	 * @param SubmissionStub[] $submissions
+	 * @param bool $skipCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function populateSubmissions(array $submissions, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->populateSubmissions($submissions, $skipCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
 	 * @param AssignmentStub $assignment
 	 * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
 	 * @param bool $skipCache

@@ -47,6 +47,23 @@ interface SubmissionProviderInterface extends HandleEmittedInterface{
      */
     public function handleResults(Closure $processor): SubmissionProviderInterface;
     /**
+	 * @param AssignmentStub[] $assignments
+	 * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
+	 * @param bool $skipCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<AssignmentStub, Submission[]>>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false) : mixed;
+
+    /**
+	 * @param SubmissionStub[] $submissions
+	 * @param bool $skipCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Submission[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function populateSubmissions(array $submissions, bool $skipCache = false) : mixed;
+
+    /**
 	 * @param AssignmentStub $assignment
 	 * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
 	 * @param bool $skipCache

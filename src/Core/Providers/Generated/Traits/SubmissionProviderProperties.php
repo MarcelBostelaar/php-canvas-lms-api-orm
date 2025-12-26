@@ -33,5 +33,37 @@ use CanvasApiLibrary\Core\Models\UserStub;
 trait SubmissionProviderProperties{
     
     
-
+    abstract public function getSubmissionsInAssignment(AssignmentStub $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    abstract public function populateSubmission(SubmissionStub $submission, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    /**
+     * Summary of getSubmissionsInAssignments     * This is a plural version of getSubmissionsInAssignment      * @param AssignmentStub[] $assignments
+ * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
+ * @param bool $skipCache
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<AssignmentStub, Submission[]>>|UnauthorizedResult     */
+    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false): Lookup{
+        $lookup = new Lookup();
+        foreach($assignments as $x){
+            $lookup->add($x, $this->getSubmissionsInAssignment($x));
+        }
+        return $lookup;
+    }
+    /**
+     * Summary of populateSubmissions
+     * This is a plural version of populateSubmission
+	 * @param SubmissionStub[] $submissions
+	 * @param bool $skipCache
+	 * @return ErrorResult|NotFoundResult|SuccessResult<Submission[]>|UnauthorizedResult
+     */
+    public function populateSubmissions(array $submissions, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+        $results = [];
+        foreach($submissions as $item){
+            $result = $this->populateSubmission($item, $skipCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            $results[] = $result->value;
+        }
+        return new SuccessResult($results);
+    }
+    
 }

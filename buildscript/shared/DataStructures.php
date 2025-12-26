@@ -234,17 +234,27 @@ class MethodDefinition {
      * @return MethodDefinition[]
      */
     public function createPluralVariants(array $pluralLookup): array {
-        $onePlural = $this->createPluralVariantInternal($pluralLookup);
-        $aliases = $onePlural->getAliasForms($pluralLookup);
-        return array_merge([$onePlural], $aliases);
+        if($this->generationType === MethodGenerationType::PopulateSingle){
+            return $this->createPluralPopulateInternal($pluralLookup);
+        }
+        elseif($this->generationType === MethodGenerationType::GetItemsInSingle){
+            return $this->createPluralGetItemsInternal($pluralLookup);
+        }
+        else{
+            throw new \Exception("Method is not of type PopulateSingle or GetItemsInSingle: " . $this->name);
+        }
     }
 
     /**
-     * Summary of createPluralVariant
-     * @param array{string:string[]} $pluralLookup
-     * @return MethodDefinition
+     * Summary of createPluralPopulateInternal
+     * @param array $pluralLookup
+     * @return MethodDefinition[]
      */
-    private function createPluralVariantInternal(array $pluralLookup): MethodDefinition {
+    private function createPluralPopulateInternal(array $pluralLookup): array {
+        $definitions = [];
+        if($this->generationType !== MethodGenerationType::PopulateSingle){
+            throw new \Exception("Method is not of type PopulateSingle: " . $this->name);
+        }
         foreach($pluralLookup as $singular => $plurals){
 
             $pos = strpos($this->name, $singular);
@@ -277,76 +287,126 @@ class MethodDefinition {
                     return $param;
                 }, $this->parameters);
 
-                if($this->generationType === MethodGenerationType::PopulateSingle){
-                    
-                    $newReturnType = $this->returnType->map(function($typeDef) {
-                        if($typeDef instanceof GenericTypeDefinition){
-                            if($typeDef->type === 'SuccessResult'){
-                                $pluralSubtype = clone $typeDef->genericParameters[0];
-                                $pluralSubtype->isArrayVariant = true;
-                                return new GenericTypeDefinition(
-                                    'SuccessResult',
-                                    [
-                                        $pluralSubtype
-                                    ]
-                                );
-                            }
+                $newReturnType = $this->returnType->map(function($typeDef) {
+                    if($typeDef instanceof GenericTypeDefinition){
+                        if($typeDef->type === 'SuccessResult'){
+                            $pluralSubtype = clone $typeDef->genericParameters[0];
+                            $pluralSubtype->isArrayVariant = true;
+                            return new GenericTypeDefinition(
+                                'SuccessResult',
+                                [
+                                    $pluralSubtype
+                                ]
+                            );
                         }
-                        return $typeDef;
-                    });
+                    }
+                    return $typeDef;
+                });
 
-                    return new MethodDefinition(
-                        $newName,
-                        $this->docstring,
-                        $newparams,
-                        $newReturnType,
-                        MethodGenerationType::PopulateMultiple,
-                        null,
-                        $this
-                    );
-                }
-                
-                //GetItemsForSingle
-                if($this->generationType === MethodGenerationType::GetItemsInSingle){
-                    //Return type becomes lookup of model
-                    $newAnnotatedReturnType = $this->returnType
-                        ->map(function($typeDef) use ($relevantParam) {
-                        if($typeDef instanceof GenericTypeDefinition){
-                            if($typeDef->type === 'SuccessResult'){
-
-                                $pluralSubtype = clone $typeDef->genericParameters[0];
-                                $pluralSubtype->isArrayVariant = true;
-
-                                return new GenericTypeDefinition(
-                                    'SuccessResult',
-                                    [
-                                        new GenericTypeDefinition(
-                                            'Lookup',
-                                            [
-                                                $relevantParam->type,
-                                                $pluralSubtype
-                                            ]
-                                        )
-                                    ]
-                                );
-                            }
-                        }
-                        return $typeDef;
-                    });
-                    return new MethodDefinition(
-                        $newName,
-                        $this->docstring,
-                        $newparams,
-                        $newAnnotatedReturnType,
-                        MethodGenerationType::GetItemsInMultiple,
-                        null,
-                        $this
-                    );
-                }
-                throw new \Exception("Cannot create plural variant for method {$this->name} with generation type {$this->generationType->name}");
+                $definitions[] = new MethodDefinition(
+                    $newName,
+                    $this->docstring,
+                    $newparams,
+                    $newReturnType,
+                    MethodGenerationType::PopulateMultiple,
+                    null,
+                    $this
+                );
             }
         }
+        if(count($definitions) > 0){
+            return $definitions;
+        }
         throw new \Exception("Could not find singular form in method {$this->name} to create plural variant");
+    }
+
+    /**
+     * Summary of createPluralGetItemsInternal
+     * @param array{string:string[]} $pluralLookup
+     * @return MethodDefinition[]
+     */
+    private function createPluralGetItemsInternal(array $pluralLookup): array {
+        if($this->generationType !== MethodGenerationType::GetItemsInSingle){
+            throw new \Exception("Method is not of type GetItemsForSingle: " . $this->name);
+        }
+
+        $split = preg_split("/In/", $this->name, 2);
+        $head = $split[0];
+        $tail = $split[1];
+
+        $definitions = [];
+
+        foreach($pluralLookup as $singular => $plurals){
+
+            if($tail !== $singular){
+                continue;
+            }
+
+            foreach($plurals as $plural){
+
+                $newName = $head . "In" . $plural;
+
+                $relevantParam = array_filter($this->parameters, fn($p) => $p->name == $this->metadata['relevantParam']);
+                if(count($relevantParam) === 0){
+                    echo "Could not find parameter {$this->metadata['relevantParam']} in method {$this->name} to create plural variant";
+                    //Singular noun might be subset of plural noun, skip
+                    continue;
+                }
+                $relevantParam = $relevantParam[0];
+
+                $pluralParam = clone $relevantParam;
+                $pluralParam->type = clone $relevantParam->type;
+                $pluralParam->type->isArrayVariant = true;
+                $pluralParam->name = lcfirst($plural); //take first plural as param name
+
+                //replace relevant param with array variant
+                $newparams = array_map(function(MethodParameter $param) use ($relevantParam, $pluralParam){
+                    if($param->name == $relevantParam->name){
+                        return $pluralParam;
+                    }
+                    return $param;
+                }, $this->parameters);
+
+                //Return type becomes lookup of model
+                $newAnnotatedReturnType = $this->returnType
+                    ->map(function($typeDef) use ($relevantParam) {
+                    if($typeDef instanceof GenericTypeDefinition){
+                        if($typeDef->type === 'SuccessResult'){
+
+                            $pluralSubtype = clone $typeDef->genericParameters[0];
+                            $pluralSubtype->isArrayVariant = true;
+
+                            return new GenericTypeDefinition(
+                                'SuccessResult',
+                                [
+                                    new GenericTypeDefinition(
+                                        'Lookup',
+                                        [
+                                            $relevantParam->type,
+                                            $pluralSubtype
+                                        ]
+                                    )
+                                ]
+                            );
+                        }
+                    }
+                    return $typeDef;
+                });
+
+                $newDef = new MethodDefinition(
+                    $newName,
+                    $this->docstring,
+                    $newparams,
+                    $newAnnotatedReturnType,
+                    MethodGenerationType::GetItemsInMultiple,
+                    null,
+                    $this
+                );
+                $newDef->metadata['relevantParam'] = $pluralParam->name;
+                $definitions[] = $newDef;
+            }
+        }
+        return $definitions;
     }
 
     public function createDocstringParamsAndReturn($tabDepth = 0): string {
@@ -388,7 +448,7 @@ class ModelParseResult {
      * @param PropertyDefinition[] $fieldsNullable Nullable fields
      * @param string[] $plurals Plural forms of the model name
      * @param bool $hasTrait Whether the trait is used
-     * @param string|null $generatedTrait The generated trait code
+     * @param string|null $parentModel The name of the parent model, if any
      */
     public function __construct(
         public readonly array $ast,
@@ -398,6 +458,7 @@ class ModelParseResult {
         public readonly array $fieldsNullable,
         public readonly array $plurals,
         public readonly bool $hasTrait,
+        public readonly ?string $parentModel,
         public readonly ?string $generatedTrait = null
     ) {}
     
@@ -413,6 +474,7 @@ class ModelParseResult {
             $this->fieldsNullable,
             $this->plurals,
             $this->hasTrait,
+            $this->parentModel,
             $generatedTrait
         );
     }

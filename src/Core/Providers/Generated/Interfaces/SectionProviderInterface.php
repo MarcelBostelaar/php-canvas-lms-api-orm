@@ -47,6 +47,22 @@ interface SectionProviderInterface extends HandleEmittedInterface{
      */
     public function handleResults(Closure $processor): SectionProviderInterface;
     /**
+	 * @param CourseStub[] $courses
+	 * @param bool $skipCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<CourseStub, Section[]>>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getAllSectionsInCourses(array $courses, bool $skipCache = false) : mixed;
+
+    /**
+	 * @param SectionStub[] $sections
+	 * @param bool $skipCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Section[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function populateSections(array $sections, bool $skipCache = false) : mixed;
+
+    /**
 	 * @param CourseStub $course
 	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Section[]>|TUnauthorizedResult

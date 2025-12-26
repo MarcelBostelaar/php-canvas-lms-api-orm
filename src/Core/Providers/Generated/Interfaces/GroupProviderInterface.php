@@ -47,6 +47,22 @@ interface GroupProviderInterface extends HandleEmittedInterface{
      */
     public function handleResults(Closure $processor): GroupProviderInterface;
     /**
+	 * @param GroupCategoryStub[] $groupCategories
+	 * @param bool $skipCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<GroupCategoryStub, Group[]>>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getAllGroupsInGroupCategories(array $groupCategories, bool $skipCache = false) : mixed;
+
+    /**
+	 * @param GroupStub[] $groups
+	 * @param bool $skipCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Group[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function populateGroups(array $groups, bool $skipCache = false) : mixed;
+
+    /**
 	 * @param GroupCategoryStub $groupCategory
 	 * @param bool $skipCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Group[]>|TUnauthorizedResult

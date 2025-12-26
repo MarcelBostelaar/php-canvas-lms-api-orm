@@ -80,6 +80,15 @@ trait CacheHelperTrait{
         return $this->_internalTrySingleValue($key, $valueFactory, $skipCache, $requiredPermission);
     }
 
+    private function userCourseAndDomainSingleValue(string $key, Closure $valueFactory, UserStub $user, CourseStub $course, bool $skipCache){
+        $this->permissionEnsurer->allUsers($course, $this->getClientID(), $skipCache);
+        $requiredPermissions = [
+            $this->permissionHandler::domainUserPermission($user),
+            $this->permissionHandler::domainCourseUserPermission($course, $user)
+        ];
+        return $this->_internalTrySingleValue($key, $valueFactory, $skipCache, ...$requiredPermissions);
+    }
+
     /**
      * Try single value. Does not do any permission ensuring, do this before calling manually.
      * @param string $key

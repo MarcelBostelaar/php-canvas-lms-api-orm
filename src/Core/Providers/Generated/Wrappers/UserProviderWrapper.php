@@ -76,6 +76,63 @@ class UserProviderWrapper implements UserProviderInterface {
     }
 
     /**
+	 * @param GroupStub[] $groups
+	 * @param bool $skipCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getUsersInGroups(array $groups, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->getUsersInGroups($groups, $skipCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
+	 * @param SectionStub[] $sections
+	 * @param ?string $enrollmentRoleFilter
+	 * @param bool $skipCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getUsersInSections(array $sections, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->getUsersInSections($sections, $enrollmentRoleFilter, $skipCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
+	 * @param CourseStub[] $courses
+	 * @param ?string $enrollmentRoleFilter
+	 * @param bool $skipCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getUsersInCourses(array $courses, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->getUsersInCourses($courses, $enrollmentRoleFilter, $skipCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
+	 * @param Domain[] $domains
+	 * @param bool $skipCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getUsersInDomains(array $domains, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->getUsersInDomains($domains, $skipCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
+	 * @param UserStub[] $users
+	 * @param bool $skipCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function populateUsers(array $users, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->populateUsers($users, $skipCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
 	 * @param GroupStub $group
 	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2

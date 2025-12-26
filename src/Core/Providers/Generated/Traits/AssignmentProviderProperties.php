@@ -33,5 +33,24 @@ use CanvasApiLibrary\Core\Models\UserStub;
 trait AssignmentProviderProperties{
     
     
-
+    abstract public function populateAssignment(AssignmentStub $assignment, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    /**
+     * Summary of populateAssignments
+     * This is a plural version of populateAssignment
+	 * @param AssignmentStub[] $assignments
+	 * @param bool $skipCache
+	 * @return ErrorResult|NotFoundResult|SuccessResult<Assignment[]>|UnauthorizedResult
+     */
+    public function populateAssignments(array $assignments, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+        $results = [];
+        foreach($assignments as $item){
+            $result = $this->populateAssignment($item, $skipCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            $results[] = $result->value;
+        }
+        return new SuccessResult($results);
+    }
+    
 }

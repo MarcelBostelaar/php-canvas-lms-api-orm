@@ -18,9 +18,12 @@ function buildProviders($folder, $models): array {
     echo "Building providers in folder: $folder\n";
 
     $pluralLookup = [];
+    $parentLookup = [];
     foreach($models as $model){
         $pluralLookup[$model->modelname] = $model->plurals;
+        $parentLookup[$model->modelname] = $model->parentModel;
     }
+
     $modelNames = array_keys($pluralLookup);
 
     $files = glob($folder . '/*Provider.php');
@@ -30,7 +33,7 @@ function buildProviders($folder, $models): array {
         'modelname' => basename($f, "Provider.php"),
         'traitname' => basename($f, ".php") . "Properties"
     ], $files);
-    $mapped = array_map(fn($n) => processProviderFile($n['file'], $n['providername'], $n['traitname'], $n['modelname'], $pluralLookup), $names);
+    $mapped = array_map(fn($n) => processProviderFile($n['file'], $n['providername'], $n['traitname'], $n['modelname'], $pluralLookup, $parentLookup), $names);
 
 
 

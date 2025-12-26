@@ -76,6 +76,17 @@ class AssignmentProviderWrapper implements AssignmentProviderInterface {
     }
 
     /**
+	 * @param AssignmentStub[] $assignments
+	 * @param bool $skipCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function populateAssignments(array $assignments, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->populateAssignments($assignments, $skipCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
 	 * @param AssignmentStub $assignment
 	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2

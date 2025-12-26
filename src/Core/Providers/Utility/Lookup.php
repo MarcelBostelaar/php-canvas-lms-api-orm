@@ -18,10 +18,10 @@ class Lookup {
      * @param Value $value
      */
     public function add(ModelInterface $key, $value): void {
-        if(!isset($this->map[$key->getResourceKey()])) {
-            $this->map[$key->getResourceKey()] = [];
+        if(!isset($this->map[$key->getId()])) {
+            $this->map[$key->getId()] = [];
         }
-        $this->map[$key->getResourceKey()][] = $value;
+        $this->map[$key->getId()][] = $value;
     }
 
     /**
@@ -29,6 +29,6 @@ class Lookup {
      * @return Value[]
      */
     public function get(ModelInterface $key): array {
-        return $this->map[$key->getResourceKey()] ?? [];
+        return $this->map[$key->getId()] ?? [];
     }
 }

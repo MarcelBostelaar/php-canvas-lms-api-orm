@@ -76,6 +76,28 @@ class SectionProviderWrapper implements SectionProviderInterface {
     }
 
     /**
+	 * @param CourseStub[] $courses
+	 * @param bool $skipCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getAllSectionsInCourses(array $courses, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->getAllSectionsInCourses($courses, $skipCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
+	 * @param SectionStub[] $sections
+	 * @param bool $skipCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function populateSections(array $sections, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->populateSections($sections, $skipCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
 	 * @param CourseStub $course
 	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2

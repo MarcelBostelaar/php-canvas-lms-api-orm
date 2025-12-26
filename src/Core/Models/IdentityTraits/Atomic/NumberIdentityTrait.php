@@ -21,6 +21,10 @@ trait NumberIdentityTrait{
 
     abstract protected function getClassName(): string;
 
+    public function getId(): string{
+        return (string)$this->id;
+    }
+
     protected function initializeNumberIdentity(): void {
         $this->mdrGetters[] = fn() => ["identity" => $this->id];
 

@@ -76,6 +76,17 @@ class CourseProviderWrapper implements CourseProviderInterface {
     }
 
     /**
+	 * @param Domain[] $domains
+	 * @param bool $skipCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getAllCoursesInDomains(array $domains, bool $skipCache = false) : mixed{
+        $value = $this->innerProvider->getAllCoursesInDomains($domains, $skipCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
 	 * @param Domain $domain
 	 * @param bool $skipCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2

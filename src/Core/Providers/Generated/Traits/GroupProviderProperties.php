@@ -33,5 +33,36 @@ use CanvasApiLibrary\Core\Models\UserStub;
 trait GroupProviderProperties{
     
     
-
+    abstract public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    abstract public function populateGroup(GroupStub $group, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    /**
+     * Summary of getAllGroupsInGroupCategories     * This is a plural version of getAllGroupsInGroupCategory      * @param GroupCategoryStub[] $groupCategories
+ * @param bool $skipCache
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<GroupCategoryStub, Group[]>>|UnauthorizedResult     */
+    public function getAllGroupsInGroupCategories(array $groupCategories, bool $skipCache = false): Lookup{
+        $lookup = new Lookup();
+        foreach($groupCategories as $x){
+            $lookup->add($x, $this->getAllGroupsInGroupCategory($x));
+        }
+        return $lookup;
+    }
+    /**
+     * Summary of populateGroups
+     * This is a plural version of populateGroup
+	 * @param GroupStub[] $groups
+	 * @param bool $skipCache
+	 * @return ErrorResult|NotFoundResult|SuccessResult<Group[]>|UnauthorizedResult
+     */
+    public function populateGroups(array $groups, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+        $results = [];
+        foreach($groups as $item){
+            $result = $this->populateGroup($item, $skipCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            $results[] = $result->value;
+        }
+        return new SuccessResult($results);
+    }
+    
 }

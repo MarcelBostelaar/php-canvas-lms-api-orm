@@ -34,6 +34,7 @@ function processModelFile($filePath, $modelname, $traitname): ModelParseResult {
     $fieldsNullable = (new FieldListFinderVisitor("nullableProperties"))->process($ast)->getList();
     $plurals = (new PluralsFinderVisitor())->process($ast)->getPlurals();
     $traitFound = (new FindTraitUserVisitor($traitname))->process($ast)->wasFound;
+    $parentModel = new ParentClassVisitor()->process($ast)->parentClassName;
     
     return new ModelParseResult(
         $ast,
@@ -42,7 +43,8 @@ function processModelFile($filePath, $modelname, $traitname): ModelParseResult {
         $fields,
         $fieldsNullable,
         $plurals,
-        $traitFound
+        $traitFound,
+        $parentModel
     );
 }
 
@@ -144,5 +146,19 @@ class PluralsFinderVisitor extends AbstractExtractorVisitor{
             $foundPlurals[] = $itemval->value;
         }
         return $foundPlurals;
+    }
+}
+
+class ParentClassVisitor extends AbstractExtractorVisitor{
+    public ?string $parentClassName = null;
+
+    public function enterNode(Node $node) {
+        if($node instanceof Stmt\Class_){
+            if($node->extends instanceof FullyQualified){
+                $data = $node->extends->toString();
+                $exploded = explode("\\", $data);
+                $this->parentClassName = $exploded[count($exploded) - 1];
+            }
+        }
     }
 }

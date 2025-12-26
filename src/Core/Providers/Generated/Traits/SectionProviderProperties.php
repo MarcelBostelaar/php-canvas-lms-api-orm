@@ -33,5 +33,36 @@ use CanvasApiLibrary\Core\Models\UserStub;
 trait SectionProviderProperties{
     
     
-
+    abstract public function getAllSectionsInCourse(CourseStub $course, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    abstract public function populateSection(SectionStub $section, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    /**
+     * Summary of getAllSectionsInCourses     * This is a plural version of getAllSectionsInCourse      * @param CourseStub[] $courses
+ * @param bool $skipCache
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<CourseStub, Section[]>>|UnauthorizedResult     */
+    public function getAllSectionsInCourses(array $courses, bool $skipCache = false): Lookup{
+        $lookup = new Lookup();
+        foreach($courses as $x){
+            $lookup->add($x, $this->getAllSectionsInCourse($x));
+        }
+        return $lookup;
+    }
+    /**
+     * Summary of populateSections
+     * This is a plural version of populateSection
+	 * @param SectionStub[] $sections
+	 * @param bool $skipCache
+	 * @return ErrorResult|NotFoundResult|SuccessResult<Section[]>|UnauthorizedResult
+     */
+    public function populateSections(array $sections, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+        $results = [];
+        foreach($sections as $item){
+            $result = $this->populateSection($item, $skipCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            $results[] = $result->value;
+        }
+        return new SuccessResult($results);
+    }
+    
 }
