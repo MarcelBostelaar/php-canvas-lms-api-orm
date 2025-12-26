@@ -2,9 +2,12 @@
 
 namespace CanvasApiLibrary\Caching\AccessAware\Providers;
 
-use CanvasApiLibrary\Core\Caching\CacheRules\UndefinedCacherule;
-use CanvasApiLibrary\Core\Caching\Utility\FullCacheProviderInterface;
-use CanvasApiLibrary\Core\Caching\Utility\CacheRule;
+use CanvasApiLibrary\Caching\AccessAware\Interfaces\CacheProviderInterface;
+use CanvasApiLibrary\Caching\AccessAware\Interfaces\PermissionsHandlerInterface;
+use CanvasApiLibrary\Caching\AccessAware\Providers\Traits\CacheHelperTrait;
+use CanvasApiLibrary\Core\Models\AssignmentStub;
+use CanvasApiLibrary\Core\Models\SubmissionStub;
+use CanvasApiLibrary\Core\Models\Submission;
 use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
 use CanvasApiLibrary\Core\Providers\SubmissionProvider;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\SubmissionProviderProperties;
@@ -25,11 +28,13 @@ class SubmissionProviderCached implements SubmissionProviderInterface{
     use SubmissionProviderProperties;
     use PermissionEnsurerTrait;
     use SubmissionWrapperTrait;
+    use CacheHelperTrait;
+
     public function __construct(
         private readonly SubmissionProvider $wrapped,
-        private readonly FullCacheProviderInterface $cache,
-        private readonly CacheRule $getSubmissionsInAssignmentCR = new UndefinedCacherule(),
-        private readonly CacheRule $populateSubmissionCR = new UndefinedCacherule()
+        private readonly CacheProviderInterface $cache,
+        private readonly int $ttl,
+        private readonly PermissionsHandlerInterface $permissionHandler
     ) {
     }
 
@@ -37,31 +42,40 @@ class SubmissionProviderCached implements SubmissionProviderInterface{
         return $this->wrapped->HandleEmitted($data, $context);
     }
 
-    public function getSubmissionsInAssignment(\CanvasApiLibrary\Core\Models\Assignment $assignment, ?UserProviderInterface $userProvider = null): array{
-        $this->doPreCacheCall();
-        
-        [$cachedItem, $set] = $this->cache->get(
-            $this->getSubmissionsInAssignmentCR,
-            $this->wrapped->getClientID(),
-            "getSubmissionsInAssignment",
-            $assignment);
-        if($cachedItem->isCacheHit){
-            return $cachedItem->value;
-        }
-        return $set($this->wrapped->getSubmissionsInAssignment($assignment, $userProvider));
+    public function getClientID(): String{
+        return $this->wrapped->getClientID();
     }
 
-    public function populateSubmission(\CanvasApiLibrary\Core\Models\Submission $submission): \CanvasApiLibrary\Core\Models\Submission{
-        $this->doPreCacheCall();
-        
-        [$cachedItem, $set] = $this->cache->get(
-            $this->populateSubmissionCR,
-            $this->wrapped->getClientID(),
-            "populateSubmission",
-            $submission);
-        if($cachedItem->isCacheHit){
-            return $cachedItem->value;
-        }
-        return $set($this->wrapped->populateSubmission($submission));
+    /**
+	 * @param AssignmentStub $assignment
+	 * @param ?UserProviderInterface $userProvider
+	 * @param bool $skipCache
+	 * @return ErrorResult|NotFoundResult|SuccessResult<Submission[]>|UnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getSubmissionsInAssignment(AssignmentStub $assignment, ?UserProviderInterface $userProvider, bool $skipCache = false) : mixed{
+        return $this->userInCourseScopedCollectionValue(
+            "getSubmissionsInAssignment" . AssignmentStub::fromStub($assignment)->getResourceKey(),
+            fn() => $this->getSubmissionsInAssignment($assignment, $userProvider, $skipCache),
+            fn(Submission $x) => [$this->permissionHandler::domainCourseUserPermission($x->course, $x->user)],
+            $skipCache,
+            $assignment->course
+        );
+    }
+
+    /**
+	 * @param SubmissionStub $submission
+	 * @param bool $skipCache
+	 * @return ErrorResult|NotFoundResult|SuccessResult<Submission>|UnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function populateSubmission(SubmissionStub $submission, bool $skipCache = false) : mixed{
+        return $this->userInCourseSingleValue(
+            Submission::fromStub($submission)->getResourceKey(),
+            fn() => $this->populateSubmission($submission, $skipCache),
+            $submission->user,
+            $submission->course,
+            $skipCache
+        );
     }
 }

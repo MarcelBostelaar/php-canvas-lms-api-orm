@@ -2,9 +2,12 @@
 
 namespace CanvasApiLibrary\Caching\AccessAware\Providers;
 
-use CanvasApiLibrary\Core\Caching\CacheRules\UndefinedCacherule;
-use CanvasApiLibrary\Core\Caching\Utility\FullCacheProviderInterface;
-use CanvasApiLibrary\Core\Caching\Utility\CacheRule;
+use CanvasApiLibrary\Caching\AccessAware\Interfaces\CacheProviderInterface;
+use CanvasApiLibrary\Caching\AccessAware\Interfaces\PermissionsHandlerInterface;
+use CanvasApiLibrary\Caching\AccessAware\Providers\Traits\CacheHelperTrait;
+use CanvasApiLibrary\Core\Models\CourseStub;
+use CanvasApiLibrary\Core\Models\Section;
+use CanvasApiLibrary\Core\Models\SectionStub;
 use CanvasApiLibrary\Core\Providers\SectionProvider;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\SectionProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\SectionProviderInterface;
@@ -24,11 +27,13 @@ class SectionProviderCached implements SectionProviderInterface{
     use SectionProviderProperties;
     use PermissionEnsurerTrait;
     use SectionWrapperTrait;
+    use CacheHelperTrait;
+
     public function __construct(
         private readonly SectionProvider $wrapped,
-        private readonly FullCacheProviderInterface $cache,
-        private readonly CacheRule $getAllSectionsInCourseCR = new UndefinedCacherule(),
-        private readonly CacheRule $populateSectionCR = new UndefinedCacherule()
+        private readonly CacheProviderInterface $cache,
+        private readonly int $ttl,
+        private readonly PermissionsHandlerInterface $permissionHandler
     ) {
     }
 
@@ -36,31 +41,35 @@ class SectionProviderCached implements SectionProviderInterface{
         return $this->wrapped->HandleEmitted($data, $context);
     }
 
-    public function getAllSectionsInCourse(\CanvasApiLibrary\Core\Models\Course $course): array{
-        $this->doPreCacheCall();
-
-        [$cachedItem, $set] = $this->cache->get(
-            $this->getAllSectionsInCourseCR,
-            $this->wrapped->getClientID(),
-            "getAllSectionsInCourse",
-            $course);
-        if($cachedItem->isCacheHit){
-            return $cachedItem->value;
-        }
-        return $set($this->wrapped->getAllSectionsInCourse($course));
+    public function getClientID(): string{
+        return $this->wrapped->getClientID();
     }
 
-    public function populateSection(\CanvasApiLibrary\Core\Models\Section $section): \CanvasApiLibrary\Core\Models\Section{
-        $this->doPreCacheCall();
+    /**
+     * @param CourseStub $course
+     * @param bool $skipCache
+     * @return ErrorResult|NotFoundResult|SuccessResult<Section[]>|UnauthorizedResult
+     */
+    public function getAllSectionsInCourse(CourseStub $course, bool $skipCache = false): mixed{
+        return $this->courseScopedCollectionValue(
+            "getAllSectionsInCourse" . CourseStub::fromStub($course)->getResourceKey(),
+            fn() => $this->getAllSectionsInCourse($course),
+            $skipCache,
+            $course
+        );
+    }
 
-        [$cachedItem, $set] = $this->cache->get(
-            $this->populateSectionCR,
-            $this->wrapped->getClientID(),
-            "populateSection",
-            $section);
-        if($cachedItem->isCacheHit){
-            return $cachedItem->value;
-        }
-        return $set($this->wrapped->populateSection($section));
+    /**
+     * @param SectionStub $section
+     * @param bool $skipCache
+     * @return ErrorResult|NotFoundResult|SuccessResult<Section>|UnauthorizedResult
+     */
+    public function populateSection(SectionStub $section, bool $skipCache = false): mixed{
+        return $this->courseSingleValue(
+            Section::fromStub($section)->getResourceKey(),
+            fn() => $this->populateSection($section, $skipCache),
+            $section->course,
+            $skipCache
+        );
     }
 }

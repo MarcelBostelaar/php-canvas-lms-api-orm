@@ -46,7 +46,7 @@ interface PermissionsHandlerInterface{
     
     public static function domainCoursePermission(CourseStub $course): Permission;
 
-    public static function domainUserPermission(UserStub $course): Permission;
+    public static function domainUserPermission(UserStub $user): Permission;
 
     public static function domainCourseUserPermission(CourseStub $course, UserStub $user): Permission;
 

@@ -88,6 +88,13 @@ interface CacheProviderInterface{
      */
     public function setBackpropagation(string $collectionKey, mixed $permissionType, string $target);
 
+    /**
+     * Configures all the items with the given keys to share permissions. Used for synching permissions of different model form of the same instance.
+     * @param string[] $keys
+     * @return void
+     */
+    public function setPermissionUnion(string ...$keys);
+
     
     /**
      * Tries to retrieve a cached collection items for this client. 

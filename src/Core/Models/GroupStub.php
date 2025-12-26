@@ -2,11 +2,12 @@
 
 namespace CanvasApiLibrary\Core\Models;
 use CanvasApiLibrary\Core\Models\Generated\GroupStubProperties;
+use CanvasApiLibrary\Core\Models\IdentityTraits\DomainBoundIdOptionalCourseContextTrait;
 use CanvasApiLibrary\Core\Models\Utility\AbstractCanvasPopulatedModel;
 use CanvasApiLibrary\Core\Models\IdentityTraits\DomainBoundIdOptionalUserCourseContextTrait;
 
 abstract class GroupStub extends AbstractCanvasPopulatedModel{
-    use DomainBoundIdOptionalUserCourseContextTrait;
+    use DomainBoundIdOptionalCourseContextTrait;
     use GroupStubProperties;
     protected static array $properties = [
     ];

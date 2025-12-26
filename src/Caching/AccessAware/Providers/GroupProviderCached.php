@@ -2,8 +2,13 @@
 
 namespace CanvasApiLibrary\Caching\AccessAware\Providers;
 
-use CanvasApiLibrary\Caching\AccessAware\Interfaces\CacheStorage;
+use CanvasApiLibrary\Caching\AccessAware\Interfaces\CacheProviderInterface;
 use CanvasApiLibrary\Caching\AccessAware\Interfaces\PermissionsHandlerInterface;
+use CanvasApiLibrary\Caching\AccessAware\Providers\Traits\CacheHelperTrait;
+use CanvasApiLibrary\Core\Models\Group;
+use CanvasApiLibrary\Core\Models\GroupCategory;
+use CanvasApiLibrary\Core\Models\GroupCategoryStub;
+use CanvasApiLibrary\Core\Models\GroupStub;
 use CanvasApiLibrary\Core\Providers\GroupProvider;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\GroupProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\GroupProviderInterface;
@@ -23,11 +28,12 @@ class GroupProviderCached implements GroupProviderInterface{
     use GroupProviderProperties;
     use PermissionEnsurerTrait;
     use GroupWrapperTrait;
+    use CacheHelperTrait;
     
     
     public function __construct(
         private readonly GroupProvider $wrapped,
-        private readonly CacheStorage $cache,
+        private readonly CacheProviderInterface $cache,
         private readonly int $ttl,
         private readonly PermissionsHandlerInterface $permissionHandler
     ) {
@@ -41,65 +47,63 @@ class GroupProviderCached implements GroupProviderInterface{
         return $this->wrapped->getClientID();
     }
 
-    public function getAllGroupsInGroupCategory(\CanvasApiLibrary\Core\Models\GroupCategory $category): array{
-        $this->doPreCacheCall();
+    /**
+     * Summary of getAllGroupsInGroupCategory
+     * @param GroupCategoryStub $groupCategory
+     * @param bool $skipCache
+     * @return ErrorResult|NotFoundResult|SuccessResult<Group[]>|UnauthorizedResult
+     */
+    public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false): mixed{
+        $originKey = GroupCategoryStub::fromStub($groupCategory)->getResourceKey();
+        $alternativeKey = GroupCategory::fromStub($groupCategory)->getResourceKey();
+        //Setup permissions union
+        $this->cache->setPermissionUnion($originKey, $alternativeKey);
+        $gcKey = "getAllGroupsInGroupCategory" . $originKey;
+        //setup backpropagation, 
+        // groups and group categories live in both the global (domain) namespace bound to user(s), 
+        // and the course specific namespace, bound to user(s). So we configure both.
 
-        $collectionKey = "getAllGroupsInGroupCategory" . $category->getResourceKey();
-        $item = $this->cache->getCollection(
-            $collectionKey,
-            $this->getClientID()
+        // Being allowed to access a group category depends on being allowed to access a group. 
+        // Can you access 1 group? You may access the category it belongs to.
+        $this->cache->setBackpropagation($gcKey, $this->permissionHandler::domainUserType(), $originKey);
+        $this->cache->setBackpropagation($gcKey, $this->permissionHandler::domainCourseUserType(), $originKey);
+
+        //Manually do permission ensurance.
+        if(isset($groupCategory->optionalCourseContext)){
+            $this->permissionEnsurer->allUsers($groupCategory->optionalCourseContext, $this->getClientID(), $skipCache);
+        }
+        else{
+            $this->permissionEnsurer->usersInDomain($groupCategory->domain, $this->getClientID(), $skipCache);
+        }
+
+        //Groups themselves do not have knowable permissions from just their data.
+        //Their permissions are propagatad back from the users in them.
+        return $this->unknownPermissionCollectionValue(
+            $gcKey, 
+            fn() => $this->getAllGroupsInGroupCategory($groupCategory),
+            $skipCache
         );
-        if($item->hit){
-            return $item->value;
-        }
-        //No hit
-        $actualItems = $this->wrapped->getAllGroupsInGroupCategory($category);
-
-        //Allowed contexts are the all user permissions of DomainUser type in this domain
-        $knownFilters = [$this->permissionHandler->contextFilterDomainUser($category->domain)];
-        if($category->optionalCourseContext !== null){
-            //and user permissions of the DomainCourseUser type in this course (in this domain)
-            $knownFilters[] = $this->permissionHandler->contextFilterDomainCourseUser(
-                $category->optionalCourseContext
-            );
-        }
-
-        //Set up collection
-        $this->cache->ensureCollection($collectionKey, $this->ttl, ...$knownFilters);
         
-        //Set up permission backpropagation from groups.
-        //Propagate back all domainuser perms
-        $this->cache->setBackpropagation($collectionKey, 
-        $this->permissionHandler->domainUserType(),
-        $category->getResourceKey());
-
-        //Propagate back all domainCourseUser perms
-        $this->cache->setBackpropagation($collectionKey, 
-        $this->permissionHandler->domainCourseUserType(),
-        $category->getResourceKey());
-
-        //Add individual items to the cache
-        foreach($actualItems as $item){
-            $this->cache->setCollectionItem(
-                $collectionKey, 
-                $item->getResourceKey(), 
-                $item->withMetaDataStripped(), 
-                $this->ttl,
-                $this->getClientID());
-                //Do not set permissions, as permissions must be backpropagated from the users which come out of the groups.
-        }
-        //No permissions can be assigned to the client from this endpoint.
-        return $actualItems;
     }
 
-    public function populateGroup(\CanvasApiLibrary\Core\Models\Group $group): \CanvasApiLibrary\Core\Models\Group{
-        $this->doPreCacheCall();
+    /**
+     * @param GroupStub $group
+     * @param bool $skipCache
+     * @return ErrorResult|NotFoundResult|SuccessResult<\CanvasApiLibrary\Core\Models\Group>|UnauthorizedResult
+     */
+    public function populateGroup(GroupStub $group, bool $skipCache = false): mixed{
+        //Manually do permission ensurance.
+        if(isset($group->optionalCourseContext)){
+            $this->permissionEnsurer->allUsers($group->optionalCourseContext, $this->getClientID(), $skipCache);
+        }
+        else{
+            $this->permissionEnsurer->usersInDomain($group->domain, $this->getClientID(), $skipCache);
+        }
 
-        return $this->cache->trySingleValue(
-            $group->getResourceKey(),
-            $this->ttl,
-            $this->getClientID(),
-            fn()=> $this->wrapped->populateGroup($group)
-        ); //Cannot set up permissions, must be backwards propagated from users in group.
+        return $this->unknownPermissionSingleValue(
+            Group::fromStub($group)->getResourceKey(),
+            fn() => $this->populateGroup($group, $skipCache),
+            $skipCache
+        );
     }
 }
