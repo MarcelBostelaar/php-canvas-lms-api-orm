@@ -1,5 +1,5 @@
 {
-    "name": "your-vendor/php-canvas-lms-api-orm",
+    "name": "canvasapilibrary/orm",
     "description": "A PHP library that provides an ORM for the Canvas LMS API",
     "type": "library",
     "license": "All-rights-reserved",
