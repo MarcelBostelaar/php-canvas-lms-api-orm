@@ -48,7 +48,7 @@ class GroupProviderCached implements GroupProviderInterface{
     }
 
     /**
-     * Summary of getAllGroupsInGroupCategory
+     * Ensure that course context is set, if the purpose is to access course-scoped groups, otherwise caching will not work correctly.
      * @param GroupCategoryStub $groupCategory
      * @param bool $skipCache
      * @return ErrorResult|NotFoundResult|SuccessResult<Group[]>|UnauthorizedResult
@@ -82,13 +82,13 @@ class GroupProviderCached implements GroupProviderInterface{
         // Being allowed to access a group category depends on being allowed to access a group. 
         // Can you access 1 group? You may access the category it belongs to.
         $this->cache->setBackpropagation($collectionKey, $this->permissionHandler::domainUserType(), $originKey);
-        $this->cache->setBackpropagation($collectionKey, $this->permissionHandler::domainCourseUserType(), $originKey);
 
         return $val;
 
     }
 
     /**
+     * Ensure that course context is set, if the purpose is to access course-scoped groups, otherwise caching will not work correctly.
      * @param GroupStub $group
      * @param bool $skipCache
      * @return ErrorResult|NotFoundResult|SuccessResult<\CanvasApiLibrary\Core\Models\Group>|UnauthorizedResult

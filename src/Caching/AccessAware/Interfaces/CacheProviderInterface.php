@@ -17,10 +17,10 @@ interface CacheProviderInterface{
      * @param mixed $value Value to cache. Must be the actual value, not a Result-type wrapper / value
      * @param int $ttl Time to keep in cache in seconds.
      * @param string $clientID Id of the current cache client.
-     * @param Permission[] $permissionsRequired String indicating the permission required to access this item. Items may have multiple permissions, store all of them, only one is required to access it.
+     * @param Permission[] $permissionRequired String indicating the permission required to access this item. Items may have multiple permissions, store all of them, only one is required to access it.
      * @return void
      */
-    public function set(string $itemKey, mixed $value, int $ttl, string $clientID, mixed ...$permissionsRequired);
+    public function set(string $itemKey, mixed $value, int $ttl, string $clientID, mixed ...$permissionRequired);
 
     /**
      * Tries to retrieve a value by key from the cache. Will do so if the client has any matching permission for any of the permissions of this item.
@@ -60,11 +60,11 @@ interface CacheProviderInterface{
      * @param string $collectionKey The key by which the collection is to be stored.
      * @param array $itemKeys The list of item keys which belong to this collection.
      * @param int $ttl Time to keep in cache in seconds.
-     * @param ContextFilter[] $itemPermissionContextFilter Allowed context filters for this collection. Any collection may only have ONE filter of any TYPE. 
+     * @param ?ContextFilter $itemPermissionContextFilter Allowed context filters for this collection. Any collection may only have ONE filter of any TYPE. 
      * Adding a filter of the same type of a different context throws an exception.
      * @return void
      */
-    public function setCollection(string $clientID, string $collectionKey, array $itemKeys, int $ttl, mixed ...$itemPermissionContextFilters);
+    public function setCollection(string $clientID, string $collectionKey, array $itemKeys, int $ttl, mixed $itemPermissionContextFilters);
 
     /**
      * Sets an item as a target for permission backpropagation. Multiple permission types may be set, but the target may not be changed for any collection.

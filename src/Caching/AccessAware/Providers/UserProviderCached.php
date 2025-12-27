@@ -77,7 +77,6 @@ class UserProviderCached implements UserProviderInterface{
         $this->cache->setPermissionUnion($key, $alternativeKey);
 
         //set backpropagate permissions from users to group
-        $this->cache->setBackpropagation($collectionKey, $this->permissionHandler::domainCourseUserType(), $alternativeKey);
         $this->cache->setBackpropagation($collectionKey, $this->permissionHandler::domainUserType(), $alternativeKey);
         return $val;
     }
@@ -93,7 +92,12 @@ class UserProviderCached implements UserProviderInterface{
         return $this->userInCourseScopedCollectionValue(
             "getUsersInSection" . SectionStub::fromStub($section)->getResourceKey(),
             fn() => $this->wrapped->getUsersInSection($section, $enrollmentRoleFilter, $skipCache),
-            fn(User $x) => [$this->permissionHandler::domainCourseUserPermission($section->course, $x)],
+            function(User $x) use($section) {
+                return [
+                    $this->permissionHandler::domainCourseUserPermission($section->course, $x),
+                    $this->permissionHandler::domainUserPermission($x)
+                ];
+            },
             $skipCache,
             $section->course
         );
@@ -110,7 +114,12 @@ class UserProviderCached implements UserProviderInterface{
         return $this->userInCourseScopedCollectionValue(
             "getUsersInCourse" . CourseStub::fromStub($course)->getResourceKey(),
             fn() => $this->wrapped->getUsersInCourse($course, $enrollmentRoleFilter, $skipCache),
-            fn(User $x) => [$this->permissionHandler::domainCourseUserPermission($course, $x)],
+            function(User $x) use($course) {
+                return [
+                    $this->permissionHandler::domainCourseUserPermission($course, $x),
+                    $this->permissionHandler::domainUserPermission($x)
+                ];
+            },
             $skipCache,
             $course
         );
@@ -126,6 +135,7 @@ class UserProviderCached implements UserProviderInterface{
         return $this->domainUserScopedCollectionValue(
             "getUsersInDomain" . $domain->getResourceKey(),
             fn() => $this->wrapped->getUsersInDomain($domain, $skipCache),
+            fn(UserStub $x) => [$this->permissionHandler::domainUserPermission($x)],
             $skipCache,
             $domain
         );
@@ -138,22 +148,11 @@ class UserProviderCached implements UserProviderInterface{
      * @phpstan-ignore return.unresolvableType
     */
     public function populateUser(UserStub $user, bool $skipCache = false) : mixed{
-        if(isset($user->optionalCourseContext)){
-            return $this->userCourseAndDomainSingleValue(
-                User::fromStub($user)->getResourceKey(),
-                fn() => $this->wrapped->populateUser($user, $skipCache),
-                $user,
-                $user->optionalCourseContext,
-                $skipCache
-            );
-        }
-        else{
-            return $this->domainUserSingleValue(
-                User::fromStub($user)->getResourceKey(),
-                fn() => $this->wrapped->populateUser($user, $skipCache),
-                $user,
-                $skipCache
-            );
-        }
+        return $this->domainUserSingleValue(
+            User::fromStub($user)->getResourceKey(),
+            fn() => $this->wrapped->populateUser($user, $skipCache),
+            $user,
+            $skipCache
+        );
     }
 }
