@@ -15,31 +15,31 @@ use Permission;
  * @template PermissionType
  */
 interface PermissionsHandlerInterface{
-    /**
-     * Returns only those permissions that exist in the same context as the given filter.
-     * Ie, student-bound items exist in the context of a domain name and course id. 
-     * This method returns only those permissions which are for that same context, 
-     * ie all other permissions to see students in that course on that domain.
-     * @param ContextFilter $context A context filter
-     * @param Permission[] $permissions Permissions to filter
-     * @return Permission[] Filtered permissions
-     */
-    public static function filterOnContext(mixed $context, array $permissions): array;
+    // /**
+    //  * Returns only those permissions that exist in the same context as the given filter.
+    //  * Ie, student-bound items exist in the context of a domain name and course id. 
+    //  * This method returns only those permissions which are for that same context, 
+    //  * ie all other permissions to see students in that course on that domain.
+    //  * @param ContextFilter $context A context filter
+    //  * @param Permission[] $permissions Permissions to filter
+    //  * @return Permission[] Filtered permissions
+    //  */
+    // public static function filterOnContext(mixed $context, array $permissions): array;
 
-    /**
-     * Filters a given list of permissions to only those of a certain type
-     * @param PermissionType $contextType The context type to filter on.
-     * @param Permission[] $permissions The permissions to filter
-     * @return Permission[] Filtered permissions
-     */
-    public static function filterOnType(mixed $contextType, array $permissions) : array;
+    // /**
+    //  * Filters a given list of permissions to only those of a certain type
+    //  * @param PermissionType $contextType The context type to filter on.
+    //  * @param Permission[] $permissions The permissions to filter
+    //  * @return Permission[] Filtered permissions
+    //  */
+    // public static function filterOnType(mixed $contextType, array $permissions) : array;
 
-    /**
-     * Extracts the context filter from a given permission
-     * @param PermissionType $permission The permission to extract context from
-     * @return ContextFilter The context filter
-     */
-    public static function contextFrom(mixed $permission): mixed;
+    // /**
+    //  * Extracts the context filter from a given permission
+    //  * @param PermissionType $permission The permission to extract context from
+    //  * @return ContextFilter The context filter
+    //  */
+    // public static function contextFrom(mixed $permission): mixed;
 
     /**
      * Creates a context filter for domain, course, and user scope
@@ -98,19 +98,19 @@ interface PermissionsHandlerInterface{
      */
     public static function domainCourseUserPermission(CourseStub $course, UserStub $user): mixed;
 
-    /**
-     * Extracts the permission type from a permission string
-     * @param Permission $permission The permission string to extract type from
-     * @return PermissionType The permission type
-     */
-    public static function typeFromPermission(mixed $permission) : mixed;
+    // /**
+    //  * Extracts the permission type from a permission string
+    //  * @param Permission $permission The permission string to extract type from
+    //  * @return PermissionType The permission type
+    //  */
+    // public static function typeFromPermission(mixed $permission) : mixed;
 
-    /**
-     * Extracts the permission type from a context filter string
-     * @param ContextFilter $contextFilter The context filter string to extract type from
-     * @return PermissionType The permission type
-     */
-    public static function typeFromContextFilter(mixed $contextFilter) : mixed;
+    // /**
+    //  * Extracts the permission type from a context filter string
+    //  * @param ContextFilter $contextFilter The context filter string to extract type from
+    //  * @return PermissionType The permission type
+    //  */
+    // public static function typeFromContextFilter(mixed $contextFilter) : mixed;
 
     /**
      * Returns the permission type for domain scope
