@@ -30,5 +30,5 @@
 [x] Maak de permission manager ook dependency injected.
 [x] Maak de types van de caching dingen generic.
 
-[] Fix provider trait generation not working anymore
+[x] Fix provider trait generation not working anymore
 [] Look alle core providers door en kijk waar je de requests kan verbeteren door b.v. meer results per pagina te vragen.

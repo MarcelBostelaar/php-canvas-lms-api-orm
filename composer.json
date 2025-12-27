@@ -5,18 +5,19 @@
     "license": "All-rights-reserved",
     "autoload": {
         "psr-4": {
-            "CanvasApiLibrary\\Core\\": "./",
+            "CanvasApiLibrary\\Core\\": "/src/Core/",
+            "CanvasApiLibrary\\Caching\\": "/src/Caching/",
             "CanvasApiLibrary\\Core\\Providers\\Interfaces\\": [
-                "Core/Providers/Generated/Interfaces",
-                "Core/Providers/Generated/Wrappers"
+                "src/Core/Providers/Generated/Interfaces",
+                "src/Core/Providers/Generated/Wrappers"
             ],
             "CanvasApiLibrary\\Core\\Providers\\": [
-                "Core/Providers/",
-                "Core/Providers/Utility/"
+                "src/Core/Providers/",
+                "src/Core/Providers/Utility/"
             ]
         },
         "classmap": [
-            "Core/Providers/Utility/ModelPopulator/"
+            "src/Core/Providers/Utility/ModelPopulator/"
         ]
     },
     "require": {
