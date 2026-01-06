@@ -16,25 +16,18 @@ use Permission;
  */
 interface PermissionsHandlerInterface{
     /**
-     * Creates a context filter for domain, course, and user scope
+     * Creates a context filter for domain, course, with any user
      * @param CourseStub $course The course to create context filter for
-     * @return ContextFilter The context filter for domain, course, and user
+     * @return ContextFilter The context filter for domain, course, with any user
      */
-    public static function contextFilterDomainCourseUser(CourseStub $course): mixed;
-
-    /**
-     * Creates a context filter for domain and course scope
-     * @param CourseStub $course The course to create context filter for
-     * @return ContextFilter The context filter for domain and course
-     */
-    public static function contextFilterDomainCourse(CourseStub $course): mixed;
+    public static function contextFilterDomainCourseAnyUser(CourseStub $course): mixed;
 
     /**
      * Creates a context filter for domain and user scope
      * @param Domain $domain The domain to create context filter for
      * @return ContextFilter The context filter for domain and user
      */
-    public static function contextFilterDomainUser(Domain $domain): mixed;
+    public static function contextFilterDomainAnyUser(Domain $domain): mixed;
 
     /**
      * Creates a permission for domain and course scope

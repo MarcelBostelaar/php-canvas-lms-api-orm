@@ -185,33 +185,8 @@ trait CacheHelperTrait{
         bool $skipCache,
         CourseStub $course) : SuccessResult|ErrorResult|UnauthorizedResult|NotFoundResult{
             $this->permissionEnsurer->usersInCourse($course, $this->getClientID(), $skipCache);
-            $permissionFilter = $this->permissionHandler::contextFilterDomainCourseUser($course);
+            $permissionFilter = $this->permissionHandler::contextFilterDomainCourseAnyUser($course);
             return $this->_internalTryCollectionValue($key, $valueFactory, $childPermissionFactory, $skipCache, $permissionFilter);
-    }
-
-    /**
-     * Attempts to retrieve a collection from cache based on known permissions of the current client. 
-     * If not cached, retrieves via factory, and if succesfull, caches result permission restricted to this course.
-     * @param string $key They key by which to identify this collection.
-     * @param Closure(): SuccessResult<ModelInterface[]>|ErrorResult|UnauthorizedResult|NotFoundResult $valueFactory
-     * @param bool $skipCache Whether or not to skip the cache and refresh the resource. If true, will always retrieve fresh value and update the cache.
-     * @param CourseStub $course The course for which this collection is permission scoped.
-     * @return ErrorResult|NotFoundResult|SuccessResult<ModelInterface[]>|UnauthorizedResult
-     */
-    private function courseScopedCollectionValue(
-        string $key, 
-        Closure $valueFactory,
-        bool $skipCache,
-        CourseStub $course): SuccessResult|ErrorResult|UnauthorizedResult|NotFoundResult{
-            $this->permissionEnsurer->usersInCourse($course, $this->getClientID(), $skipCache);
-            $permissionFilter = $this->permissionHandler::contextFilterDomainCourse($course);
-
-            //Permission for all child items are also course scoped, so we can just give all of them the same domainCourse permission.
-            $permissionFactory = function($x) use($course){
-                return $this->permissionHandler::domainCoursePermission($course);
-            };
-
-            return $this->_internalTryCollectionValue($key, $valueFactory, $permissionFactory, $skipCache, $permissionFilter);
     }
 
     private function domainUserScopedCollectionValue(
@@ -222,7 +197,7 @@ trait CacheHelperTrait{
         Domain $domain
     ){
         $this->permissionEnsurer->usersInDomain($domain, $this->getClientID(), $skipCache);
-        $permissionFilter = $this->permissionHandler::contextFilterDomainUser($domain);
+        $permissionFilter = $this->permissionHandler::contextFilterDomainAnyUser($domain);
         
         return $this->_internalTryCollectionValue($key, $valueFactory, $childPermissionFactory, $skipCache, $permissionFilter);
     }
