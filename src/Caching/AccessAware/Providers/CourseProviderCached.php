@@ -44,7 +44,7 @@ class CourseProviderCached implements CourseProviderInterface{
     }
 
     public function getAllCoursesInDomain(Domain $domain, bool $skipCache = false) : SuccessResult|NotFoundResult|ErrorResult|UnauthorizedResult{
-        return $this->clientIndividualValue(
+        return $this->clientPrivateValue(
             "getAllCoursesInDomain" . $domain->getResourceKey(),
             fn() => $this->wrapped->getAllCoursesInDomain($domain, $skipCache),
             $skipCache

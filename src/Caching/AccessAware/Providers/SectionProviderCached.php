@@ -52,11 +52,11 @@ class SectionProviderCached implements SectionProviderInterface{
      */
     public function getAllSectionsInCourse(CourseStub $course, bool $skipCache = false): mixed{
         //Assume any user in course can see all sections, thus the resulting list is the same for any user in the course
-        return $this->courseSingleValue(
+        return $this->courseCollectionValueAccessAgnostic(
             "getAllSectionsInCourse" . CourseStub::fromStub($course)->getResourceKey(),
             fn() => $this->wrapped->getAllSectionsInCourse($course),
-            $course,
-            $skipCache
+            $skipCache,
+            $course
         );
     }
 

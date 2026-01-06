@@ -26,12 +26,12 @@ trait CacheHelperTrait{
 
     
     /**
-     * Value saved per client.
+     * Value saved per client. Can be both single model or array of models (collection). Dominance matching not applied because this is per-client.
      * @param string $key
      * @param Closure $valueFactory
      * @param bool $skipCache
      */
-    private function clientIndividualValue(string $key, Closure $valueFactory, bool $skipCache){
+    private function clientPrivateValue(string $key, Closure $valueFactory, bool $skipCache){
         $modifiedKey = $this->getClientID() . "_" . $key;
         if(!$skipCache){
             $cached = $this->cache->get($this->getClientID(), $modifiedKey);
@@ -42,7 +42,13 @@ trait CacheHelperTrait{
         $value = $valueFactory();
         $clientPermission = $this->permissionHandler->clientPermission($this->getClientID());
         if($value instanceof SuccessResult){
-            $this->cache->set($modifiedKey, $value->value->withMetaDataStripped(), $this->ttl, $this->getClientID(), $clientPermission);
+            if(is_array($value->value )){
+                $cleaned = array_map(fn($x) => $x->withMetaDataStripped(), $value->value);
+            }
+            else{
+                $cleaned = $value->value->withMetaDataStripped();
+            }
+            $this->cache->set($modifiedKey, $cleaned, $this->ttl, $this->getClientID(), $clientPermission);
         }
         return $value;
     }
@@ -200,6 +206,38 @@ trait CacheHelperTrait{
         $permissionFilter = $this->permissionHandler::contextFilterDomainAnyUser($domain);
         
         return $this->_internalTryCollectionValue($key, $valueFactory, $childPermissionFactory, $skipCache, $permissionFilter);
+    }
+
+    /**
+     * Attempts to retrieve a collection from cache based on known permissions of the current client. 
+     * If not cached, retrieves via factory, and if succesfull, caches result permission restricted
+     * to the given course.
+     * Unlike other collection methods, this assumes that any user in the course will always see the same collection,
+     * thus the resulting list is the same for any user that can access the course.
+     * @param string $key
+     * @param Closure $valueFactory
+     * @param bool $skipCache
+     * @param CourseStub $course
+     */
+    private function courseCollectionValueAccessAgnostic(
+        string $key, 
+        Closure $valueFactory,
+        bool $skipCache,
+        CourseStub $course
+    ){
+        if(!$skipCache){
+            $cached = $this->cache->get($this->getClientID(), $key);
+            if($cached->hit){
+                return new SuccessResult($cached->value);
+            }
+        }
+        $value = $valueFactory();
+        $permissionsRequired = $this->permissionHandler::domainCoursePermission($course);
+        if($value instanceof SuccessResult){
+            $cleaned = array_map(fn($x) => $x->withMetaDataStripped(), $value->value);
+            $this->cache->set($key, $cleaned, $this->ttl, $this->getClientID(), $permissionsRequired);
+        }
+        return $value;
     }
 
     /**
