@@ -23,6 +23,29 @@ use Closure;
  */
 trait CacheHelperTrait{
     abstract public function getClientID(): string;
+
+    
+    /**
+     * Value saved per client.
+     * @param string $key
+     * @param Closure $valueFactory
+     * @param bool $skipCache
+     */
+    private function clientIndividualValue(string $key, Closure $valueFactory, bool $skipCache){
+        $modifiedKey = $this->getClientID() . "_" . $key;
+        if(!$skipCache){
+            $cached = $this->cache->get($this->getClientID(), $modifiedKey);
+            if($cached->hit){
+                return new SuccessResult($cached->value);
+            }
+        }
+        $value = $valueFactory();
+        $clientPermission = $this->permissionHandler->clientPermission($this->getClientID());
+        if($value instanceof SuccessResult){
+            $this->cache->set($modifiedKey, $value->value->withMetaDataStripped(), $this->ttl, $this->getClientID(), $clientPermission);
+        }
+        return $value;
+    }
     
     /**
      * Attempts to retrieve item from cache, if not cached, retrieves via factory, and if succesfull, caches result.
@@ -80,15 +103,6 @@ trait CacheHelperTrait{
         $requiredPermission = $this->permissionHandler::domainUserPermission($user);
         return $this->_internalTrySingleValue($key, $valueFactory, $skipCache, $requiredPermission);
     }
-
-    // private function userCourseAndDomainSingleValue(string $key, Closure $valueFactory, UserStub $user, CourseStub $course, bool $skipCache){
-    //     $this->permissionEnsurer->allUsers($course, $this->getClientID(), $skipCache);
-    //     $requiredPermissions = [//TODO remove
-    //         $this->permissionHandler::domainUserPermission($user),
-    //         $this->permissionHandler::domainCourseUserPermission($course, $user)
-    //     ];
-    //     return $this->_internalTrySingleValue($key, $valueFactory, $skipCache, ...$requiredPermissions);
-    // }
 
     /**
      * Try single value. Does not do any permission ensuring, do this before calling manually.
@@ -193,24 +207,12 @@ trait CacheHelperTrait{
             $permissionFilter = $this->permissionHandler::contextFilterDomainCourse($course);
 
             //Permission for all child items are also course scoped, so we can just give all of them the same domainCourse permission.
-            $permissionFactory = fn($x) => $this->permissionHandler::domainCoursePermission($course);
+            $permissionFactory = function($x) use($course){
+                return $this->permissionHandler::domainCoursePermission($course);
+            };
 
             return $this->_internalTryCollectionValue($key, $valueFactory, $permissionFactory, $skipCache, $permissionFilter);
     }
-
-    private function domainScopedCollectionValue(
-        string $key, 
-        Closure $valueFactory,
-        bool $skipCache,
-        Domain $domain): SuccessResult|ErrorResult|UnauthorizedResult|NotFoundResult{
-            $this->permissionEnsurer->domain($domain, $this->getClientID(), $skipCache);
-            $permissionFilter = $this->permissionHandler::contextFilterDomain($domain);
-
-            //Permission for all child items are also domain scoped, so we can just give all of them the same domain permission.
-            $permissionFactory = fn($x) => $this->permissionHandler::domainPermission($domain);
-            
-            return $this->_internalTryCollectionValue($key, $valueFactory, $permissionFactory, $skipCache, $permissionFilter);
-        }
 
     private function domainUserScopedCollectionValue(
         string $key, 
@@ -224,26 +226,6 @@ trait CacheHelperTrait{
         
         return $this->_internalTryCollectionValue($key, $valueFactory, $childPermissionFactory, $skipCache, $permissionFilter);
     }
-
-    // private function userCourseAndGlobalScopedCollectionValue( //TODO remove
-    //     string $key, 
-    //     Closure $valueFactory,
-    //     bool $skipCache,
-    //     CourseStub $course){
-    //         $this->permissionEnsurer->allUsers($course, $this->getClientID(), $skipCache);
-    //         $permissionFilters = [
-    //             $this->permissionHandler::contextFilterDomainUser($course->domain),
-    //             $this->permissionHandler::contextFilterDomainCourseUser($course)
-    //         ];
-
-    //         //Permission for all child items are also domain scoped, so we can just give all of them the same domain permission.
-    //         $permissionFactory = fn(UserStub $x) => [
-    //             $this->permissionHandler::domainUserPermission($x),
-    //             $this->permissionHandler::domainCourseUserPermission($course, $x)
-    //         ];
-            
-    //         return $this->_internalTryCollectionValue($key, $valueFactory, $permissionFactory, $skipCache, ...$permissionFilters);
-    //     }
 
     /**
      * Try collection value. Does not do any permission ensuring, do this before calling manually.
