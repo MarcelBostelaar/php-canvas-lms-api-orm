@@ -12,6 +12,7 @@ use CanvasApiLibrary\Core\Providers\Interfaces\AssignmentProviderInterface;
 use CanvasApiLibrary\Core\Providers\Interfaces\CourseProviderInterface;
 use CanvasApiLibrary\Core\Providers\Traits\CourseWrapperTrait;
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
+use CanvasApiLibrary\Core\Providers\Utility\ClientIDProvider;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Core\Services\CanvasCommunicator;
 use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
@@ -28,10 +29,13 @@ class CourseProvider extends AbstractProvider implements CourseProviderInterface
     use CourseWrapperTrait;
 
     public function __construct(
-        CanvasCommunicator $canvasCommunicator
+        CanvasCommunicator $canvasCommunicator,
+        ClientIDProvider $clientIDProvider
     ) {
         parent::__construct( $canvasCommunicator,
-        new ModelPopulationConfigBuilder(Course::class));
+        new ModelPopulationConfigBuilder(Course::class),
+        $clientIDProvider
+        );
     }
 
     /**

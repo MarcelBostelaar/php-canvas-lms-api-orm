@@ -10,6 +10,7 @@ use CanvasApiLibrary\Core\Providers\Generated\Traits\AssignmentProviderPropertie
 use CanvasApiLibrary\Core\Providers\Interfaces\AssignmentProviderInterface;
 use CanvasApiLibrary\Core\Providers\Traits\AssignmentWrapperTrait;
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
+use CanvasApiLibrary\Core\Providers\Utility\ClientIDProvider;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
 use CanvasApiLibrary\Core\Providers\Utility\Results\NotFoundResult;
@@ -26,12 +27,15 @@ class AssignmentProvider extends AbstractProvider implements AssignmentProviderI
     use AssignmentWrapperTrait;
 
     public function __construct(
-        CanvasCommunicator $canvasCommunicator
+        CanvasCommunicator $canvasCommunicator,
+        ClientIDProvider $clientIDProvider
     ) {
         parent::__construct($canvasCommunicator,
-        new ModelPopulationConfigBuilder(Assignment::class)
+        (new ModelPopulationConfigBuilder(Assignment::class))
             ->from("group_category_id")->to("group_category")->asModel(GroupCategory::class)
-            ->from("course_id")->to("course")->asModel(Course::class));
+            ->from("course_id")->to("course")->asModel(Course::class),
+            $clientIDProvider
+        );
     }
 
     /**

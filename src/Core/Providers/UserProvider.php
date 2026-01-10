@@ -7,6 +7,7 @@ use CanvasApiLibrary\Core\Models\UserStub;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\UserProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
 use CanvasApiLibrary\Core\Providers\Traits\UserWrapperTrait;
+use CanvasApiLibrary\Core\Providers\Utility\ClientIDProvider;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Core\Models as Models;
 use CanvasApiLibrary\Core\Models\User;
@@ -32,11 +33,14 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
     use UserWrapperTrait;
 
     public function __construct(
-        CanvasCommunicator $canvasCommunicator
+        CanvasCommunicator $canvasCommunicator,
+        ClientIDProvider $clientIDProvider
     ) {
         parent::__construct($canvasCommunicator,
-        new ModelPopulationConfigBuilder(User::class)
-                ->keyCopy("name"));
+        (new ModelPopulationConfigBuilder(User::class))
+                ->keyCopy("name"),
+                $clientIDProvider
+        );
     }
 
     /**

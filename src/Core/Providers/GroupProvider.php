@@ -7,6 +7,7 @@ use CanvasApiLibrary\Core\Models\GroupStub;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\GroupProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\GroupProviderInterface;
 use CanvasApiLibrary\Core\Providers\Traits\GroupWrapperTrait;
+use CanvasApiLibrary\Core\Providers\Utility\ClientIDProvider;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
@@ -26,10 +27,12 @@ class GroupProvider extends AbstractProvider implements GroupProviderInterface{
     use GroupWrapperTrait;
 
     public function __construct(
-        CanvasCommunicator $canvasCommunicator
+        CanvasCommunicator $canvasCommunicator,
+        ClientIDProvider $clientIDProvider
     ) {
         parent::__construct($canvasCommunicator,
-            new ModelPopulationConfigBuilder(Group::class)->keyCopy("name"));
+            (new ModelPopulationConfigBuilder(Group::class))->keyCopy("name"),
+            $clientIDProvider);
     }
 
     /**

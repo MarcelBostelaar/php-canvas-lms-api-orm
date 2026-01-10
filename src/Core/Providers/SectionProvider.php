@@ -7,6 +7,7 @@ use CanvasApiLibrary\Core\Models\SectionStub;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\SectionProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\SectionProviderInterface;
 use CanvasApiLibrary\Core\Providers\Traits\SectionWrapperTrait;
+use CanvasApiLibrary\Core\Providers\Utility\ClientIDProvider;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Core\Models\Course;
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
@@ -26,11 +27,14 @@ class SectionProvider extends AbstractProvider implements SectionProviderInterfa
     use SectionWrapperTrait;
 
     public function __construct(
-        CanvasCommunicator $canvasCommunicator
+        CanvasCommunicator $canvasCommunicator,
+        ClientIDProvider $clientIDProvider
     ) {
         parent::__construct($canvasCommunicator,
-        new ModelPopulationConfigBuilder(Section::class)
-                ->keyCopy("name"));
+        (new ModelPopulationConfigBuilder(Section::class))
+                ->keyCopy("name"),
+                $clientIDProvider
+        );
     }
 
     /**

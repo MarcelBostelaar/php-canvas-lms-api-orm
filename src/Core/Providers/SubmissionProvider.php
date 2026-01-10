@@ -14,6 +14,7 @@ use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
 use CanvasApiLibrary\Core\Providers\Traits\SubmissionWrapperTrait;
 use CanvasApiLibrary\Core\Providers\UserProvider;
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
+use CanvasApiLibrary\Core\Providers\Utility\ClientIDProvider;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Core\Services\CanvasCommunicator;
@@ -33,14 +34,16 @@ class SubmissionProvider extends AbstractProvider implements SubmissionProviderI
     use SubmissionWrapperTrait;
     
     public function __construct(
-        CanvasCommunicator $canvasCommunicator
+        CanvasCommunicator $canvasCommunicator,
+        ClientIDProvider $clientIDProvider
     ) {
         parent::__construct($canvasCommunicator,
-        new ModelPopulationConfigBuilder(Submission::class)
+        (new ModelPopulationConfigBuilder(Submission::class))
                 ->from("user_id")->to("user")->asModel(User::class)
                 ->keyCopy("url")->nullable()
                 ->keyCopy("submitted_at")->asDateTime()->nullable()
-                ->keyCopy("section")->asModel(Section::class)->nullable());
+                ->keyCopy("section")->asModel(Section::class)->nullable(),
+            $clientIDProvider);
     }
 
     /**
