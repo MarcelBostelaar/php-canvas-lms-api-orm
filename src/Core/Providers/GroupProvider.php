@@ -38,9 +38,10 @@ class GroupProvider extends AbstractProvider implements GroupProviderInterface{
     /**
      * @param GroupCategoryStub $groupCategory
      * @param bool $skipCache Does nothing for this uncached base provider.
+     * @param bool $doNotCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Group[]>|UnauthorizedResult
      */
-    public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         //Optional context already handled through getcontext
         return $this->GetMany( "/group_categories/$groupCategory->id/groups", 
         $groupCategory->getContext());
@@ -49,9 +50,10 @@ class GroupProvider extends AbstractProvider implements GroupProviderInterface{
     /**
      * @param GroupStub $group
      * @param bool $skipCache Does nothing for this uncached base provider.
+     * @param bool $doNotCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Group>|UnauthorizedResult
      */
-    public function populateGroup(GroupStub $group, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function populateGroup(GroupStub $group, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->Get( "/api/v1/groups/$group->id", $group->getContext());
     }
 }

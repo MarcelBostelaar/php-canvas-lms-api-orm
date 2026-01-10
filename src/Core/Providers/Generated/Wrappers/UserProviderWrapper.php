@@ -78,11 +78,12 @@ class UserProviderWrapper implements UserProviderInterface {
     /**
 	 * @param GroupStub[] $groups
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInGroups(array $groups, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->getUsersInGroups($groups, $skipCache);
+    public function getUsersInGroups(array $groups, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getUsersInGroups($groups, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
@@ -90,11 +91,12 @@ class UserProviderWrapper implements UserProviderInterface {
 	 * @param SectionStub[] $sections
 	 * @param ?string $enrollmentRoleFilter
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInSections(array $sections, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->getUsersInSections($sections, $enrollmentRoleFilter, $skipCache);
+    public function getUsersInSections(array $sections, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getUsersInSections($sections, $enrollmentRoleFilter, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
@@ -102,44 +104,36 @@ class UserProviderWrapper implements UserProviderInterface {
 	 * @param CourseStub[] $courses
 	 * @param ?string $enrollmentRoleFilter
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInCourses(array $courses, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->getUsersInCourses($courses, $enrollmentRoleFilter, $skipCache);
-        return ($this->resultProcessor)($value);
-    }
-
-    /**
-	 * @param Domain[] $domains
-	 * @param bool $skipCache
-	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
-     * @phpstan-ignore return.unresolvableType
-    */
-    public function getUsersInDomains(array $domains, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->getUsersInDomains($domains, $skipCache);
+    public function getUsersInCourses(array $courses, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getUsersInCourses($courses, $enrollmentRoleFilter, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param UserStub[] $users
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateUsers(array $users, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->populateUsers($users, $skipCache);
+    public function populateUsers(array $users, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->populateUsers($users, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param GroupStub $group
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInGroup(GroupStub $group, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->getUsersInGroup($group, $skipCache);
+    public function getUsersInGroup(GroupStub $group, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getUsersInGroup($group, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
@@ -147,11 +141,12 @@ class UserProviderWrapper implements UserProviderInterface {
 	 * @param SectionStub $section
 	 * @param ?string $enrollmentRoleFilter
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInSection(SectionStub $section, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->getUsersInSection($section, $enrollmentRoleFilter, $skipCache);
+    public function getUsersInSection(SectionStub $section, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getUsersInSection($section, $enrollmentRoleFilter, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
@@ -159,33 +154,24 @@ class UserProviderWrapper implements UserProviderInterface {
 	 * @param CourseStub $course
 	 * @param ?string $enrollmentRoleFilter
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInCourse(CourseStub $course, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->getUsersInCourse($course, $enrollmentRoleFilter, $skipCache);
-        return ($this->resultProcessor)($value);
-    }
-
-    /**
-	 * @param Domain $domain
-	 * @param bool $skipCache
-	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
-     * @phpstan-ignore return.unresolvableType
-    */
-    public function getUsersInDomain(Domain $domain, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->getUsersInDomain($domain, $skipCache);
+    public function getUsersInCourse(CourseStub $course, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getUsersInCourse($course, $enrollmentRoleFilter, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param UserStub $user
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateUser(UserStub $user, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->populateUser($user, $skipCache);
+    public function populateUser(UserStub $user, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->populateUser($user, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 

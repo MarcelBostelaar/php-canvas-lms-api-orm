@@ -53,12 +53,13 @@ class SubmissionProviderCached implements SubmissionProviderInterface{
 	 * @return ErrorResult|NotFoundResult|SuccessResult<Submission[]>|UnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getSubmissionsInAssignment(AssignmentStub $assignment, ?UserProviderInterface $userProvider, bool $skipCache = false) : mixed{
+    public function getSubmissionsInAssignment(AssignmentStub $assignment, ?UserProviderInterface $userProvider, bool $skipCache = false, bool $doNotCache = false) : mixed{
         return $this->userInCourseScopedCollectionValue(
             "getSubmissionsInAssignment" . AssignmentStub::fromStub($assignment)->getResourceKey(),
-            fn() => $this->wrapped->getSubmissionsInAssignment($assignment, $userProvider, $skipCache),
+            fn() => $this->wrapped->getSubmissionsInAssignment($assignment, $userProvider, $skipCache, $doNotCache),
             fn(Submission $x) => [$this->permissionHandler::domainCourseUserPermission($x->course, $x->user)],
             $skipCache,
+            $doNotCache,
             $assignment->course
         );
     }
@@ -69,13 +70,14 @@ class SubmissionProviderCached implements SubmissionProviderInterface{
 	 * @return ErrorResult|NotFoundResult|SuccessResult<Submission>|UnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSubmission(SubmissionStub $submission, bool $skipCache = false) : mixed{
+    public function populateSubmission(SubmissionStub $submission, bool $skipCache = false, bool $doNotCache = false) : mixed{
         return $this->userInCourseSingleValue(
             Submission::fromStub($submission)->getResourceKey(),
-            fn() => $this->wrapped->populateSubmission($submission, $skipCache),
+            fn() => $this->wrapped->populateSubmission($submission, $skipCache, $doNotCache),
             $submission->user,
             $submission->course,
-            $skipCache
+            $skipCache,
+            $doNotCache
         );
     }
 }

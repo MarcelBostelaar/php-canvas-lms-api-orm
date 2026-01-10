@@ -50,12 +50,13 @@ class SectionProviderCached implements SectionProviderInterface{
      * @param bool $skipCache
      * @return ErrorResult|NotFoundResult|SuccessResult<Section[]>|UnauthorizedResult
      */
-    public function getAllSectionsInCourse(CourseStub $course, bool $skipCache = false): mixed{
+    public function getAllSectionsInCourse(CourseStub $course, bool $skipCache = false, bool $doNotCache = false): mixed{
         //Assume any user in course can see all sections, thus the resulting list is the same for any user in the course
         return $this->courseCollectionValueAccessAgnostic(
             "getAllSectionsInCourse" . CourseStub::fromStub($course)->getResourceKey(),
-            fn() => $this->wrapped->getAllSectionsInCourse($course),
+            fn() => $this->wrapped->getAllSectionsInCourse($course, $skipCache, $doNotCache),
             $skipCache,
+            $doNotCache,
             $course
         );
     }
@@ -65,12 +66,13 @@ class SectionProviderCached implements SectionProviderInterface{
      * @param bool $skipCache
      * @return ErrorResult|NotFoundResult|SuccessResult<Section>|UnauthorizedResult
      */
-    public function populateSection(SectionStub $section, bool $skipCache = false): mixed{
+    public function populateSection(SectionStub $section, bool $skipCache = false, bool $doNotCache = false): mixed{
         return $this->courseSingleValue(
             Section::fromStub($section)->getResourceKey(),
-            fn() => $this->wrapped->populateSection($section, $skipCache),
+            fn() => $this->wrapped->populateSection($section, $skipCache, $doNotCache),
             $section->course,
-            $skipCache
+            $skipCache,
+            $doNotCache
         );
     }
 }

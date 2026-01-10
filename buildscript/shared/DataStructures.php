@@ -426,6 +426,9 @@ class MethodDefinition {
             if($param->name === "skipCache"){
                 $total[] = 'bool $skipCache = false';
             }
+            elseif($param->name === "doNotCache"){
+                $total[] = 'bool $doNotCache = false';
+            }
             else{
                 $total[] = $param->paramString();
             }

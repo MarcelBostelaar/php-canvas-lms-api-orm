@@ -23,6 +23,24 @@ interface CacheProviderInterface{
     public function set(string $itemKey, mixed $value, int $ttl, string $clientID, mixed ...$permissionRequired);
 
     /**
+     * Sets a value privately for only the given client
+     * @param string $itemKey
+     * @param mixed $value
+     * @param int $ttl
+     * @param string $clientID
+     * @return void
+     */
+    public function setPrivate(string $itemKey, mixed $value, int $ttl, string $clientID): void;
+
+    /**
+     * Tries to retrieve a private value by key from the cache for the given client.
+     * @param string $itemKey
+     * @param string $clientID
+     * @return CacheResult
+     */
+    public function getPrivate(string $itemKey, string $clientID): CacheResult;
+
+    /**
      * Tries to retrieve a value by key from the cache. Will do so if the client has any matching permission for any of the permissions of this item.
      * Permission bound cache operation.
      * @param string $clientID Id by which to identify this client.

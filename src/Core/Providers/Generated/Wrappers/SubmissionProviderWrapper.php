@@ -79,22 +79,24 @@ class SubmissionProviderWrapper implements SubmissionProviderInterface {
 	 * @param AssignmentStub[] $assignments
 	 * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->getSubmissionsInAssignments($assignments, $userProvider, $skipCache);
+    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getSubmissionsInAssignments($assignments, $userProvider, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param SubmissionStub[] $submissions
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSubmissions(array $submissions, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->populateSubmissions($submissions, $skipCache);
+    public function populateSubmissions(array $submissions, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->populateSubmissions($submissions, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
@@ -102,22 +104,24 @@ class SubmissionProviderWrapper implements SubmissionProviderInterface {
 	 * @param AssignmentStub $assignment
 	 * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getSubmissionsInAssignment(AssignmentStub $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->getSubmissionsInAssignment($assignment, $userProvider, $skipCache);
+    public function getSubmissionsInAssignment(AssignmentStub $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getSubmissionsInAssignment($assignment, $userProvider, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param SubmissionStub $submission
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSubmission(SubmissionStub $submission, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->populateSubmission($submission, $skipCache);
+    public function populateSubmission(SubmissionStub $submission, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->populateSubmission($submission, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 

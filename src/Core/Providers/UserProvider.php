@@ -46,9 +46,10 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
     /**
      * @param Models\GroupStub $group
      * @param bool $skipCache Does nothing for this uncached base provider.
+     * @param bool $doNotCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<User[]>|UnauthorizedResult
     */
-    public function getUsersInGroup(Models\GroupStub $group, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function getUsersInGroup(Models\GroupStub $group, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->GetMany( "/groups/{$group->id}/users", $group->getContext());
     }
 
@@ -57,9 +58,10 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
      * @param Models\SectionStub $section
      * @param ?string $enrollmentRoleFilter Filter to only retrieve a specific type of user. Allowed values: Student, Teacher, Ta, Observer, Designer
      * @param bool $skipCache Does nothing for this uncached base provider.
+     * @param bool $doNotCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<User[]>|UnauthorizedResult
      */
-    public function getUsersInSection(Models\SectionStub $section, ?string $enrollmentRoleFilter, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function getUsersInSection(Models\SectionStub $section, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         $postfix = "";
         switch($enrollmentRoleFilter){
             case null:
@@ -86,9 +88,10 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
      * @param Models\CourseStub $course
      * @param ?string $enrollmentRoleFilter Filter to only retrieve a specific type of user. Allowed values: student, teacher, ta, observer, designer
      * @param bool $skipCache Does nothing for this uncached base provider.
+     * @param bool $doNotCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<User[]>|UnauthorizedResult
      */
-    public function getUsersInCourse(Models\CourseStub $course, ?string $enrollmentRoleFilter, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function getUsersInCourse(Models\CourseStub $course, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         $postfix = "";
         switch($enrollmentRoleFilter){
             case null:
@@ -107,22 +110,23 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
         $course->getContext()); //optional course context already handled through context system.
     }
 
-    /**
-     * @param Domain $domain
-     * @param bool $skipCache
-     * @return ErrorResult|NotFoundResult|SuccessResult<User[]>|UnauthorizedResult
-     */
-    public function getUsersInDomain(Domain $domain, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
-        throw new NotImplemented();
-    }
+    // /**
+    //  * @param Domain $domain
+    //  * @param bool $skipCache
+    //  * @return ErrorResult|NotFoundResult|SuccessResult<User[]>|UnauthorizedResult
+    //  */
+    // public function getUsersInDomain(Domain $domain, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+        
+    // }
 
     /**
      * Populates a user from the canvas API.
      * @param Models\UserStub $user
      * @param bool $skipCache Does nothing for this uncached base provider.
+     * @param bool $doNotCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<User>|UnauthorizedResult
      */
-    public function populateUser(UserStub $user, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function populateUser(UserStub $user, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         if($user->optionalCourseContext === null){
             //Must be retrieved from global route. Note that only admins can do this.
             

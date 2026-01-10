@@ -41,9 +41,10 @@ class AssignmentProvider extends AbstractProvider implements AssignmentProviderI
     /**
      * @param AssignmentStub $assignment
      * @param bool $skipCache Does nothing for this uncached base provider.
+     * @param bool $doNotCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Assignment>|UnauthorizedResult
      */
-    public function populateAssignment(AssignmentStub $assignment, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function populateAssignment(AssignmentStub $assignment, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->Get(
             "/courses/{$assignment->course->id}/assignments/$assignment->id",
             $assignment->getContext()

@@ -49,17 +49,19 @@ interface CourseProviderInterface extends HandleEmittedInterface{
     /**
 	 * @param Domain[] $domains
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<Domain, Course[]>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllCoursesInDomains(array $domains, bool $skipCache = false) : mixed;
+    public function getAllCoursesInDomains(array $domains, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param Domain $domain
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Course[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllCoursesInDomain(Domain $domain, bool $skipCache = false) : mixed;
+    public function getAllCoursesInDomain(Domain $domain, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
 }

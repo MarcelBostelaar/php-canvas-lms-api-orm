@@ -43,11 +43,12 @@ class CourseProviderCached implements CourseProviderInterface{
         return $this->wrapped->getClientID();
     }
 
-    public function getAllCoursesInDomain(Domain $domain, bool $skipCache = false) : SuccessResult|NotFoundResult|ErrorResult|UnauthorizedResult{
+    public function getAllCoursesInDomain(Domain $domain, bool $skipCache = false, bool $doNotCache = false) : SuccessResult|NotFoundResult|ErrorResult|UnauthorizedResult{
         return $this->clientPrivateValue(
             "getAllCoursesInDomain" . $domain->getResourceKey(),
-            fn() => $this->wrapped->getAllCoursesInDomain($domain, $skipCache),
-            $skipCache
+            fn() => $this->wrapped->getAllCoursesInDomain($domain, $skipCache, $doNotCache),
+            $skipCache,
+            $doNotCache
         );
     }
 }

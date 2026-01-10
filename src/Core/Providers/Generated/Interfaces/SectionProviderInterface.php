@@ -49,33 +49,37 @@ interface SectionProviderInterface extends HandleEmittedInterface{
     /**
 	 * @param CourseStub[] $courses
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<CourseStub, Section[]>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllSectionsInCourses(array $courses, bool $skipCache = false) : mixed;
+    public function getAllSectionsInCourses(array $courses, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param SectionStub[] $sections
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Section[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSections(array $sections, bool $skipCache = false) : mixed;
+    public function populateSections(array $sections, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param CourseStub $course
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Section[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllSectionsInCourse(CourseStub $course, bool $skipCache = false) : mixed;
+    public function getAllSectionsInCourse(CourseStub $course, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param SectionStub $section
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Section>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSection(SectionStub $section, bool $skipCache = false) : mixed;
+    public function populateSection(SectionStub $section, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
 }
