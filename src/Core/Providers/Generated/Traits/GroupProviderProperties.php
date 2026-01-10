@@ -33,13 +33,14 @@ use CanvasApiLibrary\Core\Models\UserStub;
 trait GroupProviderProperties{
     
     
-    abstract public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
-    abstract public function populateGroup(GroupStub $group, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    abstract public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    abstract public function populateGroup(GroupStub $group, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
      * Summary of getAllGroupsInGroupCategories     * This is a plural version of getAllGroupsInGroupCategory      * @param GroupCategoryStub[] $groupCategories
  * @param bool $skipCache
+ * @param bool $doNotCache
  * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<GroupCategoryStub, Group[]>>|UnauthorizedResult     */
-    public function getAllGroupsInGroupCategories(array $groupCategories, bool $skipCache = false): Lookup{
+    public function getAllGroupsInGroupCategories(array $groupCategories, bool $skipCache = false, bool $doNotCache = false): Lookup{
         $lookup = new Lookup();
         foreach($groupCategories as $x){
             $lookup->add($x, $this->getAllGroupsInGroupCategory($x));
@@ -51,12 +52,13 @@ trait GroupProviderProperties{
      * This is a plural version of populateGroup
 	 * @param GroupStub[] $groups
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return ErrorResult|NotFoundResult|SuccessResult<Group[]>|UnauthorizedResult
      */
-    public function populateGroups(array $groups, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+    public function populateGroups(array $groups, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
         $results = [];
         foreach($groups as $item){
-            $result = $this->populateGroup($item, $skipCache);
+            $result = $this->populateGroup($item, $skipCache,  $doNotCache);
             if(!$result instanceof SuccessResult){
                 return $result;
             }

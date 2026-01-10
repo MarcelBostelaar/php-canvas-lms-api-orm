@@ -78,44 +78,48 @@ class GroupProviderWrapper implements GroupProviderInterface {
     /**
 	 * @param GroupCategoryStub[] $groupCategories
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllGroupsInGroupCategories(array $groupCategories, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->getAllGroupsInGroupCategories($groupCategories, $skipCache);
+    public function getAllGroupsInGroupCategories(array $groupCategories, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getAllGroupsInGroupCategories($groupCategories, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param GroupStub[] $groups
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateGroups(array $groups, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->populateGroups($groups, $skipCache);
+    public function populateGroups(array $groups, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->populateGroups($groups, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param GroupCategoryStub $groupCategory
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->getAllGroupsInGroupCategory($groupCategory, $skipCache);
+    public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getAllGroupsInGroupCategory($groupCategory, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param GroupStub $group
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateGroup(GroupStub $group, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->populateGroup($group, $skipCache);
+    public function populateGroup(GroupStub $group, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->populateGroup($group, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 

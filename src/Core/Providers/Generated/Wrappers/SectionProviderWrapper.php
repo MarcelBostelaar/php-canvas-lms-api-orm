@@ -78,44 +78,48 @@ class SectionProviderWrapper implements SectionProviderInterface {
     /**
 	 * @param CourseStub[] $courses
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllSectionsInCourses(array $courses, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->getAllSectionsInCourses($courses, $skipCache);
+    public function getAllSectionsInCourses(array $courses, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getAllSectionsInCourses($courses, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param SectionStub[] $sections
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSections(array $sections, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->populateSections($sections, $skipCache);
+    public function populateSections(array $sections, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->populateSections($sections, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param CourseStub $course
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllSectionsInCourse(CourseStub $course, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->getAllSectionsInCourse($course, $skipCache);
+    public function getAllSectionsInCourse(CourseStub $course, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getAllSectionsInCourse($course, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
 	 * @param SectionStub $section
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSection(SectionStub $section, bool $skipCache = false) : mixed{
-        $value = $this->innerProvider->populateSection($section, $skipCache);
+    public function populateSection(SectionStub $section, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->populateSection($section, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 

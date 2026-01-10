@@ -49,85 +49,77 @@ interface UserProviderInterface extends HandleEmittedInterface{
     /**
 	 * @param GroupStub[] $groups
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<GroupStub, User[]>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInGroups(array $groups, bool $skipCache = false) : mixed;
+    public function getUsersInGroups(array $groups, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param SectionStub[] $sections
 	 * @param ?string $enrollmentRoleFilter
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<SectionStub, User[]>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInSections(array $sections, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed;
+    public function getUsersInSections(array $sections, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param CourseStub[] $courses
 	 * @param ?string $enrollmentRoleFilter
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<CourseStub, User[]>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInCourses(array $courses, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed;
-
-    /**
-	 * @param Domain[] $domains
-	 * @param bool $skipCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<Domain, User[]>>|TUnauthorizedResult
-     * @phpstan-ignore return.unresolvableType
-    */
-    public function getUsersInDomains(array $domains, bool $skipCache = false) : mixed;
+    public function getUsersInCourses(array $courses, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param UserStub[] $users
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateUsers(array $users, bool $skipCache = false) : mixed;
+    public function populateUsers(array $users, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param GroupStub $group
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInGroup(GroupStub $group, bool $skipCache = false) : mixed;
+    public function getUsersInGroup(GroupStub $group, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param SectionStub $section
 	 * @param ?string $enrollmentRoleFilter
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInSection(SectionStub $section, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed;
+    public function getUsersInSection(SectionStub $section, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param CourseStub $course
 	 * @param ?string $enrollmentRoleFilter
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getUsersInCourse(CourseStub $course, ?string $enrollmentRoleFilter, bool $skipCache = false) : mixed;
-
-    /**
-	 * @param Domain $domain
-	 * @param bool $skipCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User[]>|TUnauthorizedResult
-     * @phpstan-ignore return.unresolvableType
-    */
-    public function getUsersInDomain(Domain $domain, bool $skipCache = false) : mixed;
+    public function getUsersInCourse(CourseStub $course, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param UserStub $user
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<User>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateUser(UserStub $user, bool $skipCache = false) : mixed;
+    public function populateUser(UserStub $user, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
 }

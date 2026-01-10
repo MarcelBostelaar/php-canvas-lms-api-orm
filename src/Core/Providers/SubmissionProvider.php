@@ -14,6 +14,7 @@ use CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface;
 use CanvasApiLibrary\Core\Providers\Traits\SubmissionWrapperTrait;
 use CanvasApiLibrary\Core\Providers\UserProvider;
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
+use CanvasApiLibrary\Core\Providers\Utility\ClientIDProvider;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Core\Services\CanvasCommunicator;
@@ -33,23 +34,26 @@ class SubmissionProvider extends AbstractProvider implements SubmissionProviderI
     use SubmissionWrapperTrait;
     
     public function __construct(
-        CanvasCommunicator $canvasCommunicator
+        CanvasCommunicator $canvasCommunicator,
+        ClientIDProvider $clientIDProvider
     ) {
         parent::__construct($canvasCommunicator,
-        new ModelPopulationConfigBuilder(Submission::class)
+        (new ModelPopulationConfigBuilder(Submission::class))
                 ->from("user_id")->to("user")->asModel(User::class)
                 ->keyCopy("url")->nullable()
                 ->keyCopy("submitted_at")->asDateTime()->nullable()
-                ->keyCopy("section")->asModel(Section::class)->nullable());
+                ->keyCopy("section")->asModel(Section::class)->nullable(),
+            $clientIDProvider);
     }
 
     /**
      * @param Models\AssignmentStub $assignment
      * @param ?UserProvider $userProvider If provided, will also fetch the users associated with these submissions and pass them to the emitted in the user provider.
      * @param bool $skipCache Does nothing for this uncached base provider.
+     * @param bool $doNotCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Submission[]>|UnauthorizedResult
      */
-    function getSubmissionsInAssignment(AssignmentStub $assignment, ?UserProviderInterface $userProvider = null, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    function getSubmissionsInAssignment(AssignmentStub $assignment, ?UserProviderInterface $userProvider = null, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         $postfix = "";
         $builder = $this->modelPopulator;
         if($userProvider !== null){
@@ -65,9 +69,10 @@ class SubmissionProvider extends AbstractProvider implements SubmissionProviderI
     /**
      * @param Models\SubmissionStub $submission
      * @param bool $skipCache Does nothing for this uncached base provider.
+     * @param bool $doNotCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Submission>|UnauthorizedResult
      */
-    public function populateSubmission(SubmissionStub $submission, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function populateSubmission(SubmissionStub $submission, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->Get("/courses/{$submission->course->id}/assignments/{$submission->assignment->id}/submissions/{$submission->user->id}",
         $submission->getContext());
     }

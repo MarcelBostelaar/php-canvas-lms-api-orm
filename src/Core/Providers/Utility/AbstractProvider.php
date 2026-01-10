@@ -22,7 +22,8 @@ abstract class AbstractProvider implements HandleEmittedInterface{
      */
     public function __construct(
         public readonly CanvasCommunicator $canvasCommunicator,
-        protected readonly ModelPopulationConfigBuilder $modelPopulator
+        protected readonly ModelPopulationConfigBuilder $modelPopulator,
+        protected readonly ClientIDProvider $clientIDProvider
         ){}
 
     /**
@@ -39,7 +40,7 @@ abstract class AbstractProvider implements HandleEmittedInterface{
     
     /**Returns an id that identifies the current client uniquely */
     public function getClientID(): string{
-        return hash("sha256", $this->canvasCommunicator->apiKey);
+        return $this->clientIDProvider->getClientID();
     }
 
     /**

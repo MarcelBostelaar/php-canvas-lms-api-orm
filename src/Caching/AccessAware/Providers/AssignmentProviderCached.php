@@ -49,11 +49,12 @@ class AssignmentProviderCached implements AssignmentProviderInterface{
      * @param bool $skipCache
      * @return ErrorResult|NotFoundResult|SuccessResult<\CanvasApiLibrary\Core\Models\Assignment>|UnauthorizedResult
      */
-    public function populateAssignment(AssignmentStub $assignment, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function populateAssignment(AssignmentStub $assignment, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->courseSingleValue(
             Assignment::fromStub($assignment)->getResourceKey(),
-            fn() => $this->wrapped->populateAssignment($assignment, $skipCache),
+            fn() => $this->wrapped->populateAssignment($assignment, $skipCache, $doNotCache),
             $assignment->course,
-            $skipCache);
+            $skipCache,
+            $doNotCache);
     }
 }

@@ -50,34 +50,38 @@ interface SubmissionProviderInterface extends HandleEmittedInterface{
 	 * @param AssignmentStub[] $assignments
 	 * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<AssignmentStub, Submission[]>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false) : mixed;
+    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param SubmissionStub[] $submissions
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Submission[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSubmissions(array $submissions, bool $skipCache = false) : mixed;
+    public function populateSubmissions(array $submissions, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param AssignmentStub $assignment
 	 * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Submission[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getSubmissionsInAssignment(AssignmentStub $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false) : mixed;
+    public function getSubmissionsInAssignment(AssignmentStub $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param SubmissionStub $submission
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Submission>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSubmission(SubmissionStub $submission, bool $skipCache = false) : mixed;
+    public function populateSubmission(SubmissionStub $submission, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
 }

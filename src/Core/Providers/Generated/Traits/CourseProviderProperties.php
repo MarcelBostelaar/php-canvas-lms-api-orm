@@ -33,12 +33,13 @@ use CanvasApiLibrary\Core\Models\UserStub;
 trait CourseProviderProperties{
     
     
-    abstract public function getAllCoursesInDomain(Domain $domain, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    abstract public function getAllCoursesInDomain(Domain $domain, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
      * Summary of getAllCoursesInDomains     * This is a plural version of getAllCoursesInDomain      * @param Domain[] $domains
  * @param bool $skipCache
+ * @param bool $doNotCache
  * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<Domain, Course[]>>|UnauthorizedResult     */
-    public function getAllCoursesInDomains(array $domains, bool $skipCache = false): Lookup{
+    public function getAllCoursesInDomains(array $domains, bool $skipCache = false, bool $doNotCache = false): Lookup{
         $lookup = new Lookup();
         foreach($domains as $x){
             $lookup->add($x, $this->getAllCoursesInDomain($x));

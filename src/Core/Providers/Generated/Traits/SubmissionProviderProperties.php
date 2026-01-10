@@ -33,14 +33,15 @@ use CanvasApiLibrary\Core\Models\UserStub;
 trait SubmissionProviderProperties{
     
     
-    abstract public function getSubmissionsInAssignment(AssignmentStub $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
-    abstract public function populateSubmission(SubmissionStub $submission, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    abstract public function getSubmissionsInAssignment(AssignmentStub $assignment, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    abstract public function populateSubmission(SubmissionStub $submission, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
      * Summary of getSubmissionsInAssignments     * This is a plural version of getSubmissionsInAssignment      * @param AssignmentStub[] $assignments
  * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
  * @param bool $skipCache
+ * @param bool $doNotCache
  * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<AssignmentStub, Submission[]>>|UnauthorizedResult     */
-    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false): Lookup{
+    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false, bool $doNotCache = false): Lookup{
         $lookup = new Lookup();
         foreach($assignments as $x){
             $lookup->add($x, $this->getSubmissionsInAssignment($x));
@@ -52,12 +53,13 @@ trait SubmissionProviderProperties{
      * This is a plural version of populateSubmission
 	 * @param SubmissionStub[] $submissions
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return ErrorResult|NotFoundResult|SuccessResult<Submission[]>|UnauthorizedResult
      */
-    public function populateSubmissions(array $submissions, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+    public function populateSubmissions(array $submissions, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
         $results = [];
         foreach($submissions as $item){
-            $result = $this->populateSubmission($item, $skipCache);
+            $result = $this->populateSubmission($item, $skipCache,  $doNotCache);
             if(!$result instanceof SuccessResult){
                 return $result;
             }

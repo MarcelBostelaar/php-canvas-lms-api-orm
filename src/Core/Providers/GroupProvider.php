@@ -7,6 +7,7 @@ use CanvasApiLibrary\Core\Models\GroupStub;
 use CanvasApiLibrary\Core\Providers\Generated\Traits\GroupProviderProperties;
 use CanvasApiLibrary\Core\Providers\Interfaces\GroupProviderInterface;
 use CanvasApiLibrary\Core\Providers\Traits\GroupWrapperTrait;
+use CanvasApiLibrary\Core\Providers\Utility\ClientIDProvider;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Core\Providers\Utility\Lookup;
@@ -26,18 +27,21 @@ class GroupProvider extends AbstractProvider implements GroupProviderInterface{
     use GroupWrapperTrait;
 
     public function __construct(
-        CanvasCommunicator $canvasCommunicator
+        CanvasCommunicator $canvasCommunicator,
+        ClientIDProvider $clientIDProvider
     ) {
         parent::__construct($canvasCommunicator,
-            new ModelPopulationConfigBuilder(Group::class)->keyCopy("name"));
+            (new ModelPopulationConfigBuilder(Group::class))->keyCopy("name"),
+            $clientIDProvider);
     }
 
     /**
      * @param GroupCategoryStub $groupCategory
      * @param bool $skipCache Does nothing for this uncached base provider.
+     * @param bool $doNotCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Group[]>|UnauthorizedResult
      */
-    public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         //Optional context already handled through getcontext
         return $this->GetMany( "/group_categories/$groupCategory->id/groups", 
         $groupCategory->getContext());
@@ -46,9 +50,10 @@ class GroupProvider extends AbstractProvider implements GroupProviderInterface{
     /**
      * @param GroupStub $group
      * @param bool $skipCache Does nothing for this uncached base provider.
+     * @param bool $doNotCache Does nothing for this uncached base provider.
      * @return ErrorResult|NotFoundResult|SuccessResult<Group>|UnauthorizedResult
      */
-    public function populateGroup(GroupStub $group, bool $skipCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
+    public function populateGroup(GroupStub $group, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
         return $this->Get( "/api/v1/groups/$group->id", $group->getContext());
     }
 }

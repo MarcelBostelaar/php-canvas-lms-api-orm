@@ -53,25 +53,28 @@ class GroupProviderCached implements GroupProviderInterface{
      * @param bool $skipCache
      * @return ErrorResult|NotFoundResult|SuccessResult<Group[]>|UnauthorizedResult
      */
-    public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false): mixed{
+    public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false, bool $doNotCache = false): mixed{
         $originKey = GroupCategoryStub::fromStub($groupCategory)->getResourceKey();
         $alternativeKey = GroupCategory::fromStub($groupCategory)->getResourceKey();
         $collectionKey = "getAllGroupsInGroupCategory" . $originKey;
-        //Manually do permission ensurance.
-        if(isset($groupCategory->optionalCourseContext)){
-            $this->permissionEnsurer->allUsers($groupCategory->optionalCourseContext, $this->getClientID(), $skipCache);
-        }
-        else{
-            $this->permissionEnsurer->usersInDomain($groupCategory->domain, $this->getClientID(), $skipCache);
-        }
+        [$skipCache, $doNotCache] = $this->optionalCourseContextPermissionEnsurer(
+            $groupCategory,
+            $skipCache,
+            $doNotCache
+        );
 
-        //Groups themselves do not have knowable permissions from just their data.
+        //Groups themselves do not have knowable permissions from just their data.  
         //Their permissions are propagatad back from the users in them.
         $val = $this->unknownPermissionCollectionValue(
             $collectionKey, 
-            fn() => $this->wrapped->getAllGroupsInGroupCategory($groupCategory),
-            $skipCache
+            fn() => $this->wrapped->getAllGroupsInGroupCategory($groupCategory, $skipCache, $doNotCache),
+            $skipCache,
+            $doNotCache
         );
+
+        if($doNotCache){
+            return $val;
+        }
         
         //Setup permissions union
         $this->cache->setPermissionUnion($originKey, $alternativeKey);
@@ -93,19 +96,18 @@ class GroupProviderCached implements GroupProviderInterface{
      * @param bool $skipCache
      * @return ErrorResult|NotFoundResult|SuccessResult<\CanvasApiLibrary\Core\Models\Group>|UnauthorizedResult
      */
-    public function populateGroup(GroupStub $group, bool $skipCache = false): mixed{
-        //Manually do permission ensurance.
-        if(isset($group->optionalCourseContext)){
-            $this->permissionEnsurer->allUsers($group->optionalCourseContext, $this->getClientID(), $skipCache);
-        }
-        else{
-            $this->permissionEnsurer->usersInDomain($group->domain, $this->getClientID(), $skipCache);
-        }
+    public function populateGroup(GroupStub $group, bool $skipCache = false, bool $doNotCache = false): mixed{
+        [$skipCache, $doNotCache] = $this->optionalCourseContextPermissionEnsurer(
+            $group,
+            $skipCache,
+            $doNotCache
+        );
 
         return $this->unknownPermissionSingleValue(
             Group::fromStub($group)->getResourceKey(),
-            fn() => $this->wrapped->populateGroup($group, $skipCache),
-            $skipCache
+            fn() => $this->wrapped->populateGroup($group, $skipCache, $doNotCache),
+            $skipCache,
+            $doNotCache
         );
     }
 }

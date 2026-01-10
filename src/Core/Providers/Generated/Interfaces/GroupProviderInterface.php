@@ -49,33 +49,37 @@ interface GroupProviderInterface extends HandleEmittedInterface{
     /**
 	 * @param GroupCategoryStub[] $groupCategories
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<GroupCategoryStub, Group[]>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllGroupsInGroupCategories(array $groupCategories, bool $skipCache = false) : mixed;
+    public function getAllGroupsInGroupCategories(array $groupCategories, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param GroupStub[] $groups
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Group[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateGroups(array $groups, bool $skipCache = false) : mixed;
+    public function populateGroups(array $groups, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param GroupCategoryStub $groupCategory
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Group[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false) : mixed;
+    public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param GroupStub $group
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Group>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateGroup(GroupStub $group, bool $skipCache = false) : mixed;
+    public function populateGroup(GroupStub $group, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
 }

@@ -49,17 +49,19 @@ interface AssignmentProviderInterface extends HandleEmittedInterface{
     /**
 	 * @param AssignmentStub[] $assignments
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Assignment[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateAssignments(array $assignments, bool $skipCache = false) : mixed;
+    public function populateAssignments(array $assignments, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param AssignmentStub $assignment
 	 * @param bool $skipCache
+	 * @param bool $doNotCache
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Assignment>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateAssignment(AssignmentStub $assignment, bool $skipCache = false) : mixed;
+    public function populateAssignment(AssignmentStub $assignment, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
 }
