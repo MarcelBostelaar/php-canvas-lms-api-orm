@@ -31,4 +31,10 @@
 [x] Maak de types van de caching dingen generic.
 
 [x] Fix provider trait generation not working anymore
+
+
 [] Look alle core providers door en kijk waar je de requests kan verbeteren door b.v. meer results per pagina te vragen.
+[] Add rubric model
+[] Add rubric assessment model
+[] Rubric model will contain the ids with which an outcome with a (full) rubric assement if linked
+[] full_rubric_assessment also includes outcome ids
