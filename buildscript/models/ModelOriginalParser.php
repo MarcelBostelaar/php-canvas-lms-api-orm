@@ -34,7 +34,7 @@ function processModelFile($filePath, $modelname, $traitname): ModelParseResult {
     $fieldsNullable = (new FieldListFinderVisitor("nullableProperties"))->process($ast)->getList();
     $plurals = (new PluralsFinderVisitor())->process($ast)->getPlurals();
     $traitFound = (new FindTraitUserVisitor($traitname))->process($ast)->wasFound;
-    $parentModel = new ParentClassVisitor()->process($ast)->parentClassName;
+    $parentModel = (new ParentClassVisitor())->process($ast)->parentClassName;
     
     return new ModelParseResult(
         $ast,

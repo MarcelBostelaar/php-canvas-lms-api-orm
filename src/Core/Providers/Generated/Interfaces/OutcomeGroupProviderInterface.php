@@ -35,7 +35,7 @@ use CanvasApiLibrary\Core\Models\UserStub;
  * @template TNotFoundResult Type of value that a not found result will emit
  * @template TErrorResult Type of value that any other error result will emit
  */
-interface SectionProviderInterface extends HandleEmittedInterface{
+interface OutcomegroupProviderInterface extends HandleEmittedInterface{
 
     public function getClientID(): string;
 
@@ -46,43 +46,52 @@ interface SectionProviderInterface extends HandleEmittedInterface{
      * @template newNotFoundT
      * @template newErrorT
      * @param Closure(TSuccessResult|TErrorResult|TNotFoundResult|TUnauthorizedResult) : (newSuccessT|newErrorT|newNotFoundT|newUnauthorizedT) $processor
-     * @return SectionProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
+     * @return OutcomegroupProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
      */
-    public function handleResults(Closure $processor): SectionProviderInterface;
+    public function handleResults(Closure $processor): OutcomegroupProviderInterface;
+    /**
+	 * @param OutcomegroupStub[] $outcomegroups
+	 * @param bool $skipCache
+	 * @param bool $doNotCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Outcomegroup[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function populateOutcomegroups(array $outcomegroups, bool $skipCache = false, bool $doNotCache = false) : mixed;
+
     /**
 	 * @param CourseStub[] $courses
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<CourseStub, Section[]>>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<CourseStub, Outcomegroup[]>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllSectionsInCourses(array $courses, bool $skipCache = false, bool $doNotCache = false) : mixed;
+    public function getOutcomegroupsInCourses(array $courses, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
-	 * @param SectionStub[] $sections
+	 * @param OutcomegroupStub $outcomeGroup
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Section[]>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Outcomegroup>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSections(array $sections, bool $skipCache = false, bool $doNotCache = false) : mixed;
+    public function populateOutcomegroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
 	 * @param CourseStub $course
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Section[]>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Outcomegroup[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllSectionsInCourse(CourseStub $course, bool $skipCache = false, bool $doNotCache = false) : mixed;
+    public function getOutcomegroupsInCourse(CourseStub $course, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
-	 * @param SectionStub $section
+	 * @param OutcomegroupStub $outcomeGroup
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Section>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Outcomegroup[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSection(SectionStub $section, bool $skipCache = false, bool $doNotCache = false) : mixed;
+    public function getSubgroupsOfOutcomegroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
 }

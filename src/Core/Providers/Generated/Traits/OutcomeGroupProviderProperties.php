@@ -33,35 +33,23 @@ use CanvasApiLibrary\Core\Models\User;
 use CanvasApiLibrary\Core\Models\UserDisplay;
 use CanvasApiLibrary\Core\Models\UserStub;
 
-trait SectionProviderProperties{
+trait OutcomegroupProviderProperties{
     
     
-    abstract public function getAllSectionsInCourse(CourseStub $course, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
-    abstract public function populateSection(SectionStub $section, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    abstract public function populateOutcomegroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    abstract public function getOutcomegroupsInCourse(CourseStub $course, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
-     * Summary of getAllSectionsInCourses     * This is a plural version of getAllSectionsInCourse      * @param CourseStub[] $courses
- * @param bool $skipCache
- * @param bool $doNotCache
- * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<CourseStub, Section[]>>|UnauthorizedResult     */
-    public function getAllSectionsInCourses(array $courses, bool $skipCache = false, bool $doNotCache = false): Lookup{
-        $lookup = new Lookup();
-        foreach($courses as $x){
-            $lookup->add($x, $this->getAllSectionsInCourse($x));
-        }
-        return $lookup;
-    }
-    /**
-     * Summary of populateSections
-     * This is a plural version of populateSection
-	 * @param SectionStub[] $sections
+     * Summary of populateOutcomegroups
+     * This is a plural version of populateOutcomegroup
+	 * @param OutcomegroupStub[] $outcomegroups
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return ErrorResult|NotFoundResult|SuccessResult<Section[]>|UnauthorizedResult
+	 * @return ErrorResult|NotFoundResult|SuccessResult<Outcomegroup[]>|UnauthorizedResult
      */
-    public function populateSections(array $sections, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+    public function populateOutcomegroups(array $outcomegroups, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
         $results = [];
-        foreach($sections as $item){
-            $result = $this->populateSection($item, $skipCache,  $doNotCache);
+        foreach($outcomegroups as $item){
+            $result = $this->populateOutcomegroup($item, $skipCache,  $doNotCache);
             if(!$result instanceof SuccessResult){
                 return $result;
             }
@@ -69,5 +57,17 @@ trait SectionProviderProperties{
         }
         return new SuccessResult($results);
     }
-    
+        /**
+     * Summary of getOutcomegroupsInCourses     * This is a plural version of getOutcomegroupsInCourse      * @param CourseStub[] $courses
+ * @param bool $skipCache
+ * @param bool $doNotCache
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<CourseStub, Outcomegroup[]>>|UnauthorizedResult     */
+    public function getOutcomegroupsInCourses(array $courses, bool $skipCache = false, bool $doNotCache = false): Lookup{
+        $lookup = new Lookup();
+        foreach($courses as $x){
+            $lookup->add($x, $this->getOutcomegroupsInCourse($x));
+        }
+        return $lookup;
+    }
+
 }

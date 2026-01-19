@@ -42,17 +42,17 @@ use CanvasApiLibrary\Core\Models\UserStub;
  * @template TNotFoundResult2 Returned type of value that a not found result will emit
  * @template TErrorResult Wrapped type of value that any other error result will emit
  * @template TErrorResult2 Returned type of value that any other error result will emit
- * @implements SectionProviderInterface<TSuccessResult2,TErrorResult2,TNotFoundResult2,TUnauthorizedResult2>
+ * @implements OutcomegroupProviderInterface<TSuccessResult2,TErrorResult2,TNotFoundResult2,TUnauthorizedResult2>
  */
-class SectionProviderWrapper implements SectionProviderInterface {
+class OutcomegroupProviderWrapper implements OutcomegroupProviderInterface {
 
     /**
      * Summary of __construct
-     * @param SectionProviderInterface<TSuccessResult,TErrorResult,TNotFoundResult,TUnauthorizedResult> $innerProvider
+     * @param OutcomegroupProviderInterface<TSuccessResult,TErrorResult,TNotFoundResult,TUnauthorizedResult> $innerProvider
      * @param Closure(TSuccessResult|TErrorResult|TNotFoundResult|TUnauthorizedResult) : (TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2) $resultProcessor
      */
     public function __construct(
-        private SectionProviderInterface $innerProvider,
+        private OutcomegroupProviderInterface $innerProvider,
         private Closure $resultProcessor){
     }
 
@@ -67,15 +67,27 @@ class SectionProviderWrapper implements SectionProviderInterface {
      * @template newNotFoundT
      * @template newErrorT
      * @param Closure(TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2) : (newSuccessT|newErrorT|newNotFoundT|newUnauthorizedT) $processor
-     * @return SectionProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
+     * @return OutcomegroupProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
      */
-    public function handleResults(Closure $processor): SectionProviderInterface {
+    public function handleResults(Closure $processor): OutcomegroupProviderInterface {
         $previousProcessor = $this->resultProcessor ?? fn($x) => $x;
-        return new SectionProviderWrapper( $this->innerProvider, fn($x) => $processor($previousProcessor($x)));
+        return new OutcomegroupProviderWrapper( $this->innerProvider, fn($x) => $processor($previousProcessor($x)));
     }
 
     public function HandleEmitted(mixed $data, array $context): void {
         $this->innerProvider->HandleEmitted($data, $context);
+    }
+
+    /**
+	 * @param OutcomegroupStub[] $outcomegroups
+	 * @param bool $skipCache
+	 * @param bool $doNotCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function populateOutcomegroups(array $outcomegroups, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->populateOutcomegroups($outcomegroups, $skipCache, $doNotCache);
+        return ($this->resultProcessor)($value);
     }
 
     /**
@@ -85,20 +97,20 @@ class SectionProviderWrapper implements SectionProviderInterface {
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllSectionsInCourses(array $courses, bool $skipCache = false, bool $doNotCache = false) : mixed{
-        $value = $this->innerProvider->getAllSectionsInCourses($courses, $skipCache, $doNotCache);
+    public function getOutcomegroupsInCourses(array $courses, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getOutcomegroupsInCourses($courses, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
-	 * @param SectionStub[] $sections
+	 * @param OutcomegroupStub $outcomeGroup
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSections(array $sections, bool $skipCache = false, bool $doNotCache = false) : mixed{
-        $value = $this->innerProvider->populateSections($sections, $skipCache, $doNotCache);
+    public function populateOutcomegroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->populateOutcomegroup($outcomeGroup, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
@@ -109,20 +121,20 @@ class SectionProviderWrapper implements SectionProviderInterface {
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllSectionsInCourse(CourseStub $course, bool $skipCache = false, bool $doNotCache = false) : mixed{
-        $value = $this->innerProvider->getAllSectionsInCourse($course, $skipCache, $doNotCache);
+    public function getOutcomegroupsInCourse(CourseStub $course, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getOutcomegroupsInCourse($course, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
     /**
-	 * @param SectionStub $section
+	 * @param OutcomegroupStub $outcomeGroup
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateSection(SectionStub $section, bool $skipCache = false, bool $doNotCache = false) : mixed{
-        $value = $this->innerProvider->populateSection($section, $skipCache, $doNotCache);
+    public function getSubgroupsOfOutcomegroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getSubgroupsOfOutcomegroup($outcomeGroup, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 
