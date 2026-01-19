@@ -32,6 +32,7 @@ class OutcomegroupProvider extends AbstractProvider implements OutcomegroupProvi
         parent::__construct( $canvasCommunicator,
         (new ModelPopulationConfigBuilder(Outcomegroup::class))
         ->keyCopy("title")
+        ->keyCopy("url")
         ->keyCopy("description")
         ->keyCopy("subgroups_url")
         ->keyCopy("outcomes_url")

@@ -36,28 +36,8 @@ use CanvasApiLibrary\Core\Models\User;
 use CanvasApiLibrary\Core\Models\UserDisplay;
 use CanvasApiLibrary\Core\Models\UserStub;
 
-trait AssignmentProviderProperties{
+trait OutcomeResultProviderProperties{
     
     
-    abstract public function populateAssignment(AssignmentStub $assignment, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
-    /**
-     * Summary of populateAssignments
-     * This is a plural version of populateAssignment
-	 * @param AssignmentStub[] $assignments
-	 * @param bool $skipCache
-	 * @param bool $doNotCache
-	 * @return ErrorResult|NotFoundResult|SuccessResult<Assignment[]>|UnauthorizedResult
-     */
-    public function populateAssignments(array $assignments, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
-        $results = [];
-        foreach($assignments as $item){
-            $result = $this->populateAssignment($item, $skipCache,  $doNotCache);
-            if(!$result instanceof SuccessResult){
-                return $result;
-            }
-            $results[] = $result->value;
-        }
-        return new SuccessResult($results);
-    }
-    
+
 }

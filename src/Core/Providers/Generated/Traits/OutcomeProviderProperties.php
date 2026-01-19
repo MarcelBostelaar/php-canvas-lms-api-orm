@@ -36,22 +36,22 @@ use CanvasApiLibrary\Core\Models\User;
 use CanvasApiLibrary\Core\Models\UserDisplay;
 use CanvasApiLibrary\Core\Models\UserStub;
 
-trait AssignmentProviderProperties{
+trait OutcomeProviderProperties{
     
     
-    abstract public function populateAssignment(AssignmentStub $assignment, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    abstract public function populateOutcome(OutcomeStub $outcome, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
-     * Summary of populateAssignments
-     * This is a plural version of populateAssignment
-	 * @param AssignmentStub[] $assignments
+     * Summary of populateOutcomes
+     * This is a plural version of populateOutcome
+	 * @param OutcomeStub[] $outcomes
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return ErrorResult|NotFoundResult|SuccessResult<Assignment[]>|UnauthorizedResult
+	 * @return ErrorResult|NotFoundResult|SuccessResult<Outcome[]>|UnauthorizedResult
      */
-    public function populateAssignments(array $assignments, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+    public function populateOutcomes(array $outcomes, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
         $results = [];
-        foreach($assignments as $item){
-            $result = $this->populateAssignment($item, $skipCache,  $doNotCache);
+        foreach($outcomes as $item){
+            $result = $this->populateOutcome($item, $skipCache,  $doNotCache);
             if(!$result instanceof SuccessResult){
                 return $result;
             }

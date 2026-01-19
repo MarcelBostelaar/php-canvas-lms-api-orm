@@ -45,17 +45,17 @@ use CanvasApiLibrary\Core\Models\UserStub;
  * @template TNotFoundResult2 Returned type of value that a not found result will emit
  * @template TErrorResult Wrapped type of value that any other error result will emit
  * @template TErrorResult2 Returned type of value that any other error result will emit
- * @implements GroupProviderInterface<TSuccessResult2,TErrorResult2,TNotFoundResult2,TUnauthorizedResult2>
+ * @implements OutcomeResultProviderInterface<TSuccessResult2,TErrorResult2,TNotFoundResult2,TUnauthorizedResult2>
  */
-class GroupProviderWrapper implements GroupProviderInterface {
+class OutcomeResultProviderWrapper implements OutcomeResultProviderInterface {
 
     /**
      * Summary of __construct
-     * @param GroupProviderInterface<TSuccessResult,TErrorResult,TNotFoundResult,TUnauthorizedResult> $innerProvider
+     * @param OutcomeResultProviderInterface<TSuccessResult,TErrorResult,TNotFoundResult,TUnauthorizedResult> $innerProvider
      * @param Closure(TSuccessResult|TErrorResult|TNotFoundResult|TUnauthorizedResult) : (TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2) $resultProcessor
      */
     public function __construct(
-        private GroupProviderInterface $innerProvider,
+        private OutcomeResultProviderInterface $innerProvider,
         private Closure $resultProcessor){
     }
 
@@ -70,11 +70,11 @@ class GroupProviderWrapper implements GroupProviderInterface {
      * @template newNotFoundT
      * @template newErrorT
      * @param Closure(TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2) : (newSuccessT|newErrorT|newNotFoundT|newUnauthorizedT) $processor
-     * @return GroupProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
+     * @return OutcomeResultProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
      */
-    public function handleResults(Closure $processor): GroupProviderInterface {
+    public function handleResults(Closure $processor): OutcomeResultProviderInterface {
         $previousProcessor = $this->resultProcessor ?? fn($x) => $x;
-        return new GroupProviderWrapper( $this->innerProvider, fn($x) => $processor($previousProcessor($x)));
+        return new OutcomeResultProviderWrapper( $this->innerProvider, fn($x) => $processor($previousProcessor($x)));
     }
 
     public function HandleEmitted(mixed $data, array $context): void {
@@ -82,50 +82,15 @@ class GroupProviderWrapper implements GroupProviderInterface {
     }
 
     /**
-	 * @param GroupCategoryStub[] $groupCategories
+	 * @param CourseStub $course
+	 * @param array $users
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getAllGroupsInGroupCategories(array $groupCategories, bool $skipCache = false, bool $doNotCache = false) : mixed{
-        $value = $this->innerProvider->getAllGroupsInGroupCategories($groupCategories, $skipCache, $doNotCache);
-        return ($this->resultProcessor)($value);
-    }
-
-    /**
-	 * @param GroupStub[] $groups
-	 * @param bool $skipCache
-	 * @param bool $doNotCache
-	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
-     * @phpstan-ignore return.unresolvableType
-    */
-    public function populateGroups(array $groups, bool $skipCache = false, bool $doNotCache = false) : mixed{
-        $value = $this->innerProvider->populateGroups($groups, $skipCache, $doNotCache);
-        return ($this->resultProcessor)($value);
-    }
-
-    /**
-	 * @param GroupCategoryStub $groupCategory
-	 * @param bool $skipCache
-	 * @param bool $doNotCache
-	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
-     * @phpstan-ignore return.unresolvableType
-    */
-    public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false, bool $doNotCache = false) : mixed{
-        $value = $this->innerProvider->getAllGroupsInGroupCategory($groupCategory, $skipCache, $doNotCache);
-        return ($this->resultProcessor)($value);
-    }
-
-    /**
-	 * @param GroupStub $group
-	 * @param bool $skipCache
-	 * @param bool $doNotCache
-	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
-     * @phpstan-ignore return.unresolvableType
-    */
-    public function populateGroup(GroupStub $group, bool $skipCache = false, bool $doNotCache = false) : mixed{
-        $value = $this->innerProvider->populateGroup($group, $skipCache, $doNotCache);
+    public function getOutcomesInCourse(CourseStub $course, array $users, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getOutcomesInCourse($course, $users, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 

@@ -16,6 +16,9 @@ use CanvasApiLibrary\Core\Models\Group;
 use CanvasApiLibrary\Core\Models\GroupCategory;
 use CanvasApiLibrary\Core\Models\GroupCategoryStub;
 use CanvasApiLibrary\Core\Models\GroupStub;
+use CanvasApiLibrary\Core\Models\Outcome;
+use CanvasApiLibrary\Core\Models\OutcomeResult;
+use CanvasApiLibrary\Core\Models\OutcomeResultStub;
 use CanvasApiLibrary\Core\Models\OutcomeStub;
 use CanvasApiLibrary\Core\Models\Outcomegroup;
 use CanvasApiLibrary\Core\Models\OutcomegroupStub;
@@ -49,6 +52,15 @@ interface OutcomegroupProviderInterface extends HandleEmittedInterface{
      * @return OutcomegroupProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
      */
     public function handleResults(Closure $processor): OutcomegroupProviderInterface;
+    /**
+	 * @param OutcomegroupStub[] $outcomes
+	 * @param bool $skipCache
+	 * @param bool $doNotCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Outcomegroup[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function populateOutcomesgroup(array $outcomes, bool $skipCache = false, bool $doNotCache = false) : mixed;
+
     /**
 	 * @param OutcomegroupStub[] $outcomegroups
 	 * @param bool $skipCache

@@ -38,7 +38,7 @@ use CanvasApiLibrary\Core\Models\UserStub;
  * @template TNotFoundResult Type of value that a not found result will emit
  * @template TErrorResult Type of value that any other error result will emit
  */
-interface AssignmentProviderInterface extends HandleEmittedInterface{
+interface OutcomeProviderInterface extends HandleEmittedInterface{
 
     public function getClientID(): string;
 
@@ -49,25 +49,34 @@ interface AssignmentProviderInterface extends HandleEmittedInterface{
      * @template newNotFoundT
      * @template newErrorT
      * @param Closure(TSuccessResult|TErrorResult|TNotFoundResult|TUnauthorizedResult) : (newSuccessT|newErrorT|newNotFoundT|newUnauthorizedT) $processor
-     * @return AssignmentProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
+     * @return OutcomeProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
      */
-    public function handleResults(Closure $processor): AssignmentProviderInterface;
+    public function handleResults(Closure $processor): OutcomeProviderInterface;
     /**
-	 * @param AssignmentStub[] $assignments
+	 * @param OutcomeStub[] $outcomes
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Assignment[]>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Outcome[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateAssignments(array $assignments, bool $skipCache = false, bool $doNotCache = false) : mixed;
+    public function populateOutcomes(array $outcomes, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
-	 * @param AssignmentStub $assignment
+	 * @param OutcomeStub $outcome
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Assignment>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Outcome>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateAssignment(AssignmentStub $assignment, bool $skipCache = false, bool $doNotCache = false) : mixed;
+    public function populateOutcome(OutcomeStub $outcome, bool $skipCache = false, bool $doNotCache = false) : mixed;
+
+    /**
+	 * @param OutcomegroupStub $outcomeGroup
+	 * @param bool $skipCache
+	 * @param bool $doNotCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Outcome[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getOutcomesInOutcomeGroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
 }

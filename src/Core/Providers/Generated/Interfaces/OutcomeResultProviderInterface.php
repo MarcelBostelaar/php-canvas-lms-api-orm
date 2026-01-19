@@ -38,7 +38,7 @@ use CanvasApiLibrary\Core\Models\UserStub;
  * @template TNotFoundResult Type of value that a not found result will emit
  * @template TErrorResult Type of value that any other error result will emit
  */
-interface AssignmentProviderInterface extends HandleEmittedInterface{
+interface OutcomeResultProviderInterface extends HandleEmittedInterface{
 
     public function getClientID(): string;
 
@@ -49,25 +49,17 @@ interface AssignmentProviderInterface extends HandleEmittedInterface{
      * @template newNotFoundT
      * @template newErrorT
      * @param Closure(TSuccessResult|TErrorResult|TNotFoundResult|TUnauthorizedResult) : (newSuccessT|newErrorT|newNotFoundT|newUnauthorizedT) $processor
-     * @return AssignmentProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
+     * @return OutcomeResultProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
      */
-    public function handleResults(Closure $processor): AssignmentProviderInterface;
+    public function handleResults(Closure $processor): OutcomeResultProviderInterface;
     /**
-	 * @param AssignmentStub[] $assignments
+	 * @param CourseStub $course
+	 * @param array $users
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Assignment[]>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<OutcomeResult[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function populateAssignments(array $assignments, bool $skipCache = false, bool $doNotCache = false) : mixed;
-
-    /**
-	 * @param AssignmentStub $assignment
-	 * @param bool $skipCache
-	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Assignment>|TUnauthorizedResult
-     * @phpstan-ignore return.unresolvableType
-    */
-    public function populateAssignment(AssignmentStub $assignment, bool $skipCache = false, bool $doNotCache = false) : mixed;
+    public function getOutcomesInCourse(CourseStub $course, array $users, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
 }

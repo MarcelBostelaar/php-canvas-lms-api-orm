@@ -20,6 +20,9 @@ use CanvasApiLibrary\Core\Models\Group;
 use CanvasApiLibrary\Core\Models\GroupCategory;
 use CanvasApiLibrary\Core\Models\GroupCategoryStub;
 use CanvasApiLibrary\Core\Models\GroupStub;
+use CanvasApiLibrary\Core\Models\Outcome;
+use CanvasApiLibrary\Core\Models\OutcomeResult;
+use CanvasApiLibrary\Core\Models\OutcomeResultStub;
 use CanvasApiLibrary\Core\Models\OutcomeStub;
 use CanvasApiLibrary\Core\Models\Outcomegroup;
 use CanvasApiLibrary\Core\Models\OutcomegroupStub;
@@ -39,6 +42,25 @@ trait OutcomegroupProviderProperties{
     abstract public function populateOutcomegroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     abstract public function getOutcomegroupsInCourse(CourseStub $course, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
+     * Summary of populateOutcomesgroup
+     * This is a plural version of populateOutcomegroup
+	 * @param OutcomegroupStub[] $outcomes
+	 * @param bool $skipCache
+	 * @param bool $doNotCache
+	 * @return ErrorResult|NotFoundResult|SuccessResult<Outcomegroup[]>|UnauthorizedResult
+     */
+    public function populateOutcomesgroup(array $outcomes, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+        $results = [];
+        foreach($outcomes as $item){
+            $result = $this->populateOutcomegroup($item, $skipCache,  $doNotCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            $results[] = $result->value;
+        }
+        return new SuccessResult($results);
+    }
+        /**
      * Summary of populateOutcomegroups
      * This is a plural version of populateOutcomegroup
 	 * @param OutcomegroupStub[] $outcomegroups

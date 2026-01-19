@@ -20,6 +20,9 @@ use CanvasApiLibrary\Core\Models\Group;
 use CanvasApiLibrary\Core\Models\GroupCategory;
 use CanvasApiLibrary\Core\Models\GroupCategoryStub;
 use CanvasApiLibrary\Core\Models\GroupStub;
+use CanvasApiLibrary\Core\Models\Outcome;
+use CanvasApiLibrary\Core\Models\OutcomeResult;
+use CanvasApiLibrary\Core\Models\OutcomeResultStub;
 use CanvasApiLibrary\Core\Models\OutcomeStub;
 use CanvasApiLibrary\Core\Models\Outcomegroup;
 use CanvasApiLibrary\Core\Models\OutcomegroupStub;
@@ -76,6 +79,18 @@ class OutcomegroupProviderWrapper implements OutcomegroupProviderInterface {
 
     public function HandleEmitted(mixed $data, array $context): void {
         $this->innerProvider->HandleEmitted($data, $context);
+    }
+
+    /**
+	 * @param OutcomegroupStub[] $outcomes
+	 * @param bool $skipCache
+	 * @param bool $doNotCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function populateOutcomesgroup(array $outcomes, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->populateOutcomesgroup($outcomes, $skipCache, $doNotCache);
+        return ($this->resultProcessor)($value);
     }
 
     /**
