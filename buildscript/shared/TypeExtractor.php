@@ -435,11 +435,11 @@ class CloseAngleBracketParser extends StringLiteralParser{
  * @return IParserCombinator<GenericTypeDefinition>
  */
 function GenericTypeString(){
-    return new AtomicTypeParser()
+    return (new AtomicTypeParser())
     ->then(new OpenAngleBracketParser())
     ->then(
-        new StringLiteralParser(",")->asSeperator(
-            new LazyParser(fn() => FullTypeString())
+        (new StringLiteralParser(","))->asSeperator(
+            (new LazyParser(fn() => FullTypeString()))
                                 ->wrapWhitepace()
     ))
     ->then(new CloseAngleBracketParser())
@@ -455,15 +455,15 @@ function GenericTypeString(){
  * @return IParserCombinator<AtomicTypeDefinition|GenericTypeDefinition>
  */
 function GenericOrAtomic(){
-    return new StringLiteralParser("?")->optional()
+    return (new StringLiteralParser("?"))->optional()
     ->then(
         GenericTypeString()
         ->or(
-            new AtomicTypeParser()
+            (new AtomicTypeParser())
             ->map(fn($x) => new AtomicTypeDefinition($x))
         )
     )
-    ->then(new StringLiteralParser("[]")->optional())
+    ->then((new StringLiteralParser("[]"))->optional())
     ->map(function($result) {
         $isArray = $result[2] !== null;
         $isNullable = $result[0] !== null;
@@ -485,7 +485,7 @@ function GenericOrAtomic(){
 function FullTypeString(){
     //(generic ?? atomic) [ | self ]*
     //first try generic, then atomic.
-    return new PipeParser()
+    return (new PipeParser())
     ->asSeperator(new LazyParser(fn() => GenericOrAtomic()))
     ->map(function($value){
         if(count($value) === 1){
