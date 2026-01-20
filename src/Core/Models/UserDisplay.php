@@ -4,7 +4,7 @@ namespace CanvasApiLibrary\Core\Models;
 
 use CanvasApiLibrary\Core\Models\Generated\UserDisplayProperties;
 
-abstract class UserDisplay extends UserStub{
+class UserDisplay extends UserStub{
     use UserDisplayProperties;
     protected static array $properties = [
         ["string", "short_name"],

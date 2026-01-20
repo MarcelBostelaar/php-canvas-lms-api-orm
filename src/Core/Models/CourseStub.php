@@ -5,7 +5,7 @@ use CanvasApiLibrary\Core\Models\Generated\CourseStubProperties;
 use CanvasApiLibrary\Core\Models\Utility\AbstractCanvasPopulatedModel;
 use CanvasApiLibrary\Core\Models\IdentityTraits\DomainBoundIdTrait;
 
-abstract class CourseStub extends AbstractCanvasPopulatedModel{
+class CourseStub extends AbstractCanvasPopulatedModel{
     use DomainBoundIdTrait;
     use CourseStubProperties;
     protected static array $properties = [

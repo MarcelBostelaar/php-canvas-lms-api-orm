@@ -5,7 +5,7 @@ use CanvasApiLibrary\Core\Models\Generated\GroupStubProperties;
 use CanvasApiLibrary\Core\Models\IdentityTraits\DomainBoundIdOptionalCourseContextTrait;
 use CanvasApiLibrary\Core\Models\Utility\AbstractCanvasPopulatedModel;
 
-abstract class GroupStub extends AbstractCanvasPopulatedModel{
+class GroupStub extends AbstractCanvasPopulatedModel{
     use DomainBoundIdOptionalCourseContextTrait;
     use GroupStubProperties;
     protected static array $properties = [
