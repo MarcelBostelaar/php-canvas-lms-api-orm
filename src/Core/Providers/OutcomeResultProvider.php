@@ -11,6 +11,7 @@ use CanvasApiLibrary\Core\Providers\Interfaces\OutcomeResultProviderInterface;
 use CanvasApiLibrary\Core\Providers\Traits\OutcomeResultWrapperTrait;
 use CanvasApiLibrary\Core\Providers\Utility\AbstractProvider;
 use CanvasApiLibrary\Core\Providers\Utility\ClientIDProvider;
+use CanvasApiLibrary\Core\Providers\Utility\Lookup;
 use CanvasApiLibrary\Core\Providers\Utility\ModelPopulator\ModelPopulationConfigBuilder;
 use CanvasApiLibrary\Core\Services\CanvasCommunicator;
 use CanvasApiLibrary\Core\Providers\Utility\Results\ErrorResult;
@@ -50,15 +51,27 @@ class OutcomeResultProvider extends AbstractProvider implements OutcomeResultPro
      * @param UserStub[] $users
      * @param bool $skipCache
      * @param bool $doNotCache
-     * @return ErrorResult|NotFoundResult|SuccessResult<OutcomeResult[]>|UnauthorizedResult
+     * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<UserStub, OutcomeResult>>|UnauthorizedResult
      */
     public function getOutcomesInCourse(CourseStub $course, array $users = [], bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
         $params = "";
         $userIDs = array_map(fn($user) => "user_ids[]=" . $user->getId(), $users);
         $params .= implode("&", $userIDs);
-        return $this->GetMany(
+        $outcomes = $this->GetMany(
             "courses/{$course->id}/outcome_results" . (empty($params) ? "" : "?" . $params),
             $course->getContext()
         );
+        if(!$outcomes instanceof SuccessResult){
+            return $outcomes;
+        }
+
+        //group per user
+        $data = $outcomes->value;
+        $lookup = new Lookup();
+        foreach($data as $outcomeResult){
+            $lookup->add($outcomeResult->user, $outcomeResult);
+        }
+        //TODO figure out why this type error happens
+        return new SuccessResult($lookup);
     }
 }
