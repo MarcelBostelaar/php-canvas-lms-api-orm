@@ -1,7 +1,7 @@
-/.vscode/* export-ignore
-/buildscript/* export-ignore
-/docs/* export-ignore
-/old_code_for_reference/* export-ignore
+.vscode export-ignore
+buildscript export-ignore
+docs export-ignore
+old_code_for_reference export-ignore
 composer.lock export-ignore
 .gitignore export-ignore
 .gitattributes export-ignore
