@@ -2,11 +2,8 @@
 
 namespace CanvasApiLibrary\Core\Models;
 use CanvasApiLibrary\Core\Models\Generated\OutcomeResultProperties;
-use CanvasApiLibrary\Core\Models\Utility\AbstractCanvasPopulatedModel;
-use CanvasApiLibrary\Core\Models\IdentityTraits\CourseBoundIdTrait;
 
 class OutcomeResult extends OutcomeResultStub{
-    use CourseBoundIdTrait;
     use OutcomeResultProperties;
     protected static array $properties = [
         ["int", "score"],

@@ -82,6 +82,19 @@ class OutcomeResultProviderWrapper implements OutcomeResultProviderInterface {
     }
 
     /**
+	 * @param CourseStub[] $courses
+	 * @param array $users
+	 * @param bool $skipCache
+	 * @param bool $doNotCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getOutcomeResultsInCourses(array $courses, array $users, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getOutcomeResultsInCourses($courses, $users, $skipCache, $doNotCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
 	 * @param CourseStub $course
 	 * @param array $users
 	 * @param bool $skipCache
@@ -89,8 +102,21 @@ class OutcomeResultProviderWrapper implements OutcomeResultProviderInterface {
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getOutcomesInCourse(CourseStub $course, array $users, bool $skipCache = false, bool $doNotCache = false) : mixed{
-        $value = $this->innerProvider->getOutcomesInCourse($course, $users, $skipCache, $doNotCache);
+    public function getOutcomeResultsInCourse(CourseStub $course, array $users, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getOutcomeResultsInCourse($course, $users, $skipCache, $doNotCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
+	 * @param CourseStub $course
+	 * @param array $users
+	 * @param bool $skipCache
+	 * @param bool $doNotCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getOutcomeResultsGroupedInCourse(CourseStub $course, array $users, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getOutcomeResultsGroupedInCourse($course, $users, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 

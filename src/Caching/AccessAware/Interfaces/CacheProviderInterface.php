@@ -2,6 +2,8 @@
 
 namespace CanvasApiLibrary\Caching\AccessAware\Interfaces;
 
+use Permission;
+
 /**
  * Abstract class that can be subclassed to make a concrete cache provider for the caching system, with a backing system of your choice.
  * 
@@ -140,4 +142,11 @@ interface CacheProviderInterface{
      * Miss (empty) otherwise.
      */
     public function getCollection(string $clientID, string $collectionKey): CacheResult;
+
+    /**
+     * Retrieves all permissions associated with a given value.
+     * @param string $itemKey
+     * @return Permission[]
+     */
+    public function getPermissions(string $itemKey): array;
 }

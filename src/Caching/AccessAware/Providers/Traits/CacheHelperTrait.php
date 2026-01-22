@@ -64,7 +64,7 @@ trait CacheHelperTrait{
      * @param mixed $permissionRequired The permission object for this item.
      * @return SuccessResult<ModelInterface>|ErrorResult|UnauthorizedResult|NotFoundResult
      */
-    private function _internalTrySingleValue(string $key, Closure $valueFactory, bool $skipCache, bool $doNotCache, mixed $permissionRequired): SuccessResult|ErrorResult|UnauthorizedResult|NotFoundResult{
+    private function givenPermissionsSingleValue(string $key, Closure $valueFactory, bool $skipCache, bool $doNotCache, mixed $permissionRequired): SuccessResult|ErrorResult|UnauthorizedResult|NotFoundResult{
         if(!$skipCache){
             $cached = $this->cache->get($this->getClientID(), $key);
             if($cached->hit){
@@ -92,7 +92,7 @@ trait CacheHelperTrait{
     private function userInCourseSingleValue(string $key, Closure $valueFactory, UserStub $user, CourseStub $course, bool $skipCache, bool $doNotCache): SuccessResult|ErrorResult|UnauthorizedResult|NotFoundResult{
         $this->permissionEnsurer->usersInCourse($course, $this->getClientID(), $skipCache);
         $requiredPermission = $this->permissionHandler::domainCourseUserPermission($course, $user);
-        return $this->_internalTrySingleValue($key, $valueFactory, $skipCache, $doNotCache, $requiredPermission);
+        return $this->givenPermissionsSingleValue($key, $valueFactory, $skipCache, $doNotCache, $requiredPermission);
     }
     /**
      * Attempts to retrieve item from cache. If not cached, retrieves via factory, and if succesfull, caches result permission restricted to the given course.
@@ -106,7 +106,7 @@ trait CacheHelperTrait{
     private function courseSingleValue(string $key, Closure $valueFactory, CourseStub $course, bool $skipCache, bool $doNotCache): SuccessResult|ErrorResult|UnauthorizedResult|NotFoundResult{
         $this->permissionEnsurer->usersInCourse($course, $this->getClientID(), $skipCache);
         $requiredPermission = $this->permissionHandler::domainCoursePermission($course);
-        return $this->_internalTrySingleValue($key, $valueFactory, $skipCache, $doNotCache, $requiredPermission);
+        return $this->givenPermissionsSingleValue($key, $valueFactory, $skipCache, $doNotCache, $requiredPermission);
     }
 
     private function userSingleValue(string $key, Closure $valueFactory, UserStub $user, bool $skipCache, bool $doNotCache): SuccessResult|ErrorResult|UnauthorizedResult|NotFoundResult{
@@ -115,7 +115,7 @@ trait CacheHelperTrait{
         //If client has permission to see user, cache will fetch it correctly.
         //If client has not yet set up permissions for this user, the successful fetch will set it up.
         $requiredPermission = $this->permissionHandler::domainUserPermission($user);
-        return $this->_internalTrySingleValue($key, $valueFactory, $skipCache, $doNotCache, $requiredPermission);
+        return $this->givenPermissionsSingleValue($key, $valueFactory, $skipCache, $doNotCache, $requiredPermission);
     }
 
     /**
@@ -127,7 +127,7 @@ trait CacheHelperTrait{
      * @return ErrorResult|NotFoundResult|SuccessResult<ModelInterface>|UnauthorizedResult
      */
     private function unknownPermissionSingleValue(string $key, Closure $valueFactory, bool $skipCache, bool $doNotCache): SuccessResult|ErrorResult|UnauthorizedResult|NotFoundResult{
-        return $this->_internalTrySingleValue($key, $valueFactory, $skipCache, $doNotCache, null);
+        return $this->givenPermissionsSingleValue($key, $valueFactory, $skipCache, $doNotCache, null);
     }
 
     /**
@@ -226,6 +226,7 @@ trait CacheHelperTrait{
         bool $doNotCache,
         CourseStub $course
     ){
+        $this->permissionEnsurer->domain($course->domain, $this->getClientID(), false);
         if(!$skipCache){
             $cached = $this->cache->get($this->getClientID(), $key);
             if($cached->hit){
@@ -239,6 +240,78 @@ trait CacheHelperTrait{
             $this->cache->set($key, $cleaned, $this->ttl, $this->getClientID(), $permissionsRequired);
         }
         return $value;
+    }
+
+    /**
+     * Attempts to retrieve a collection value that is access agnostic and has no specific context, but is permission secured.
+     * Meaning, the result of this call is the same for all users, if they have any of the permissions, but a permissions is needed.
+     * Copies all known permissions from the origin item to the child items.
+     * Caches individual child items on their resource key.
+     * @param string $key
+     * @param ModelInterface $originItem
+     * @param Closure $valueFactory
+     * @param bool $skipCache
+     * @param bool $doNotCache
+     */
+    private function permissionPropagatedAccessAgnosticCollectionValue(
+        string $key,
+        ModelInterface $originItem,
+        Closure $valueFactory,
+        bool $skipCache,
+        bool $doNotCache
+    ){
+        if($skipCache){
+            return $valueFactory();
+        }
+        $parentPermissions = $this->cache->getPermissions($originItem->getResourceKey());
+        $collection = $this->givenPermissionsSingleValue( 
+            $key,
+            $valueFactory,
+            $skipCache,
+            $doNotCache,
+            $parentPermissions
+        );
+        //save individual outcomes as well
+        if($collection instanceof SuccessResult && !$doNotCache){
+            foreach($collection as $item){
+                $this->cache->set(
+                    $item->getResourceKey(),
+                    $item,
+                    $this->ttl,
+                    $this->getClientID(),
+                    $parentPermissions
+                );
+            }
+        }
+        return $collection;
+    }
+
+    /**
+     * Try a user scoped collection value. Does not do permission ensuring, do manually before calling.
+     * @param string $key
+     * @param Closure $valueFactory 
+     * @param Closure(ModelInterface) : mixed[] $userPermissionFactory Takes the child item and produces a corresponding domain-user permission
+     * @param Domain $domain
+     * @param bool $skipCache
+     * @param bool $doNotCache
+     * @return ErrorResult|NotFoundResult|SuccessResult<ModelInterface[]>|UnauthorizedResult
+     */
+    private function userScopedCollectionValue(
+        string $key, 
+        Closure $valueFactory,
+        Closure $userPermissionFactory,
+        Domain $domain,
+        bool $skipCache,
+        bool $doNotCache
+    ){
+        return $this->_internalTryCollectionValue(
+            $key,
+            $valueFactory,
+            $userPermissionFactory,
+            $skipCache,
+            $doNotCache,
+            $this->permissionHandler::contextFilterDomainAnyUser($domain)
+        );
     }
 
     /**
@@ -282,4 +355,5 @@ trait CacheHelperTrait{
             return [true, true];
         }
     }
+
 }

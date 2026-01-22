@@ -32,7 +32,7 @@
 
 [x] Fix provider trait generation not working anymore
 
-
+[] fix codegen for plural versions to also pass plurals to subtype
 [] Look alle core providers door en kijk waar je de requests kan verbeteren door b.v. meer results per pagina te vragen.
 [] Add rubric model
 [] Add rubric assessment model

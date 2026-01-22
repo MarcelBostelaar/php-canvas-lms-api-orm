@@ -3,6 +3,7 @@
 namespace CanvasApiLibrary\Core\Providers\Utility;
 
 use CanvasApiLibrary\Core\Models\Utility\ModelInterface;
+use Closure;
 /**
  * @template Key extends \CanvasApiLibrary\Core\Models\Utility\ModelInterface
  * @template Value
@@ -30,5 +31,11 @@ class Lookup {
      */
     public function get(ModelInterface $key): array {
         return $this->map[$key->getId()] ?? [];
+    }
+
+    public function addMany(Closure $keyFuncFromValue, array $values){
+        foreach($values as $value){
+            $this->add($keyFuncFromValue($value), $value);
+        }
     }
 }

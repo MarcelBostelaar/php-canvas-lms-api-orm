@@ -39,5 +39,19 @@ use CanvasApiLibrary\Core\Models\UserStub;
 trait OutcomeResultProviderProperties{
     
     
+    abstract public function getOutcomeResultsInCourse(CourseStub $course, array $users, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    /**
+     * Summary of getOutcomeResultsInCourses     * This is a plural version of getOutcomeResultsInCourse      * @param CourseStub[] $courses
+ * @param array $users
+ * @param bool $skipCache
+ * @param bool $doNotCache
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<CourseStub, OutcomeResult[]>>|UnauthorizedResult     */
+    public function getOutcomeResultsInCourses(array $courses, array $users, bool $skipCache = false, bool $doNotCache = false): Lookup{
+        $lookup = new Lookup();
+        foreach($courses as $x){
+            $lookup->add($x, $this->getOutcomeResultsInCourse($x));
+        }
+        return $lookup;
+    }
 
 }

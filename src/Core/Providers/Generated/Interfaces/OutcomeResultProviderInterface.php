@@ -53,6 +53,26 @@ interface OutcomeResultProviderInterface extends HandleEmittedInterface{
      */
     public function handleResults(Closure $processor): OutcomeResultProviderInterface;
     /**
+	 * @param CourseStub[] $courses
+	 * @param array $users
+	 * @param bool $skipCache
+	 * @param bool $doNotCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<CourseStub, OutcomeResult[]>>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getOutcomeResultsInCourses(array $courses, array $users, bool $skipCache = false, bool $doNotCache = false) : mixed;
+
+    /**
+	 * @param CourseStub $course
+	 * @param array $users
+	 * @param bool $skipCache
+	 * @param bool $doNotCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<OutcomeResult[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getOutcomeResultsInCourse(CourseStub $course, array $users, bool $skipCache = false, bool $doNotCache = false) : mixed;
+
+    /**
 	 * @param CourseStub $course
 	 * @param array $users
 	 * @param bool $skipCache
@@ -60,6 +80,6 @@ interface OutcomeResultProviderInterface extends HandleEmittedInterface{
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<UserStub, OutcomeResult>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getOutcomesInCourse(CourseStub $course, array $users, bool $skipCache = false, bool $doNotCache = false) : mixed;
+    public function getOutcomeResultsGroupedInCourse(CourseStub $course, array $users, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
 }
