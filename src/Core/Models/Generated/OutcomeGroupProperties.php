@@ -17,11 +17,11 @@ trait OutcomegroupProperties{
         }
     }
 
-    public string $description{
+    public ?string $description{
         get {
             return $this->description;
         }
-        set(string $value) {
+        set(?string $value) {
             $this->description = $value;
         }
     }
