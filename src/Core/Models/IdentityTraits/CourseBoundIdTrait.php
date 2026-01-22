@@ -21,4 +21,10 @@ trait CourseBoundIdTrait{
         $this->initializeDomainIdentity();
         $this->initializeCourseIdentity();
     }
+    public function isRegularModel() : bool{
+        return true;
+    }
+    public function isUrlModel() : bool{
+        return false;
+    }
 }

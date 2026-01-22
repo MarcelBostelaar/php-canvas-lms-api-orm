@@ -207,4 +207,7 @@ trait IdentityBoiletplateTrait {
         $context = $supertype->getContext();
         return static::newFromMinimumDataRepresentation($mdr, $context);
     }
+
+    abstract public function isRegularModel() : bool;
+    abstract public function isUrlModel() : bool;
 }

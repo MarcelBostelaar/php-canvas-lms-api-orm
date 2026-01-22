@@ -14,4 +14,10 @@ trait DomainBoundIdOptionalCourseContextTrait{
         $this->wrappedInitIdentityTraits();
         $this->initializeOptionalCourseContext();
     }
+    public function isRegularModel() : bool{
+        return true;
+    }
+    public function isUrlModel() : bool{
+        return false;
+    }
 }

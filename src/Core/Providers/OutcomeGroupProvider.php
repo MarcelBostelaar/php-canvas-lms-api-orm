@@ -38,7 +38,6 @@ class OutcomegroupProvider extends AbstractProvider implements OutcomegroupProvi
         ->keyCopy("outcomes_url")
         ->keyCopy("parent_outcome_group")
             ->nullable()
-            ->processNonNullValue(fn($x) => $x["id"])
             ->asModel(OutcomegroupStub::class)
         ,$clientIDProvider
         );
