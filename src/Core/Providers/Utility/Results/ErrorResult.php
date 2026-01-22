@@ -4,6 +4,7 @@ namespace CanvasApiLibrary\Core\Providers\Utility\Results;
 
 class ErrorResult
 {
+    use ResultMonadTrait;
     /**
      * @param string[] $errors
      */
