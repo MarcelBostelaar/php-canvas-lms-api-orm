@@ -9,13 +9,13 @@ final class Outcome extends OutcomeStub{
 
     protected static array $properties = [
         ["string", "title"],
-        ["string", "description"],
         ["int", "points_possible"],
         ["int", "mastery_points"],
         ["string", "calculation_method"]
     ];
     protected static array $nullableProperties = [
-        ["int", "calculation_int"]
+        ["int", "calculation_int"],
+        ["string", "description"]
     ];
 
     protected function getClassName(): string{

@@ -34,7 +34,7 @@ class OutcomeProvider extends AbstractProvider implements OutcomeProviderInterfa
         (new ModelPopulationConfigBuilder(Outcome::class))
         ->keyCopy("title")
         ->keyCopy("url")
-        ->keyCopy("description")
+        ->keyCopy("description")->nullable()
         ->keyCopy("points_possible")
         ->keyCopy("mastery_points")
         ->keyCopy("calculation_method")
@@ -65,7 +65,11 @@ class OutcomeProvider extends AbstractProvider implements OutcomeProviderInterfa
      */
     public function getOutcomesInOutcomegroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
         //Contains its own url, so we use that
-        $url = $outcomeGroup->outcomes_url;
-        return $this->GetMany($url, $outcomeGroup->getContext());
+        $url = $outcomeGroup->outcomes_url . "?outcome_style=full";
+        return $this->GetMany($url, 
+        $outcomeGroup->getContext(),
+        null,
+        fn($x) => array_map(fn($y) => $y['outcome'], $x)
+        );
     }
 }

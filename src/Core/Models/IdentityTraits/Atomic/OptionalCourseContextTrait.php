@@ -31,7 +31,10 @@ trait OptionalCourseContextTrait{
             }
             return CourseStub::newFromMinimumDataRepresentation($data, $this->getContext());
         }
-        set (CourseStub $value) {
+        set (?CourseStub $value) {
+            if($value === null){
+                throw new ChangingIdException("Tried to unset the course of this item");
+            }
             $data = $this->getMetadata("optionalcoursecontext");
             if(!isset($this->course_identity)){
                 if($this->domain != $value->domain){

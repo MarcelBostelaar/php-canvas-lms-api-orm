@@ -40,6 +40,6 @@ class Lookup {
     }
 
     public function getAll(): array {
-        return array_values($this->map);
+        return array_merge(...array_values($this->map));
     }
 }

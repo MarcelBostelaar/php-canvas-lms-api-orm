@@ -45,7 +45,7 @@ class CanvasCommunicator{
         return self::combineUrls("$head/$head2", ...$elements);
     }
 
-    private function fixURL(string $route, Domain $domain) : string{
+    protected function fixURL(string $route, Domain $domain) : string{
         //split into parts:
         $route = ltrim($route, "/");
         //replace api/v1 is if it is at the start of route or end of domain
@@ -63,11 +63,11 @@ class CanvasCommunicator{
     }
 
     public function Get(string $route, Domain $domain) : array{
-        return self::curlGet($this->fixURL($route, $domain), $this->apiKey);
+        return $this::curlGet($this->fixURL($route, $domain), $this->apiKey);
     }
 
     public function Put(string $route, Domain $domain, mixed $data) : array{
-        return self::curlPut($this->fixURL($route, $domain), $this->apiKey, $data);
+        return $this::curlPut($this->fixURL($route, $domain), $this->apiKey, $data);
     }
 
     //Static cURL calls
