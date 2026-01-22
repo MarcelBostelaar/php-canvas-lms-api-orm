@@ -47,12 +47,16 @@ trait CourseProviderProperties{
  * @param bool $skipCache
  * @param bool $doNotCache
  * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<Domain, Course[]>>|UnauthorizedResult     */
-    public function getAllCoursesInDomains(array $domains, bool $skipCache = false, bool $doNotCache = false): Lookup{
+    public function getAllCoursesInDomains(array $domains, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($domains as $x){
-            $lookup->add($x, $this->getAllCoursesInDomain($x, $skipCache, $doNotCache));
+            $result = $this->getAllCoursesInDomain($x, $skipCache, $doNotCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            $lookup->add($x, $result->value);
         }
-        return $lookup;
+        return new SuccessResult($lookup);
     }
 
 }

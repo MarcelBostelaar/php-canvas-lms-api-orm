@@ -62,6 +62,15 @@ interface OutcomeProviderInterface extends HandleEmittedInterface{
     public function populateOutcomes(array $outcomes, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
     /**
+	 * @param OutcomegroupStub[] $outcomegroups
+	 * @param bool $skipCache
+	 * @param bool $doNotCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<OutcomegroupStub, Outcome[]>>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getOutcomesInOutcomegroups(array $outcomegroups, bool $skipCache = false, bool $doNotCache = false) : mixed;
+
+    /**
 	 * @param OutcomeStub $outcome
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
@@ -77,6 +86,6 @@ interface OutcomeProviderInterface extends HandleEmittedInterface{
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Outcome[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getOutcomesInOutcomeGroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false) : mixed;
+    public function getOutcomesInOutcomegroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
 }

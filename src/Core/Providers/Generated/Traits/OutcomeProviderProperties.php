@@ -40,6 +40,7 @@ trait OutcomeProviderProperties{
     
     
     abstract public function populateOutcome(OutcomeStub $outcome, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
+    abstract public function getOutcomesInOutcomegroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
      * Summary of populateOutcomes
  
@@ -61,5 +62,23 @@ trait OutcomeProviderProperties{
         }
         return new SuccessResult($results);
     }
-    
+        /**
+     * Summary of getOutcomesInOutcomegroups 
+     * This is a plural version of getOutcomesInOutcomegroup 
+      * @param OutcomegroupStub[] $outcomegroups
+ * @param bool $skipCache
+ * @param bool $doNotCache
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<OutcomegroupStub, Outcome[]>>|UnauthorizedResult     */
+    public function getOutcomesInOutcomegroups(array $outcomegroups, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
+        $lookup = new Lookup();
+        foreach($outcomegroups as $x){
+            $result = $this->getOutcomesInOutcomegroup($x, $skipCache, $doNotCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            $lookup->add($x, $result->value);
+        }
+        return new SuccessResult($lookup);
+    }
+
 }

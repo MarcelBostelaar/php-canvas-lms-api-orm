@@ -63,7 +63,7 @@ class OutcomeProvider extends AbstractProvider implements OutcomeProviderInterfa
      * @param bool $doNotCache
      * @return ErrorResult|NotFoundResult|SuccessResult<Outcome[]>|UnauthorizedResult
      */
-    public function getOutcomesInOutcomeGroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+    public function getOutcomesInOutcomegroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
         //Contains its own url, so we use that
         $url = $outcomeGroup->outcomes_url;
         return $this->GetMany($url, $outcomeGroup->getContext());

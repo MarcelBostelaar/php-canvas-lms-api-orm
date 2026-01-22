@@ -90,12 +90,16 @@ trait OutcomegroupProviderProperties{
  * @param bool $skipCache
  * @param bool $doNotCache
  * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<CourseStub, Outcomegroup[]>>|UnauthorizedResult     */
-    public function getOutcomegroupsInCourses(array $courses, bool $skipCache = false, bool $doNotCache = false): Lookup{
+    public function getOutcomegroupsInCourses(array $courses, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($courses as $x){
-            $lookup->add($x, $this->getOutcomegroupsInCourse($x, $skipCache, $doNotCache));
+            $result = $this->getOutcomegroupsInCourse($x, $skipCache, $doNotCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            $lookup->add($x, $result->value);
         }
-        return $lookup;
+        return new SuccessResult($lookup);
     }
 
 }

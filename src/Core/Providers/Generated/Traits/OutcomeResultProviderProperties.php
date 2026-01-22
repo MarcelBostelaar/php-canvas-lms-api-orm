@@ -48,12 +48,16 @@ trait OutcomeResultProviderProperties{
  * @param bool $skipCache
  * @param bool $doNotCache
  * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<CourseStub, OutcomeResult[]>>|UnauthorizedResult     */
-    public function getOutcomeResultsInCourses(array $courses, array $users, bool $skipCache = false, bool $doNotCache = false): Lookup{
+    public function getOutcomeResultsInCourses(array $courses, array $users, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($courses as $x){
-            $lookup->add($x, $this->getOutcomeResultsInCourse($x, $users, $skipCache, $doNotCache));
+            $result = $this->getOutcomeResultsInCourse($x, $users, $skipCache, $doNotCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            $lookup->add($x, $result->value);
         }
-        return $lookup;
+        return new SuccessResult($lookup);
     }
 
 }

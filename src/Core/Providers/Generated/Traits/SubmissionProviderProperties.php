@@ -49,12 +49,16 @@ trait SubmissionProviderProperties{
  * @param bool $skipCache
  * @param bool $doNotCache
  * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<AssignmentStub, Submission[]>>|UnauthorizedResult     */
-    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false, bool $doNotCache = false): Lookup{
+    public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($assignments as $x){
-            $lookup->add($x, $this->getSubmissionsInAssignment($x, $userProvider, $skipCache, $doNotCache));
+            $result = $this->getSubmissionsInAssignment($x, $userProvider, $skipCache, $doNotCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            $lookup->add($x, $result->value);
         }
-        return $lookup;
+        return new SuccessResult($lookup);
     }
     /**
      * Summary of populateSubmissions

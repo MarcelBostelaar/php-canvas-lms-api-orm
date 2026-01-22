@@ -136,12 +136,16 @@ function generateMultiMethod(MethodDefinition $method) {
      * This is a plural version of <?=$method->pluralVariantOf->name?> 
      <?=$method->createDocstringParamsAndReturn()?>
      */
-    public function <?=$method->name?>(<?=$method->paramString()?>): Lookup{
+    public function <?=$method->name?>(<?=$method->paramString()?>): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($<?=$relevantParam->name?> as $x){
-            $lookup->add($x, $this-><?=$method->pluralVariantOf->name?>(<?=$processedParamsAsString?>));
+            $result = $this-><?=$method->pluralVariantOf->name?>(<?=$processedParamsAsString?>);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            $lookup->add($x, $result->value);
         }
-        return $lookup;
+        return new SuccessResult($lookup);
     }
 <?php
 }

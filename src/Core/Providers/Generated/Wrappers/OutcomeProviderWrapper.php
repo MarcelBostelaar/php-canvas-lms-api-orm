@@ -94,6 +94,18 @@ class OutcomeProviderWrapper implements OutcomeProviderInterface {
     }
 
     /**
+	 * @param OutcomegroupStub[] $outcomegroups
+	 * @param bool $skipCache
+	 * @param bool $doNotCache
+	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getOutcomesInOutcomegroups(array $outcomegroups, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getOutcomesInOutcomegroups($outcomegroups, $skipCache, $doNotCache);
+        return ($this->resultProcessor)($value);
+    }
+
+    /**
 	 * @param OutcomeStub $outcome
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
@@ -112,8 +124,8 @@ class OutcomeProviderWrapper implements OutcomeProviderInterface {
 	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
      * @phpstan-ignore return.unresolvableType
     */
-    public function getOutcomesInOutcomeGroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false) : mixed{
-        $value = $this->innerProvider->getOutcomesInOutcomeGroup($outcomeGroup, $skipCache, $doNotCache);
+    public function getOutcomesInOutcomegroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false) : mixed{
+        $value = $this->innerProvider->getOutcomesInOutcomegroup($outcomeGroup, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 

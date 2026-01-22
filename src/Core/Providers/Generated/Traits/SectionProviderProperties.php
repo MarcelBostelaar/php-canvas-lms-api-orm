@@ -48,12 +48,16 @@ trait SectionProviderProperties{
  * @param bool $skipCache
  * @param bool $doNotCache
  * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<CourseStub, Section[]>>|UnauthorizedResult     */
-    public function getAllSectionsInCourses(array $courses, bool $skipCache = false, bool $doNotCache = false): Lookup{
+    public function getAllSectionsInCourses(array $courses, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($courses as $x){
-            $lookup->add($x, $this->getAllSectionsInCourse($x, $skipCache, $doNotCache));
+            $result = $this->getAllSectionsInCourse($x, $skipCache, $doNotCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            $lookup->add($x, $result->value);
         }
-        return $lookup;
+        return new SuccessResult($lookup);
     }
     /**
      * Summary of populateSections

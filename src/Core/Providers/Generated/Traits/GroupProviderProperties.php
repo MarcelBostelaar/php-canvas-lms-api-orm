@@ -48,12 +48,16 @@ trait GroupProviderProperties{
  * @param bool $skipCache
  * @param bool $doNotCache
  * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<GroupCategoryStub, Group[]>>|UnauthorizedResult     */
-    public function getAllGroupsInGroupCategories(array $groupCategories, bool $skipCache = false, bool $doNotCache = false): Lookup{
+    public function getAllGroupsInGroupCategories(array $groupCategories, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($groupCategories as $x){
-            $lookup->add($x, $this->getAllGroupsInGroupCategory($x, $skipCache, $doNotCache));
+            $result = $this->getAllGroupsInGroupCategory($x, $skipCache, $doNotCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            $lookup->add($x, $result->value);
         }
-        return $lookup;
+        return new SuccessResult($lookup);
     }
     /**
      * Summary of populateGroups
