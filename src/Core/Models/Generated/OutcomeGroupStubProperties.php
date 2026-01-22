@@ -4,9 +4,9 @@ namespace CanvasApiLibrary\Core\Models\Generated;
 
 use CanvasApiLibrary\Core\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Core\Exceptions\MixingDomainsException;
-use CanvasApiLibrary\Core\Models\OutcomeGroupStub;
+use CanvasApiLibrary\Core\Models\OutcomegroupStub;
 
-trait OutcomeGroupStubProperties{
+trait OutcomegroupStubProperties{
     public string $subgroups_url{
         get {
             return $this->subgroups_url;

@@ -5,9 +5,9 @@ namespace CanvasApiLibrary\Core\Models\Generated;
 use CanvasApiLibrary\Core\Exceptions\NotPopulatedException;
 use CanvasApiLibrary\Core\Exceptions\MixingDomainsException;
 use CanvasApiLibrary\Core\Models\OutcomegroupStub;
-use CanvasApiLibrary\Core\Models\OutcomeGroup;
+use CanvasApiLibrary\Core\Models\Outcomegroup;
 
-trait OutcomeGroupProperties{
+trait OutcomegroupProperties{
     public string $title{
         get {
             return $this->title;
@@ -44,7 +44,7 @@ trait OutcomeGroupProperties{
             if($value->domain != $this->domain){
                 $selfDomain = $this->domain->domain;
                 $otherDomain = $value->domain->domain;
-                throw new MixingDomainsException("Tried to save a OutcomegroupStub from domain '$otherDomain' to OutcomeGroup.parent_outcome_group from domain '$selfDomain'.");
+                throw new MixingDomainsException("Tried to save a OutcomegroupStub from domain '$otherDomain' to Outcomegroup.parent_outcome_group from domain '$selfDomain'.");
             }
             $this->parent_outcome_group_identity = $value->getMinimumDataRepresentation();
         }

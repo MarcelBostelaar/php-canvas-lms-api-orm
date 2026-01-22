@@ -21,11 +21,11 @@ use CanvasApiLibrary\Core\Models\GroupCategory;
 use CanvasApiLibrary\Core\Models\GroupCategoryStub;
 use CanvasApiLibrary\Core\Models\GroupStub;
 use CanvasApiLibrary\Core\Models\Outcome;
-use CanvasApiLibrary\Core\Models\OutcomeGroup;
-use CanvasApiLibrary\Core\Models\OutcomeGroupStub;
 use CanvasApiLibrary\Core\Models\OutcomeResult;
 use CanvasApiLibrary\Core\Models\OutcomeResultStub;
 use CanvasApiLibrary\Core\Models\OutcomeStub;
+use CanvasApiLibrary\Core\Models\Outcomegroup;
+use CanvasApiLibrary\Core\Models\OutcomegroupStub;
 use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Models\SectionStub;
 use CanvasApiLibrary\Core\Models\Submission;
@@ -104,19 +104,6 @@ class OutcomeResultProviderWrapper implements OutcomeResultProviderInterface {
     */
     public function getOutcomeResultsInCourse(CourseStub $course, array $users, bool $skipCache = false, bool $doNotCache = false) : mixed{
         $value = $this->innerProvider->getOutcomeResultsInCourse($course, $users, $skipCache, $doNotCache);
-        return ($this->resultProcessor)($value);
-    }
-
-    /**
-	 * @param CourseStub $course
-	 * @param array $users
-	 * @param bool $skipCache
-	 * @param bool $doNotCache
-	 * @return TSuccessResult2|TErrorResult2|TNotFoundResult2|TUnauthorizedResult2
-     * @phpstan-ignore return.unresolvableType
-    */
-    public function getOutcomeResultsGroupedInCourse(CourseStub $course, array $users, bool $skipCache = false, bool $doNotCache = false) : mixed{
-        $value = $this->innerProvider->getOutcomeResultsGroupedInCourse($course, $users, $skipCache, $doNotCache);
         return ($this->resultProcessor)($value);
     }
 

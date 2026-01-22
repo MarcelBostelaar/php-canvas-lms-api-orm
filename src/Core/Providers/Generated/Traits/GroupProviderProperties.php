@@ -21,11 +21,11 @@ use CanvasApiLibrary\Core\Models\GroupCategory;
 use CanvasApiLibrary\Core\Models\GroupCategoryStub;
 use CanvasApiLibrary\Core\Models\GroupStub;
 use CanvasApiLibrary\Core\Models\Outcome;
-use CanvasApiLibrary\Core\Models\OutcomeGroup;
-use CanvasApiLibrary\Core\Models\OutcomeGroupStub;
 use CanvasApiLibrary\Core\Models\OutcomeResult;
 use CanvasApiLibrary\Core\Models\OutcomeResultStub;
 use CanvasApiLibrary\Core\Models\OutcomeStub;
+use CanvasApiLibrary\Core\Models\Outcomegroup;
+use CanvasApiLibrary\Core\Models\OutcomegroupStub;
 use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Models\SectionStub;
 use CanvasApiLibrary\Core\Models\Submission;
@@ -42,20 +42,24 @@ trait GroupProviderProperties{
     abstract public function getAllGroupsInGroupCategory(GroupCategoryStub $groupCategory, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     abstract public function populateGroup(GroupStub $group, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
-     * Summary of getAllGroupsInGroupCategories     * This is a plural version of getAllGroupsInGroupCategory      * @param GroupCategoryStub[] $groupCategories
+     * Summary of getAllGroupsInGroupCategories 
+     * This is a plural version of getAllGroupsInGroupCategory 
+      * @param GroupCategoryStub[] $groupCategories
  * @param bool $skipCache
  * @param bool $doNotCache
  * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<GroupCategoryStub, Group[]>>|UnauthorizedResult     */
     public function getAllGroupsInGroupCategories(array $groupCategories, bool $skipCache = false, bool $doNotCache = false): Lookup{
         $lookup = new Lookup();
         foreach($groupCategories as $x){
-            $lookup->add($x, $this->getAllGroupsInGroupCategory($x));
+            $lookup->add($x, $this->getAllGroupsInGroupCategory($x, $skipCache, $doNotCache));
         }
         return $lookup;
     }
     /**
      * Summary of populateGroups
+ 
      * This is a plural version of populateGroup
+ 
 	 * @param GroupStub[] $groups
 	 * @param bool $skipCache
 	 * @param bool $doNotCache

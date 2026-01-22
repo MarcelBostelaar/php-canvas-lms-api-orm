@@ -17,11 +17,11 @@ use CanvasApiLibrary\Core\Models\GroupCategory;
 use CanvasApiLibrary\Core\Models\GroupCategoryStub;
 use CanvasApiLibrary\Core\Models\GroupStub;
 use CanvasApiLibrary\Core\Models\Outcome;
-use CanvasApiLibrary\Core\Models\OutcomeGroup;
-use CanvasApiLibrary\Core\Models\OutcomeGroupStub;
 use CanvasApiLibrary\Core\Models\OutcomeResult;
 use CanvasApiLibrary\Core\Models\OutcomeResultStub;
 use CanvasApiLibrary\Core\Models\OutcomeStub;
+use CanvasApiLibrary\Core\Models\Outcomegroup;
+use CanvasApiLibrary\Core\Models\OutcomegroupStub;
 use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Models\SectionStub;
 use CanvasApiLibrary\Core\Models\Submission;
@@ -38,7 +38,7 @@ use CanvasApiLibrary\Core\Models\UserStub;
  * @template TNotFoundResult Type of value that a not found result will emit
  * @template TErrorResult Type of value that any other error result will emit
  */
-interface OutcomeGroupProviderInterface extends HandleEmittedInterface{
+interface OutcomegroupProviderInterface extends HandleEmittedInterface{
 
     public function getClientID(): string;
 
@@ -49,9 +49,36 @@ interface OutcomeGroupProviderInterface extends HandleEmittedInterface{
      * @template newNotFoundT
      * @template newErrorT
      * @param Closure(TSuccessResult|TErrorResult|TNotFoundResult|TUnauthorizedResult) : (newSuccessT|newErrorT|newNotFoundT|newUnauthorizedT) $processor
-     * @return OutcomeGroupProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
+     * @return OutcomegroupProviderInterface<newSuccessT,newErrorT,newNotFoundT,newUnauthorizedT>
      */
-    public function handleResults(Closure $processor): OutcomeGroupProviderInterface;
+    public function handleResults(Closure $processor): OutcomegroupProviderInterface;
+    /**
+	 * @param OutcomegroupStub[] $outcomes
+	 * @param bool $skipCache
+	 * @param bool $doNotCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Outcomegroup[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function populateOutcomesgroup(array $outcomes, bool $skipCache = false, bool $doNotCache = false) : mixed;
+
+    /**
+	 * @param OutcomegroupStub[] $outcomegroups
+	 * @param bool $skipCache
+	 * @param bool $doNotCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Outcomegroup[]>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function populateOutcomegroups(array $outcomegroups, bool $skipCache = false, bool $doNotCache = false) : mixed;
+
+    /**
+	 * @param CourseStub[] $courses
+	 * @param bool $skipCache
+	 * @param bool $doNotCache
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<CourseStub, Outcomegroup[]>>|TUnauthorizedResult
+     * @phpstan-ignore return.unresolvableType
+    */
+    public function getOutcomegroupsInCourses(array $courses, bool $skipCache = false, bool $doNotCache = false) : mixed;
+
     /**
 	 * @param OutcomegroupStub $outcomeGroup
 	 * @param bool $skipCache

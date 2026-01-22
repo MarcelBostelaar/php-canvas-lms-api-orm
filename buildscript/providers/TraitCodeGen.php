@@ -69,8 +69,8 @@ function generatePopulator(MethodDefinition $method) {
     $tailParamString = implode(', ', array_map(fn($p) => ' $' . $p->name, $tailParams));
     ?>
     /**
-     * Summary of <?=$method->name . "\n"?>
-     * This is a plural version of <?=$method->pluralVariantOf->name . "\n"?>
+     * Summary of <?=$method->name . "\n"?> 
+     * This is a plural version of <?=$method->pluralVariantOf->name . "\n"?> 
 <?=$method->createDocstringParamsAndReturn(1) . "\n"?>
      */
     public function <?=$method->name?>(<?=$method->paramString()?>): <?= $method->returnType->codeString() ?> {
@@ -113,6 +113,16 @@ function generateMultiMethod(MethodDefinition $method) {
         throw new Exception("Method is not of type GetItemsForMultiple: " . $method->name);
     }
 
+    //make new param string but replace relevant param with $x
+    $processedParams = array_map(function(MethodParameter $p) use ($method){
+        if($p->name === $method->metadata['relevantParam']){
+            return '$x';
+        }
+        return '$' . $p->name;
+    }, $method->parameters);
+    $processedParamsAsString = implode(', ', $processedParams);
+
+    $paramString = array_map(fn(MethodParameter $p) => $p->name, $method->parameters);
     $relevantParam = array_filter($method->parameters, fn(MethodParameter $p) => $p->name === $method->metadata['relevantParam']);
 
     if(count($relevantParam) !== 1){
@@ -122,14 +132,14 @@ function generateMultiMethod(MethodDefinition $method) {
 
     ?>
     /**
-     * Summary of <?=$method->name?>
-     * This is a plural version of <?=$method->pluralVariantOf->name?>
+     * Summary of <?=$method->name?> 
+     * This is a plural version of <?=$method->pluralVariantOf->name?> 
      <?=$method->createDocstringParamsAndReturn()?>
      */
     public function <?=$method->name?>(<?=$method->paramString()?>): Lookup{
         $lookup = new Lookup();
         foreach($<?=$relevantParam->name?> as $x){
-            $lookup->add($x, $this-><?=$method->pluralVariantOf->name?>($x));
+            $lookup->add($x, $this-><?=$method->pluralVariantOf->name?>(<?=$processedParamsAsString?>));
         }
         return $lookup;
     }
