@@ -33,7 +33,7 @@ trait SubmissionProperties{
                 return null;
             }
             $item = new SectionStub();
-            $item->newFromMinimumDataRepresentation($this->section_identity, $this->getContext());
+            $item = $item->newFromMinimumDataRepresentation($this->section_identity, $this->getContext());
             return $item;
         }
         set (?SectionStub $value) {

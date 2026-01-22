@@ -33,7 +33,7 @@ trait OutcomegroupProperties{
                 return null;
             }
             $item = new OutcomegroupStub();
-            $item->newFromMinimumDataRepresentation($this->parent_outcome_group_identity, $this->getContext());
+            $item = $item->newFromMinimumDataRepresentation($this->parent_outcome_group_identity, $this->getContext());
             return $item;
         }
         set (?OutcomegroupStub $value) {
