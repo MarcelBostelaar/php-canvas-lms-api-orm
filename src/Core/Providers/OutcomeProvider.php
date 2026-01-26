@@ -33,7 +33,6 @@ class OutcomeProvider extends AbstractProvider implements OutcomeProviderInterfa
         parent::__construct( $canvasCommunicator,
         (new ModelPopulationConfigBuilder(Outcome::class))
         ->keyCopy("title")
-        ->keyCopy("url")
         ->keyCopy("description")->nullable()
         ->keyCopy("points_possible")
         ->keyCopy("mastery_points")
@@ -51,9 +50,7 @@ class OutcomeProvider extends AbstractProvider implements OutcomeProviderInterfa
      * @return ErrorResult|NotFoundResult|SuccessResult<Outcome>|UnauthorizedResult
      */
     public function populateOutcome(OutcomeStub $outcome, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
-        //use the url and domain to directly fetch the outcome group, so we don't have to know the context
-        $url = $outcome->url;
-        return $this->Get($url, $outcome->getContext());
+        return $this->Get("outcomes/" . $outcome->id, $outcome->getContext());
     }
 
     /**
