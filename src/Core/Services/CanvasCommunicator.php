@@ -127,7 +127,8 @@ class CanvasCommunicator{
                 throw new \Exception("Unexpected data structure when handling pagination for URL $url");
             }
             $data = $data[$topKey];
-            [$additionalData, $additionalStatus] = self::curlGet($nextURLHandler->nextURL, $apiKey)[$topKey];
+            [$additionalData, $additionalStatus] = self::curlGet($nextURLHandler->nextURL, $apiKey);
+            $additionalData = $additionalData[$topKey];
             $data = array_merge($data, $additionalData);
             $data = [$topKey => $data];
         }
