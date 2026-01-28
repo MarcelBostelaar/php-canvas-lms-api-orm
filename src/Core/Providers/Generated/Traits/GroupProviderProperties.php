@@ -47,7 +47,7 @@ trait GroupProviderProperties{
       * @param GroupCategoryStub[] $groupCategories
  * @param bool $skipCache
  * @param bool $doNotCache
- * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<GroupCategoryStub, Group[]>>|UnauthorizedResult     */
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<GroupCategoryStub, Group>>|UnauthorizedResult     */
     public function getAllGroupsInGroupCategories(array $groupCategories, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($groupCategories as $x){
@@ -55,7 +55,9 @@ trait GroupProviderProperties{
             if(!$result instanceof SuccessResult){
                 return $result;
             }
-            $lookup->add($x, $result->value);
+            foreach($result->value as $y){
+                $lookup->add($x, $y);
+            }
         }
         return new SuccessResult($lookup);
     }

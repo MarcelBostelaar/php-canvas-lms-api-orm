@@ -374,7 +374,7 @@ class MethodDefinition {
                         if($typeDef->type === 'SuccessResult'){
 
                             $pluralSubtype = clone $typeDef->genericParameters[0];
-                            $pluralSubtype->isArrayVariant = true;
+                            $pluralSubtype->isArrayVariant = false;
 
                             return new GenericTypeDefinition(
                                 'SuccessResult',

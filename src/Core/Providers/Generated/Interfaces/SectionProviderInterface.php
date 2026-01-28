@@ -56,7 +56,7 @@ interface SectionProviderInterface extends HandleEmittedInterface{
 	 * @param CourseStub[] $courses
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<CourseStub, Section[]>>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<CourseStub, Section>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
     public function getAllSectionsInCourses(array $courses, bool $skipCache = false, bool $doNotCache = false) : mixed;

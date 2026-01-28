@@ -57,7 +57,7 @@ interface SubmissionProviderInterface extends HandleEmittedInterface{
 	 * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<AssignmentStub, Submission[]>>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<AssignmentStub, Submission>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
     public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false, bool $doNotCache = false) : mixed;

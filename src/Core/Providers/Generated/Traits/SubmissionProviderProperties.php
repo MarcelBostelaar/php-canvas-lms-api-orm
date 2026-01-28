@@ -48,7 +48,7 @@ trait SubmissionProviderProperties{
  * @param ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider
  * @param bool $skipCache
  * @param bool $doNotCache
- * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<AssignmentStub, Submission[]>>|UnauthorizedResult     */
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<AssignmentStub, Submission>>|UnauthorizedResult     */
     public function getSubmissionsInAssignments(array $assignments, ?CanvasApiLibrary\Core\Providers\Interfaces\UserProviderInterface $userProvider, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($assignments as $x){
@@ -56,7 +56,9 @@ trait SubmissionProviderProperties{
             if(!$result instanceof SuccessResult){
                 return $result;
             }
-            $lookup->add($x, $result->value);
+            foreach($result->value as $y){
+                $lookup->add($x, $y);
+            }
         }
         return new SuccessResult($lookup);
     }

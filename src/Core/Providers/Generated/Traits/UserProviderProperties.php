@@ -49,7 +49,7 @@ trait UserProviderProperties{
       * @param GroupStub[] $groups
  * @param bool $skipCache
  * @param bool $doNotCache
- * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<GroupStub, User[]>>|UnauthorizedResult     */
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<GroupStub, User>>|UnauthorizedResult     */
     public function getUsersInGroups(array $groups, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($groups as $x){
@@ -57,7 +57,9 @@ trait UserProviderProperties{
             if(!$result instanceof SuccessResult){
                 return $result;
             }
-            $lookup->add($x, $result->value);
+            foreach($result->value as $y){
+                $lookup->add($x, $y);
+            }
         }
         return new SuccessResult($lookup);
     }
@@ -68,7 +70,7 @@ trait UserProviderProperties{
  * @param ?string $enrollmentRoleFilter
  * @param bool $skipCache
  * @param bool $doNotCache
- * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<SectionStub, User[]>>|UnauthorizedResult     */
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<SectionStub, User>>|UnauthorizedResult     */
     public function getUsersInSections(array $sections, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($sections as $x){
@@ -76,7 +78,9 @@ trait UserProviderProperties{
             if(!$result instanceof SuccessResult){
                 return $result;
             }
-            $lookup->add($x, $result->value);
+            foreach($result->value as $y){
+                $lookup->add($x, $y);
+            }
         }
         return new SuccessResult($lookup);
     }
@@ -87,7 +91,7 @@ trait UserProviderProperties{
  * @param ?string $enrollmentRoleFilter
  * @param bool $skipCache
  * @param bool $doNotCache
- * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<CourseStub, User[]>>|UnauthorizedResult     */
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<CourseStub, User>>|UnauthorizedResult     */
     public function getUsersInCourses(array $courses, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($courses as $x){
@@ -95,7 +99,9 @@ trait UserProviderProperties{
             if(!$result instanceof SuccessResult){
                 return $result;
             }
-            $lookup->add($x, $result->value);
+            foreach($result->value as $y){
+                $lookup->add($x, $y);
+            }
         }
         return new SuccessResult($lookup);
     }

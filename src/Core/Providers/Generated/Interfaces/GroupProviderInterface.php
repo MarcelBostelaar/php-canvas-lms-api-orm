@@ -56,7 +56,7 @@ interface GroupProviderInterface extends HandleEmittedInterface{
 	 * @param GroupCategoryStub[] $groupCategories
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<GroupCategoryStub, Group[]>>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<GroupCategoryStub, Group>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
     public function getAllGroupsInGroupCategories(array $groupCategories, bool $skipCache = false, bool $doNotCache = false) : mixed;

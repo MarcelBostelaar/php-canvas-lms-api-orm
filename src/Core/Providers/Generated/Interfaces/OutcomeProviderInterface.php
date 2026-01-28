@@ -65,7 +65,7 @@ interface OutcomeProviderInterface extends HandleEmittedInterface{
 	 * @param OutcomegroupStub[] $outcomegroups
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<OutcomegroupStub, Outcome[]>>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<OutcomegroupStub, Outcome>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
     public function getOutcomesInOutcomegroups(array $outcomegroups, bool $skipCache = false, bool $doNotCache = false) : mixed;

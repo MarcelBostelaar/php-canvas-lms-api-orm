@@ -56,7 +56,7 @@ interface UserProviderInterface extends HandleEmittedInterface{
 	 * @param GroupStub[] $groups
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<GroupStub, User[]>>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<GroupStub, User>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
     public function getUsersInGroups(array $groups, bool $skipCache = false, bool $doNotCache = false) : mixed;
@@ -66,7 +66,7 @@ interface UserProviderInterface extends HandleEmittedInterface{
 	 * @param ?string $enrollmentRoleFilter
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<SectionStub, User[]>>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<SectionStub, User>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
     public function getUsersInSections(array $sections, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false) : mixed;
@@ -76,7 +76,7 @@ interface UserProviderInterface extends HandleEmittedInterface{
 	 * @param ?string $enrollmentRoleFilter
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<CourseStub, User[]>>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<CourseStub, User>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
     public function getUsersInCourses(array $courses, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false) : mixed;

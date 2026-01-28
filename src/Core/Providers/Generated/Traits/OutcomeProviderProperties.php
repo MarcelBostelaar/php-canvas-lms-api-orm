@@ -68,7 +68,7 @@ trait OutcomeProviderProperties{
       * @param OutcomegroupStub[] $outcomegroups
  * @param bool $skipCache
  * @param bool $doNotCache
- * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<OutcomegroupStub, Outcome[]>>|UnauthorizedResult     */
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<OutcomegroupStub, Outcome>>|UnauthorizedResult     */
     public function getOutcomesInOutcomegroups(array $outcomegroups, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($outcomegroups as $x){
@@ -76,7 +76,9 @@ trait OutcomeProviderProperties{
             if(!$result instanceof SuccessResult){
                 return $result;
             }
-            $lookup->add($x, $result->value);
+            foreach($result->value as $y){
+                $lookup->add($x, $y);
+            }
         }
         return new SuccessResult($lookup);
     }

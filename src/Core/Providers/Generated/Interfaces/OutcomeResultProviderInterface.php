@@ -57,7 +57,7 @@ interface OutcomeResultProviderInterface extends HandleEmittedInterface{
 	 * @param array $users
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<CourseStub, OutcomeResult[]>>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<CourseStub, OutcomeResult>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
     public function getOutcomeResultsInCourses(array $courses, array $users, bool $skipCache = false, bool $doNotCache = false) : mixed;
