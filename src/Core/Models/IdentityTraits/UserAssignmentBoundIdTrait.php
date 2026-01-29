@@ -28,4 +28,10 @@ trait UserAssignmentBoundIdTrait{
         $this->initializeUserIdentity();
         $this->initializeAssignmentIdentity();
     }
+    public function isRegularModel() : bool{
+        return true;
+    }
+    public function isUrlModel() : bool{
+        return false;
+    }
 }

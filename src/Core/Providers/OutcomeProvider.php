@@ -33,8 +33,7 @@ class OutcomeProvider extends AbstractProvider implements OutcomeProviderInterfa
         parent::__construct( $canvasCommunicator,
         (new ModelPopulationConfigBuilder(Outcome::class))
         ->keyCopy("title")
-        ->keyCopy("url")
-        ->keyCopy("description")
+        ->keyCopy("description")->nullable()
         ->keyCopy("points_possible")
         ->keyCopy("mastery_points")
         ->keyCopy("calculation_method")
@@ -51,9 +50,7 @@ class OutcomeProvider extends AbstractProvider implements OutcomeProviderInterfa
      * @return ErrorResult|NotFoundResult|SuccessResult<Outcome>|UnauthorizedResult
      */
     public function populateOutcome(OutcomeStub $outcome, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult{
-        //use the url and domain to directly fetch the outcome group, so we don't have to know the context
-        $url = $outcome->url;
-        return $this->Get($url, $outcome->getContext());
+        return $this->Get("outcomes/" . $outcome->id, $outcome->getContext());
     }
 
     /**
@@ -63,9 +60,13 @@ class OutcomeProvider extends AbstractProvider implements OutcomeProviderInterfa
      * @param bool $doNotCache
      * @return ErrorResult|NotFoundResult|SuccessResult<Outcome[]>|UnauthorizedResult
      */
-    public function getOutcomesInOutcomeGroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
+    public function getOutcomesInOutcomegroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false): ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult {
         //Contains its own url, so we use that
-        $url = $outcomeGroup->outcomes_url;
-        return $this->GetMany($url, $outcomeGroup->getContext());
+        $url = $outcomeGroup->outcomes_url . "?outcome_style=full";
+        return $this->GetMany($url, 
+        $outcomeGroup->getContext(),
+        null,
+        fn($x) => array_map(fn($y) => $y['outcome'], $x)
+        );
     }
 }

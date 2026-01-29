@@ -38,4 +38,8 @@ class Lookup {
             $this->add($keyFuncFromValue($value), $value);
         }
     }
+
+    public function getAll(): array {
+        return array_merge(...array_values($this->map));
+    }
 }

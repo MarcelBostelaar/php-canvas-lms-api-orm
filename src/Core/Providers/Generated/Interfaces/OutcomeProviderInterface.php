@@ -17,11 +17,11 @@ use CanvasApiLibrary\Core\Models\GroupCategory;
 use CanvasApiLibrary\Core\Models\GroupCategoryStub;
 use CanvasApiLibrary\Core\Models\GroupStub;
 use CanvasApiLibrary\Core\Models\Outcome;
-use CanvasApiLibrary\Core\Models\OutcomeGroup;
-use CanvasApiLibrary\Core\Models\OutcomeGroupStub;
 use CanvasApiLibrary\Core\Models\OutcomeResult;
 use CanvasApiLibrary\Core\Models\OutcomeResultStub;
 use CanvasApiLibrary\Core\Models\OutcomeStub;
+use CanvasApiLibrary\Core\Models\Outcomegroup;
+use CanvasApiLibrary\Core\Models\OutcomegroupStub;
 use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Models\SectionStub;
 use CanvasApiLibrary\Core\Models\Submission;
@@ -65,7 +65,7 @@ interface OutcomeProviderInterface extends HandleEmittedInterface{
 	 * @param OutcomegroupStub[] $outcomegroups
 	 * @param bool $skipCache
 	 * @param bool $doNotCache
-	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<OutcomegroupStub, Outcome[]>>|TUnauthorizedResult
+	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Lookup<OutcomegroupStub, Outcome>>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
     public function getOutcomesInOutcomegroups(array $outcomegroups, bool $skipCache = false, bool $doNotCache = false) : mixed;
@@ -86,6 +86,6 @@ interface OutcomeProviderInterface extends HandleEmittedInterface{
 	 * @return TErrorResult|TNotFoundResult|TSuccessResult<Outcome[]>|TUnauthorizedResult
      * @phpstan-ignore return.unresolvableType
     */
-    public function getOutcomesInOutcomeGroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false) : mixed;
+    public function getOutcomesInOutcomegroup(OutcomegroupStub $outcomeGroup, bool $skipCache = false, bool $doNotCache = false) : mixed;
 
 }

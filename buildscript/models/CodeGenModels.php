@@ -58,7 +58,7 @@ function NullableModelGetter($modelname, $propertyIdName){?>
                 return null;
             }
             $item = new <?=$modelname?>();
-            $item->newFromMinimumDataRepresentation($this-><?=$propertyIdName?>, $this->getContext());
+            $item = $item->newFromMinimumDataRepresentation($this-><?=$propertyIdName?>, $this->getContext());
             return $item;
         }
 <?php

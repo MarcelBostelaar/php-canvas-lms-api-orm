@@ -37,9 +37,12 @@ class OutcomeResultProvider extends AbstractProvider implements OutcomeResultPro
         (new ModelPopulationConfigBuilder(OutcomeResult::class))
         ->keyCopy("score")
         ->keyCopy("submitted_or_assessed_at")->asDateTime()
-        ->keyCopy("learning_outcome")->asModel(OutcomeStub::class)
         ->from("links")
-            ->processAnyValue(fn($x) => $x["user"])
+            ->processAnyValue(fn($x) => (int)$x["learning_outcome"])
+            ->to("learning_outcome")
+            ->asModel(OutcomeStub::class)
+        ->from("links")
+            ->processAnyValue(fn($x) => (int)$x["user"])
             ->to("user")
             ->asModel(UserStub::class)
         ,$clientIDProvider
@@ -60,7 +63,9 @@ class OutcomeResultProvider extends AbstractProvider implements OutcomeResultPro
         $params .= implode("&", $userIDs);
         return $this->GetMany(
             "courses/{$course->id}/outcome_results" . (empty($params) ? "" : "?" . $params),
-            $course->getContext()
+            $course->getContext(),
+            null,
+            fn($x) => $x["outcome_results"]
         );
     }
 }

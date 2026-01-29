@@ -77,17 +77,22 @@ abstract class AbstractProvider implements HandleEmittedInterface{
     * @return SuccessResult<ModelT[]>|UnauthorizedResult|NotFoundResult|ErrorResult
     */
     protected function GetMany(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null, ?callable $postProcessor = null): SuccessResult|UnauthorizedResult|NotFoundResult|ErrorResult{
-        [$data, $status, $builder] = $this->GetInternal($route, $context, $customBuilder);
-        if($postProcessor){
-            $data = $postProcessor($data);
-        }
+       try{
+            [$data, $status, $builder] = $this->GetInternal($route, $context, $customBuilder);
+            if($postProcessor){
+                $data = $postProcessor($data);
+            }
 
-        return match($status){
-            CanvasReturnStatus::SUCCESS => new SuccessResult($builder->buildMany($data, ...$context)),
-            CanvasReturnStatus::UNAUTHORIZED => new UnauthorizedResult(),
-            CanvasReturnStatus::NOT_FOUND => new NotFoundResult(),
-            default => new ErrorResult(),
-        };
+            return match($status){
+                CanvasReturnStatus::SUCCESS => new SuccessResult($builder->buildMany($data, ...$context)),
+                CanvasReturnStatus::UNAUTHORIZED => new UnauthorizedResult(),
+                CanvasReturnStatus::NOT_FOUND => new NotFoundResult(),
+                default => new ErrorResult(),
+            };
+       } 
+         catch(Exception $ex){
+                return new ErrorResult([$ex->getMessage() . " " . $ex->getTraceAsString()]);
+         }
     }
 
     /**
@@ -95,16 +100,20 @@ abstract class AbstractProvider implements HandleEmittedInterface{
      * @return SuccessResult<ModelT>|UnauthorizedResult|NotFoundResult|ErrorResult
      */
     protected function Get(string $route, array $context, ?ModelPopulationConfigBuilder $customBuilder = null, ?callable $postProcessor = null): SuccessResult|UnauthorizedResult|NotFoundResult|ErrorResult{
-        [$data, $status, $builder] = $this->GetInternal($route, $context, $customBuilder);
-        if($postProcessor){
-            $data = array_map($postProcessor, $data);
-        }
+        try{
+            [$data, $status, $builder] = $this->GetInternal($route, $context, $customBuilder);
+            if($postProcessor){
+                $data = array_map($postProcessor, $data);
+            }
 
-        return match($status){
-            CanvasReturnStatus::SUCCESS => new SuccessResult($builder->build($data, ...$context)),
-            CanvasReturnStatus::UNAUTHORIZED => new UnauthorizedResult(),
-            CanvasReturnStatus::NOT_FOUND => new NotFoundResult(),
-            default => new ErrorResult(),
-        };
+            return match($status){
+                CanvasReturnStatus::SUCCESS => new SuccessResult($builder->build($data, ...$context)),
+                CanvasReturnStatus::UNAUTHORIZED => new UnauthorizedResult(),
+                CanvasReturnStatus::NOT_FOUND => new NotFoundResult(),
+                default => new ErrorResult(),
+            };
+        } catch(Exception $ex){
+            return new ErrorResult([$ex->getMessage() . " " . $ex->getTraceAsString()]);
+        }
     }
 }

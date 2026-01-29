@@ -7,6 +7,7 @@ namespace CanvasApiLibrary\Core\Providers\Utility\Results;
  */
 class SuccessResult
 {
+    use ResultMonadTrait;
     /**
      * @param TValue $value
      */

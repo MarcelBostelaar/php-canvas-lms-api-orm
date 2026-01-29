@@ -21,11 +21,11 @@ use CanvasApiLibrary\Core\Models\GroupCategory;
 use CanvasApiLibrary\Core\Models\GroupCategoryStub;
 use CanvasApiLibrary\Core\Models\GroupStub;
 use CanvasApiLibrary\Core\Models\Outcome;
-use CanvasApiLibrary\Core\Models\OutcomeGroup;
-use CanvasApiLibrary\Core\Models\OutcomeGroupStub;
 use CanvasApiLibrary\Core\Models\OutcomeResult;
 use CanvasApiLibrary\Core\Models\OutcomeResultStub;
 use CanvasApiLibrary\Core\Models\OutcomeStub;
+use CanvasApiLibrary\Core\Models\Outcomegroup;
+use CanvasApiLibrary\Core\Models\OutcomegroupStub;
 use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Models\SectionStub;
 use CanvasApiLibrary\Core\Models\Submission;
@@ -44,46 +44,72 @@ trait UserProviderProperties{
     abstract public function getUsersInCourse(CourseStub $course, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     abstract public function populateUser(UserStub $user, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
-     * Summary of getUsersInGroups     * This is a plural version of getUsersInGroup      * @param GroupStub[] $groups
+     * Summary of getUsersInGroups 
+     * This is a plural version of getUsersInGroup 
+      * @param GroupStub[] $groups
  * @param bool $skipCache
  * @param bool $doNotCache
- * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<GroupStub, User[]>>|UnauthorizedResult     */
-    public function getUsersInGroups(array $groups, bool $skipCache = false, bool $doNotCache = false): Lookup{
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<GroupStub, User>>|UnauthorizedResult     */
+    public function getUsersInGroups(array $groups, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($groups as $x){
-            $lookup->add($x, $this->getUsersInGroup($x));
+            $result = $this->getUsersInGroup($x, $skipCache, $doNotCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            foreach($result->value as $y){
+                $lookup->add($x, $y);
+            }
         }
-        return $lookup;
+        return new SuccessResult($lookup);
     }
     /**
-     * Summary of getUsersInSections     * This is a plural version of getUsersInSection      * @param SectionStub[] $sections
+     * Summary of getUsersInSections 
+     * This is a plural version of getUsersInSection 
+      * @param SectionStub[] $sections
  * @param ?string $enrollmentRoleFilter
  * @param bool $skipCache
  * @param bool $doNotCache
- * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<SectionStub, User[]>>|UnauthorizedResult     */
-    public function getUsersInSections(array $sections, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false): Lookup{
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<SectionStub, User>>|UnauthorizedResult     */
+    public function getUsersInSections(array $sections, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($sections as $x){
-            $lookup->add($x, $this->getUsersInSection($x));
+            $result = $this->getUsersInSection($x, $enrollmentRoleFilter, $skipCache, $doNotCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            foreach($result->value as $y){
+                $lookup->add($x, $y);
+            }
         }
-        return $lookup;
+        return new SuccessResult($lookup);
     }
     /**
-     * Summary of getUsersInCourses     * This is a plural version of getUsersInCourse      * @param CourseStub[] $courses
+     * Summary of getUsersInCourses 
+     * This is a plural version of getUsersInCourse 
+      * @param CourseStub[] $courses
  * @param ?string $enrollmentRoleFilter
  * @param bool $skipCache
  * @param bool $doNotCache
- * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<CourseStub, User[]>>|UnauthorizedResult     */
-    public function getUsersInCourses(array $courses, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false): Lookup{
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<CourseStub, User>>|UnauthorizedResult     */
+    public function getUsersInCourses(array $courses, ?string $enrollmentRoleFilter, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($courses as $x){
-            $lookup->add($x, $this->getUsersInCourse($x));
+            $result = $this->getUsersInCourse($x, $enrollmentRoleFilter, $skipCache, $doNotCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            foreach($result->value as $y){
+                $lookup->add($x, $y);
+            }
         }
-        return $lookup;
+        return new SuccessResult($lookup);
     }
     /**
      * Summary of populateUsers
+ 
      * This is a plural version of populateUser
+ 
 	 * @param UserStub[] $users
 	 * @param bool $skipCache
 	 * @param bool $doNotCache

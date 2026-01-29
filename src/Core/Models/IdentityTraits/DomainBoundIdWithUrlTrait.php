@@ -21,4 +21,10 @@ trait DomainBoundIdWithUrlTrait{
         $this->initializeDomainIdentity();
         $this->initializeUrlIdentity();
     }
+    public function isRegularModel() : bool{
+        return false;
+    }
+    public function isUrlModel() : bool{
+        return true;
+    }
 }

@@ -32,7 +32,8 @@
 
 [x] Fix provider trait generation not working anymore
 
-[] fix codegen for plural versions to also pass plurals to subtype
+[x] fix codegen for plural versions to also pass plurals to subtype
+[x] Remove url from outcome, can be directly accessed via /api/v1/outcomes/:id. Not true for outcome groups (somehow)
 [] Look alle core providers door en kijk waar je de requests kan verbeteren door b.v. meer results per pagina te vragen.
 [] Add rubric model
 [] Add rubric assessment model

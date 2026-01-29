@@ -2,11 +2,12 @@
 
 namespace CanvasApiLibrary\Core\Models;
 use CanvasApiLibrary\Core\Models\Generated\OutcomeStubProperties;
+use CanvasApiLibrary\Core\Models\IdentityTraits\DomainBoundIdTrait;
 use CanvasApiLibrary\Core\Models\IdentityTraits\DomainBoundIdWithUrlTrait;
 use CanvasApiLibrary\Core\Models\Utility\AbstractCanvasPopulatedModel;
 
 class OutcomeStub extends AbstractCanvasPopulatedModel{
-    use DomainBoundIdWithUrlTrait;
+    use DomainBoundIdTrait;
     use OutcomeStubProperties;
     protected static array $properties = [
     ];

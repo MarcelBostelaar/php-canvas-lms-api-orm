@@ -8,11 +8,11 @@ final class Outcomegroup extends OutcomegroupStub{
     public static array $plurals = ["Outcomegroups"];
 
     protected static array $properties = [
-        ["string", "title"],
-        ["string", "description"]
+        ["string", "title"]
     ];
     protected static array $nullableProperties = [
-        [OutcomegroupStub::class, "parent_outcome_group"]
+        [OutcomegroupStub::class, "parent_outcome_group"],
+        ["string", "description"]
     ];
 
     protected function getClassName(): string{

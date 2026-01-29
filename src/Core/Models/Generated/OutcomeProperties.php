@@ -16,15 +16,6 @@ trait OutcomeProperties{
         }
     }
 
-    public string $description{
-        get {
-            return $this->description;
-        }
-        set(string $value) {
-            $this->description = $value;
-        }
-    }
-
     public int $points_possible{
         get {
             return $this->points_possible;
@@ -58,6 +49,15 @@ trait OutcomeProperties{
         }
         set(?int $value) {
             $this->calculation_int = $value;
+        }
+    }
+
+    public ?string $description{
+        get {
+            return $this->description;
+        }
+        set(?string $value) {
+            $this->description = $value;
         }
     }
 

@@ -45,12 +45,29 @@ class CanvasCommunicator{
         return self::combineUrls("$head/$head2", ...$elements);
     }
 
+    protected function fixURL(string $route, Domain $domain) : string{
+        //split into parts:
+        $route = ltrim($route, "/");
+        //replace api/v1 is if it is at the start of route or end of domain
+        if(str_starts_with($route, "api/v1")){
+            $route = substr($route, 6);
+        }
+        $route = ltrim($route, "/");
+
+        $domainstr = rtrim($domain->domain, "/");
+        if(str_ends_with($domainstr, "api/v1")){
+            $domainstr = substr($domainstr, 0, -6);
+        }
+        $domainstr = rtrim($domainstr, "/");
+        return self::combineUrls($domainstr, "api/v1", $route);
+    }
+
     public function Get(string $route, Domain $domain) : array{
-        return self::curlGet(self::combineUrls($domain->domain, $route), $this->apiKey);
+        return $this::curlGet($this->fixURL($route, $domain), $this->apiKey);
     }
 
     public function Put(string $route, Domain $domain, mixed $data) : array{
-        return self::curlPut(self::combineUrls($domain->domain, $route), $this->apiKey, $data);
+        return $this::curlPut($this->fixURL($route, $domain), $this->apiKey, $data);
     }
 
     //Static cURL calls
@@ -110,7 +127,8 @@ class CanvasCommunicator{
                 throw new \Exception("Unexpected data structure when handling pagination for URL $url");
             }
             $data = $data[$topKey];
-            [$additionalData, $additionalStatus] = self::curlGet($nextURLHandler->nextURL, $apiKey)[$topKey];
+            [$additionalData, $additionalStatus] = self::curlGet($nextURLHandler->nextURL, $apiKey);
+            $additionalData = $additionalData[$topKey];
             $data = array_merge($data, $additionalData);
             $data = [$topKey => $data];
         }

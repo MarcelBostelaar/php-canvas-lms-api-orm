@@ -21,11 +21,11 @@ use CanvasApiLibrary\Core\Models\GroupCategory;
 use CanvasApiLibrary\Core\Models\GroupCategoryStub;
 use CanvasApiLibrary\Core\Models\GroupStub;
 use CanvasApiLibrary\Core\Models\Outcome;
-use CanvasApiLibrary\Core\Models\OutcomeGroup;
-use CanvasApiLibrary\Core\Models\OutcomeGroupStub;
 use CanvasApiLibrary\Core\Models\OutcomeResult;
 use CanvasApiLibrary\Core\Models\OutcomeResultStub;
 use CanvasApiLibrary\Core\Models\OutcomeStub;
+use CanvasApiLibrary\Core\Models\Outcomegroup;
+use CanvasApiLibrary\Core\Models\OutcomegroupStub;
 use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Models\SectionStub;
 use CanvasApiLibrary\Core\Models\Submission;
@@ -41,17 +41,25 @@ trait OutcomeResultProviderProperties{
     
     abstract public function getOutcomeResultsInCourse(CourseStub $course, array $users, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
-     * Summary of getOutcomeResultsInCourses     * This is a plural version of getOutcomeResultsInCourse      * @param CourseStub[] $courses
+     * Summary of getOutcomeResultsInCourses 
+     * This is a plural version of getOutcomeResultsInCourse 
+      * @param CourseStub[] $courses
  * @param array $users
  * @param bool $skipCache
  * @param bool $doNotCache
- * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<CourseStub, OutcomeResult[]>>|UnauthorizedResult     */
-    public function getOutcomeResultsInCourses(array $courses, array $users, bool $skipCache = false, bool $doNotCache = false): Lookup{
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<CourseStub, OutcomeResult>>|UnauthorizedResult     */
+    public function getOutcomeResultsInCourses(array $courses, array $users, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($courses as $x){
-            $lookup->add($x, $this->getOutcomeResultsInCourse($x));
+            $result = $this->getOutcomeResultsInCourse($x, $users, $skipCache, $doNotCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            foreach($result->value as $y){
+                $lookup->add($x, $y);
+            }
         }
-        return $lookup;
+        return new SuccessResult($lookup);
     }
 
 }

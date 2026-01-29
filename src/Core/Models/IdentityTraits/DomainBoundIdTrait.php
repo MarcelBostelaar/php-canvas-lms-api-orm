@@ -18,4 +18,10 @@ trait DomainBoundIdTrait{
         $this->initializeNumberIdentity();
         $this->initializeDomainIdentity();
     }
+    public function isRegularModel() : bool{
+        return true;
+    }
+    public function isUrlModel() : bool{
+        return false;
+    }
 }

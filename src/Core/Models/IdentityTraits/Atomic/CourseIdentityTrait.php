@@ -9,7 +9,7 @@ trait CourseIdentityTrait{
     protected mixed $course_identity;
     public CourseStub $course{
         get { 
-            return CourseStub::newFromMinimumDataRepresentation($this->course_identity, $this->getContext());
+            return CourseStub::newFromMinimumDataRepresentation($this->course_identity, []); //Course does not require additional info beyond its own minimum data representation. Getting context regularly causes infinite recursion.
         }
         set (CourseStub $value) {
             if(!isset($this->course_identity)){

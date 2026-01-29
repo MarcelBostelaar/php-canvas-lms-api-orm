@@ -33,12 +33,11 @@ class OutcomegroupProvider extends AbstractProvider implements OutcomegroupProvi
         (new ModelPopulationConfigBuilder(Outcomegroup::class))
         ->keyCopy("title")
         ->keyCopy("url")
-        ->keyCopy("description")
+        ->keyCopy("description")->nullable()
         ->keyCopy("subgroups_url")
         ->keyCopy("outcomes_url")
         ->keyCopy("parent_outcome_group")
             ->nullable()
-            ->processNonNullValue(fn($x) => $x["id"])
             ->asModel(OutcomegroupStub::class)
         ,$clientIDProvider
         );

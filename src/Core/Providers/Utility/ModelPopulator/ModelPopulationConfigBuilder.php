@@ -164,7 +164,16 @@ class ModelPopulationConfigBuilder{
      * @return ModelPopulationConfigBuilder
      */
     public function asModel($modelClass): ModelPopulationConfigBuilder{
-        return $this->addProcessor(new ProcessorModel($modelClass));
+        $testInstance = new $modelClass();
+        if($testInstance->isRegularModel()){
+            return $this->addProcessor(new ProcessorModel($modelClass));
+        }
+        elseif($testInstance->isUrlModel()){
+            return $this->addProcessor(new ProcessorUrlModel($modelClass));
+        }
+        else{
+            throw new LogicException("Tried to use asModel with a class that is neither a regular model nor a url model: $modelClass");
+        }
     }
 
     /**

@@ -21,11 +21,11 @@ use CanvasApiLibrary\Core\Models\GroupCategory;
 use CanvasApiLibrary\Core\Models\GroupCategoryStub;
 use CanvasApiLibrary\Core\Models\GroupStub;
 use CanvasApiLibrary\Core\Models\Outcome;
-use CanvasApiLibrary\Core\Models\OutcomeGroup;
-use CanvasApiLibrary\Core\Models\OutcomeGroupStub;
 use CanvasApiLibrary\Core\Models\OutcomeResult;
 use CanvasApiLibrary\Core\Models\OutcomeResultStub;
 use CanvasApiLibrary\Core\Models\OutcomeStub;
+use CanvasApiLibrary\Core\Models\Outcomegroup;
+use CanvasApiLibrary\Core\Models\OutcomegroupStub;
 use CanvasApiLibrary\Core\Models\Section;
 use CanvasApiLibrary\Core\Models\SectionStub;
 use CanvasApiLibrary\Core\Models\Submission;
@@ -41,16 +41,24 @@ trait CourseProviderProperties{
     
     abstract public function getAllCoursesInDomain(Domain $domain, bool $skipCache = false, bool $doNotCache = false) : ErrorResult|NotFoundResult|SuccessResult|UnauthorizedResult;
     /**
-     * Summary of getAllCoursesInDomains     * This is a plural version of getAllCoursesInDomain      * @param Domain[] $domains
+     * Summary of getAllCoursesInDomains 
+     * This is a plural version of getAllCoursesInDomain 
+      * @param Domain[] $domains
  * @param bool $skipCache
  * @param bool $doNotCache
- * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<Domain, Course[]>>|UnauthorizedResult     */
-    public function getAllCoursesInDomains(array $domains, bool $skipCache = false, bool $doNotCache = false): Lookup{
+ * @return ErrorResult|NotFoundResult|SuccessResult<Lookup<Domain, Course>>|UnauthorizedResult     */
+    public function getAllCoursesInDomains(array $domains, bool $skipCache = false, bool $doNotCache = false): SuccessResult|ErrorResult|NotFoundResult|UnauthorizedResult {
         $lookup = new Lookup();
         foreach($domains as $x){
-            $lookup->add($x, $this->getAllCoursesInDomain($x));
+            $result = $this->getAllCoursesInDomain($x, $skipCache, $doNotCache);
+            if(!$result instanceof SuccessResult){
+                return $result;
+            }
+            foreach($result->value as $y){
+                $lookup->add($x, $y);
+            }
         }
-        return $lookup;
+        return new SuccessResult($lookup);
     }
 
 }
