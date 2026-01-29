@@ -80,7 +80,7 @@ class UserProvider extends AbstractProvider implements UserProviderInterface{
         $section->getContext(), 
         $this->modelPopulator
         ->staticFrom($section->course)->to("optionalCourseContext"),
-        fn($item) => $item["user"],);
+        fn($item) => array_map(fn($x) => $x["user"], $item));
     }
 
     /**
